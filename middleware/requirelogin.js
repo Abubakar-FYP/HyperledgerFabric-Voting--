@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken')
-const {JWTKEY}  = require('../url/keys')
+const {JWTKEY}  = require('../Urls/keys')
 
 const mongoose = require('mongoose')//remember this format!!!
-require('../models/admin')
+require('../Models/admin')
 const Admin = mongoose.model('Admin')
 
 

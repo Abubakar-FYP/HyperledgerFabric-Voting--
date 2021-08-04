@@ -56,5 +56,8 @@ const voterSchema = new mongoose.Schema({
 	
 })  //all the data's hash will be created to login next time
 
-mongoose.model("Voter",voterSchema); //Voter model registered,
+global.Voter = global.Voter || mongoose.model("Voter",voterSchema) 
+module.exports = global.Voter
+
+//Voter model registered,
 //we also can export this model,but mongoose object stores it 

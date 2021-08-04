@@ -41,4 +41,5 @@ const voteSchema = new mongoose.Schema({
     
 })
 
-mongoose.model('Vote',voteSchema)
+global.Vote = global.Vote || mongoose.model("Vote",voteSchema) 
+module.exports = global.Vote

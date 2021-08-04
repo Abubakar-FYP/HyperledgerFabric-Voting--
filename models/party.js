@@ -20,4 +20,4 @@ const partySchema = new mongoose.Schema({
 
 })
 
-mongoose.model("Party",partySchema)
+mongoose.model("Party",partySchema)   

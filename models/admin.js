@@ -14,4 +14,5 @@ const adminSchema = mongoose.Schema({
 
 })
 
-mongoose.model("Admin",adminSchema)
+global.Admin = global.Admin || mongoose.model("Admin",adminSchema) 
+module.exports = global.Admin

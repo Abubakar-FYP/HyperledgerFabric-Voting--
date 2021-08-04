@@ -6,18 +6,12 @@
     const requireLogin = require('../middleware/requirelogin')
 
     require('../models/voter')
-    require('../models/candidate')
     require('../models/vote')
     require('../models/ballot')
 
     const Voter = mongoose.model('Voter') 
-    const Candidate = mongoose.model('Candidate')
     const Vote = mongoose.model('Vote')
     const Ballot = mongoose.model('Ballot')
-
-    router.get('/',(req,res)=>{
-        res.send('hi')
-    })
 
     router.post('/vote',(req,res)=>{    
         const {cnic} = req.body  //we get info from the session and req all info from the cnic session!!

@@ -3,26 +3,25 @@
     const router = express.Router()
     const mongoose = require('mongoose')
     const SHA256 = require('crypto-js/sha256')
-    const jwt = require('jsonwebtoken')
-    const {JWTKEY} = require('../url/keys')
-    const requireLogin = require('../middleware/requirelogin')
-    const otp = require('../middleware/otp')
-
-    require('../models/admin')
-    require('../models/voter')
-    require('../models/hash')
-    require('../models/candidate')
+    const path = require('path')
     
+    const jwt = require('jsonwebtoken')
+    const {JWTKEY} = require('../Urls/keys')
+    const requireLogin = require('../Middleware/requirelogin')
+    const otp = require('../Middleware/otp')
 
-
+    require('../Models/admin')
+    require('../Models/voter')
+    require('../Models/hash')
+    
     const Admin = mongoose.model('Admin')
     const Voter = mongoose.model('Voter') 
     const Hash = mongoose.model('Hash')
-    const Candidate = mongoose.model('Candidate')
+    router.use(express.urlencoded({extended:false})) //take form data and access them in our post method 
 
-    router.get('/protected',requireLogin,(req,res)=>{
-      res.send('this route is now protected')
-    }) 
+    router.post('/check',(req,res)=>{
+        res.send('check route')
+    })
 
     router.post('/signinadmin',requireLogin,(req,res)=>{
         
@@ -54,25 +53,37 @@
     
     })
 
-    router.post('/signupvoter',async (req,res,next)=>{
+    router.post('/signupvoter',async (req,res)=>{
     
-    const {cnic,phoneNumber} = await req.body
-    const response = await otp.bird("",phoneNumber,otp.otpGenerator())
-    
+    const {cnic,phoneNumber} = req.body
+
+    const otp4digit = otp.otpGenerator()
+
+    const response = await otp.bird("",phoneNumber,otp4digit) 
+    W
+    res.status(200).json({message:"request successfully made to OTP Manager"})
+
     if(!response){
-        res.status(400).json({})
+        res.status(400).json({message:"No response was given by OTP Manager"})
     }
 
-    if(!name||!email||!cnic||!phoneNumber||!age||!address||!gender ||!nationality){
-        return res.status(400).json({message:"one of the fields are empty"})
+    if(otp4digit != await req.body.otpNumber){
+        return res.status(400).json({message:"otp entered in the field does not match otp generated"})
     }
+
+    //render or redirect next page
+    //require post request(form data)
+
+    /////////// Updated Code ^//////////
+
+    if(!name||!email||!age||!address||!gender ||!nationality||!area||!street||!house){
+        return res.status(400).json({message:"one of the fields are empty"})
+    } //here we check all the input if their null
 
     if(age<18){
         res.json({message:"age is below required age"})
         return 
     }
-    
-    //here we will send otp to confirm first and wait for a specific time for a reply if not then we return simply
     
     const hash = SHA256(JSON.stringify(cnic)).toString()
 
@@ -83,24 +94,22 @@
         return 
         }
 
-            res.status(200)
-
-            //insert otp middleware,to confirm user by his/her number     
-
                 const voter = new Voter({
                     name,
                     email,
                     cnic,
                     phoneNumber,
                     age,
-                    address,
                     gender,
-                    nationality
+                    nationality,
+                    voteflag,
+                    ballotid,
+                    address
                 })
         
                 voter.save()
                 .then(voter=>{
-                    console.log('voter registered')
+                    res.status(200).json({message:'successfull voter'})
                 })
                 .catch(()=>{
                     res.json("there seems to be an error in generating the voter")
@@ -124,7 +133,7 @@
         .catch(err=>{
             console.log(err)
         })
-            //using otp send the hash password to their mobiles
+
     })
 
     router.post('/signinvoter',requireLogin,(req,res,next)=>{
