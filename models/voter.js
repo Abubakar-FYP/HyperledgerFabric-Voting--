@@ -49,12 +49,22 @@ const voterSchema = new mongoose.Schema({
 		default:0000
 	}, //this will be randomly assigned upon when
 
-	address:{
+	area:{
 		type:String,
 		required:true
-	 }, //address is divided into area,street,house
-	
-})  //all the data's hash will be created to login next time
+	 },
+	 
+	street:{
+		type:String,
+		required:true
+	 },
+
+	house:{
+		type:String,
+		required:true
+	},
+
+})  //all the data's hash will be created to login next time*
 
 global.Voter = global.Voter || mongoose.model("Voter",voterSchema) 
 module.exports = global.Voter
