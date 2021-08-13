@@ -1,22 +1,19 @@
-var messagebird = require('messagebird')('svVfL54wCBI7CE26F8QfFBDFt');
+var messagebird = require('messagebird')('IzsjzHBmGCH4WG3RcFQxMybtk');
 
-const bird =(from,to,message)=>{
+const bird = (from,to,message,next,req)=>{
 
-    console.log(typeof(to))
-    
-    var params = {
-      'originator': "Ali",
-      'recipients': [to],
-      'body': message
-    };
+  var params = {
+    'originator':"PVS",
+    'recipients': [to],
+    'body': ` ${message} is your otp assigned by PVS,This is sent to you for verification `
+  };
 
-    messagebird.messages.create(params, function (err, response) {
-      if (err) {
-        return console.log(err);
-      }
-      console.log(response);
-    });
-
+  messagebird.messages.create(params, function (err, response) {
+    if (err) {
+      return console.log(err);
+    }
+    console.log(response);
+  });
 }
 
 const otpGenerator = ()=>{
@@ -24,7 +21,25 @@ const otpGenerator = ()=>{
   return otp
 }
 
+const otpSender = (to,next)=>{
+  
+  const otp4digit = otpGenerator()
+    
+  const response = bird("",to,otp4digit) 
+
+  if(!response){
+    console.log('No response was given by otp Manager')
+    return 
+  }
+
+  console.log(response)
+  
+  return otp4digit
+}
+
+
 module.exports = {
   "bird":bird,
-  "otpGenerator":otpGenerator
+  "otpGenerator":otpGenerator,
+  "otpSender":otpSender
 }

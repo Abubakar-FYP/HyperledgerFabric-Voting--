@@ -1,28 +1,37 @@
-    //includes signUp and LogIn
-    const express = require('express')
-    const router = express.Router()
-    const mongoose = require('mongoose')
-    const SHA256 = require('crypto-js/sha256')
-    const path = require('path')
-    
-    const jwt = require('jsonwebtoken')
-    const {JWTKEY} = require('../Urls/keys')
-    const requireLogin = require('../Middleware/requirelogin')
-    const otp = require('../Middleware/otp')
+    //packages imported
+    const express = require('express');
+    const router = express.Router();
+    const mongoose = require('mongoose');
+    const SHA256 = require('crypto-js/sha256');
+    const expsession = require('express-session')
 
-    require('../Models/admin')
-    require('../Models/voter')
-    require('../Models/hash')
+    //middleware
+    const jwt = require('jsonwebtoken');
+    const {JWTKEY} = require('../Urls/keys');
+    const requireLogin = require('../Middleware/requirelogin');
+    const otp = require('../Middleware/otp');
+    const request = require('../Middleware/requestHandler');
+
+    //registering models
+    require('../Models/admin');
+    require('../Models/voter');
+    require('../Models/hash');
     
-    const Admin = mongoose.model('Admin')
-    const Voter = mongoose.model('Voter') 
-    const Hash = mongoose.model('Hash')
+    //models
+    const Admin = mongoose.model('Admin');
+    const Voter = mongoose.model('Voter'); 
+    const Hash = mongoose.model('Hash');
     router.use(express.urlencoded({extended:false})) //take form data and access them in our post method 
 
-    router.post('/check',(req,res)=>{
-        res.send('check route')
-    })
 
+    router.post('/',(req,res)=>{
+        res.send('signup home');
+    }) 
+
+    router.post('/check',(req,res)=>{
+        res.send('signup home route');
+    })
+ 
     router.post('/signinadmin',requireLogin,(req,res)=>{
         
         const {email,password} = req.body
@@ -53,120 +62,107 @@
     
     })
 
-    router.post('/signupvoter',async (req,res)=>{
+    router.post('/signup',async (req,res,next)=>{
     
-    const {cnic,phoneNumber} = req.body
-
-    const otp4digit = otp.otpGenerator()
-
-    const response = await otp.bird("",phoneNumber,otp4digit) 
-    W
-    res.status(200).json({message:"request successfully made to OTP Manager"})
-
-    if(!response){
-        res.status(400).json({message:"No response was given by OTP Manager"})
-    }
-
-    if(otp4digit != await req.body.otpNumber){
-        return res.status(400).json({message:"otp entered in the field does not match otp generated"})
-    }
-
-    //render or redirect next page
-    //require post request(form data)
-
-    /////////// Updated Code ^//////////
-
-    if(!name||!email||!age||!address||!gender ||!nationality||!area||!street||!house){
-        return res.status(400).json({message:"one of the fields are empty"})
-    } //here we check all the input if their null
-
-    if(age<18){
-        res.json({message:"age is below required age"})
-        return 
+    const {cnic,phoneNumber} = req.body;
+    
+    if(!cnic||!phoneNumber){
+        return res.status(404).json({message:"one or more of the fields are empty"});
     }
     
-    const hash = SHA256(JSON.stringify(cnic)).toString()
-
-    Hash.findOne({hash:hash})
+    await Voter
+    .findOne({cnic:cnic})
     .then(found=>{
         if(found){
-        res.status(400).json({message:"cannot register user already exists"})
-        return 
+            return res.status(400).json({message:"voter already registered"});
         }
+    })
+    .catch(err=>{
+        if(err){
+            res.status(400).json({message:err});
+        }
+    })
 
-                const voter = new Voter({
-                    name,
-                    email,
-                    cnic,
-                    phoneNumber,
-                    age,
-                    gender,
-                    nationality,
-                    voteflag,
-                    ballotid,
-                    address
-                })
-        
-                voter.save()
-                .then(voter=>{
-                    res.status(200).json({message:'successfull voter'})
-                })
-                .catch(()=>{
-                    res.json("there seems to be an error in generating the voter")
-                    return
-                })
+    const genOtp = otp.otpSender(phoneNumber); //middleware,for sending otp, and saves the otp in variable
 
-                const newhash = new Hash({
-                    hash:hash
-                })
+    localStorage.setItem('myOtp',genOtp); //saves otp for use in next route
+    
+    res.status(200).json({message:"successufully otp sent"});
 
-                newhash.save()
-                .then(newhash=>{
-                    console.log('voter hash also created')
-                    res.status(200).json('hash has been created first time,use this to login next time')
-                })
-                .catch(err=>{
-                    console.log(err)
-                })
+    next();
+    }) //save otp in cookie or session to use in another route or middleware
 
-        })
-        .catch(err=>{
-            console.log(err)
-        })
+    router.post('/signupotp',async (req,res,next)=>{
+    
+    const genOtp = localStorage.getItem('myOtp'); //we get our otp from previous route
+
+    if(req.body.otp != genOtp){
+        return res.status(404).json({message:"the otp does not match"});
+    }
 
     })
 
-    router.post('/signinvoter',requireLogin,(req,res,next)=>{
+    router.post('/signupinfo',async (req,res)=>{
 
-        const {cnic} = req.body
-        console.log(typeof(cnic))
+    const{name,cnic,email,age,phoneNumber,gender,nationality,area,street,house} = req.body;
+    
+    const newVoter = new Voter({
+        name,
+        cnic,
+        email,
+        age,
+        phoneNumber,
+        gender,
+        nationality,
+        area,
+        street,
+        house
+    });
 
-        if(!cnic){ 
-            res.json({message:'not present'})
-            return
+    newVoter.save()
+    .then((resp)=>{
+        if(!resp){
+            res.json({message:"there was some error saving the voter"});
+            return ;
         }
-       
-        res.status(200)
 
-        const hash = SHA256(JSON.stringify(cnic)).toString()
+        res.json({message:"Voter successfully saved"});
 
-        Hash.findOne({hash:hash}) //comparing the hased cnic
-        .then(found=>{
+    }).catch(err=>{
+            res.json({message:`there was some error saving the voter ${err}`});
+    });
 
+    })
+
+    router.post('/signin',async (req,res,next)=>{
+
+        const {cnic,phoneNumber} = req.body;
+        
+        if(!cnic||!phoneNumber){ 
+            res.json({message:'not present'});
+            return ;
+        }
+
+        Voter.findOne({cnic:cnic}).then(found=>{
             if(!found){
-            console.log('Voter Not present')    
-            res.status(400).json({message:'wrong cnic'})
-            return
+                return res.status(400).json({message:"voter not registered"});
             }
-
-            res.json('voter present')
-        
-            //middleware or route to main page
-        })
-        .catch(err=>{
-            console.log(err)
         })
 
+        const genOtp = otp.otpSender(phoneNumber);
+
+        localStorage.setItem('sOtp',genOtp);
     })
 
-module.exports = router
+    router.post('/signinotp',async (req,res)=>{
+ 
+        const genOtp = localStorage.getItem('sOtp');
+
+        if(genOtp != await req.body.otpNumber){
+            return await res.status(400).json({message:"otp entered in the field does not match otp generated"});
+        }
+        
+        res.status(200).json({message:"successfully login"});
+    })
+
+module.exports = router;

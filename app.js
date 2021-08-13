@@ -23,12 +23,15 @@ require('./Models/hash')
 require('./Models/vote')
 //models registered
 
+/* 
 app.use('/ballot',ballot)
-app.use('/vote',vote)
-app.use('/signup',signup)
+app.use('/vote',vote) */
+/* 
+app.use('/signup',signup) */
 
+app.use([signup])
 
-
+const serverNumber = 1970
 ///////MongoDB connection//////////////////////
 
 
@@ -58,6 +61,6 @@ app.get('/',(req,res)=>{
     res.send('home')
 })
 
-app.listen(1970,()=>{
-    console.log('connected')
+app.listen(serverNumber,()=>{
+    console.log(`connected to ${serverNumber}`)
 })
