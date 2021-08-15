@@ -1,8 +1,8 @@
-import { method } from 'bluebird';
+// import { method } from 'bluebird';
 import React from 'react';
 import { useState } from 'react';
 import {Link} from 'react-router-dom';
-
+import M from 'materialize-css';
 const Signup =()=>{
     const [FirstName ,setFirstName ] = useState ("")
     const [LastName ,setLastname ] = useState ("")
@@ -14,11 +14,11 @@ const Signup =()=>{
     const [Province,setprovince] = useState ("")
     const [Country , setCountry] = useState("")
 
-    const PostData=()=>{
-        fetch("https://localhost:5000/Signup",{
+    const PostData =()=>{
+        fetch("/signup",{
         method:"post",
         headers:{
-            "content-Type":"application/json"
+            "Content-Type":"application/json"
         },
         body:JSON.stringify({
             FirstName:"",
@@ -30,9 +30,11 @@ const Signup =()=>{
             Area:"",
             Province:"",
             Country:""})
-        }).then(res=>res.JSON())
-        .then (data=>{
-            console.log(data)
+        }).then(res=>res.json())
+        .then(data=>{
+            if (data.error){
+            M.toast({html: 'data.error'})
+            }
         })
     }
 
