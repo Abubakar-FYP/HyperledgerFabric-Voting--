@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const validator = require('express-validator')
 
-const hashSchema = mongoose.Schema({
+const hashSchema = new mongoose.Schema({
     
     hash:{
         type:String,

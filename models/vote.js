@@ -1,29 +1,24 @@
-const mongoose = require('mongoose')
-const {ObjectId} = mongoose.Schema.Types.ObjectId
+const mongoose = require('mongoose');
 
 const voteSchema = new mongoose.Schema({
 
     votername:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Voter",
-        required:true
-    },
-
-    fromhash:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Hash",
+        type:String,
         required:true
     },
 
     candidatename:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Candidate",
+        type:String,
         required:true
     },
 
-    tohash:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Hash",
+    voterId:{
+        type:Number,
+        required:true
+    },
+
+    candidateId:{
+        type:Number,
         required:true
     },
 
@@ -38,8 +33,7 @@ const voteSchema = new mongoose.Schema({
         required:true
     }
 
-    
-})
+});
 
-global.Vote = global.Vote || mongoose.model("Vote",voteSchema) 
-module.exports = global.Vote
+global.Vote = global.Vote || mongoose.model("Vote",voteSchema); 
+module.exports = global.Vote;
