@@ -14,28 +14,37 @@ function App() {
   return (
     <div className="App">
     <BrowserRouter>
+    
     <Navbar/>
+    
     <Route exact path="/Home">
       <Home/>
     </Route>
+    
     <Route exact path ="/Signin">
       <Signin/>
     </Route>
+    
     <Route exact path ="/Signup">
       <Signup/>
     </Route>
+    
     <Route exact path ="/AboutUs">
       <AboutUs/>
     </Route>
+    
     <Route exact path ="/Contact">
       <Contact/>
     </Route>
+    
     <Route exact path ="/ElectionResultPortal">
       <ElectionResultPortal/>
     </Route>
+    
     <Route exact path ="/OTP">
       <OTP/>
     </Route>
+    
     </BrowserRouter>
     </div>
   )

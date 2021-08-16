@@ -3,6 +3,7 @@ import React from 'react';
 import { useState } from 'react';
 import {Link} from 'react-router-dom';
 import M from 'materialize-css';
+import { useHistory } from 'react-router';
 
 const Signup =()=>{
     const [FirstName ,setFirstName ] = useState ("")
@@ -16,6 +17,7 @@ const Signup =()=>{
     const [Country , setCountry] = useState("")
 
     const PostData =()=>{
+        let history = useHistory();
         fetch("/signup",{
         method:"post",
         headers:{
@@ -35,10 +37,10 @@ const Signup =()=>{
         .then(data=>{
             if (data.error){
             M.toast({html: data.error,classes:"#c62828 red darken-3"})
+            history.push('/Signup')
             }
             else{
-                M.toast({html: data.message,classes:"#43a047 green darken-1"})
-                history.push('/Signup')
+            M.toast({html: data.message,classes:"#43a047 green darken-1"})
             }
         })
     }
