@@ -1,6 +1,7 @@
 import React from 'react';
 import { useHistory } from 'react-router';
 import {Link} from 'react-router-dom';
+
 /* 
 const Signin()=>{
     const 
@@ -18,6 +19,8 @@ const Signin = () =>{
        <div className="mycard">
        <div className = "card auth-card">
            <h1>Sign in </h1>
+            <input type="number" id="cnic" placeholder="CNIC"/>
+            
             <input type="tel" id="phone" name="phone" placeholder="Mobile Number" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" 
             /* value={MobileNumber} *//* 
             onChange={(e)=>setMobilenumber(e.target.value)} */

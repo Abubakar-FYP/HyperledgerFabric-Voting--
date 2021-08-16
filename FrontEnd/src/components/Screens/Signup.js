@@ -33,15 +33,16 @@ const Signup =()=>{
             Area:"",
             Province:"",
             Country:""})
-        }).then(res=>res.json())
+        })
+        .then(res=>res.json())
         .then(data=>{
             if (data.error){
             M.toast({html: data.error,classes:"#c62828 red darken-3"})
-            history.push('/Signup')
             }
             else{
             M.toast({html: data.message,classes:"#43a047 green darken-1"})
-            }
+            history.push('/Signup')    
+        }
         })
     }
 
