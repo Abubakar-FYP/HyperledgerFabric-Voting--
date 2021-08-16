@@ -15,12 +15,19 @@ var ballot = require("./Routes/ballot")
 var vote = require("./Routes/vote")
 var signup = require("./Routes/signup")
 
-app.set('view engine', 'html');
+
+/* require('./Models/hash')
+require('./Models/otp')
+for future if required or remove the models*/
 
 require('./Models/admin')
 require('./Models/voter')
-require('./Models/hash')
 require('./Models/vote')
+require('./Models/campaign')
+require('./Models/area')
+require('./Models/ballot')
+require('./Models/candidate')
+require('./Models/party')
 //models registered
 
 /* 
