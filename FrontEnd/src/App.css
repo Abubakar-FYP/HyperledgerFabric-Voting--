@@ -48,3 +48,8 @@ h5 Link to :hover{
   text-align:  center;
   margin: 20px;
 }
+#toast-container{
+  top:30px;
+  right:20px;
+  left: auto !important; 
+}
