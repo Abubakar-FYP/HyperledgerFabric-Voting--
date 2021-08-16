@@ -19,7 +19,7 @@ const Signup =()=>{
     const PostData =()=>{
         let history = useHistory();
         fetch("/signup",{
-        method:"post",
+        method:"post", 
         headers:{
             "Content-Type":"application/json"
         },
