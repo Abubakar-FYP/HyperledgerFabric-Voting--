@@ -18,6 +18,13 @@ const partySchema = new mongoose.Schema({
         required:true
     },
 
+    candidateList:{
+        type: [mongoose.Schema.Types.ObjectId],
+        ref:'Candidate',
+        required:true
+    }
+
 })
 
-mongoose.model("Party",partySchema)   
+global.Party = global.Party || mongoose.model("Party",partySchema);
+module.exports = global.Party;

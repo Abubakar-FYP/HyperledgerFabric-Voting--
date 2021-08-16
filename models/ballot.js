@@ -1,7 +1,6 @@
-const mongoose = require('mongoose') //Admin editable only
+const {Schema,mongoose} = require('mongoose') //Admin editable only
 
 const ballotSchema = new mongoose.Schema({
-
 
     ballotname:{
         type:String,
@@ -13,10 +12,12 @@ const ballotSchema = new mongoose.Schema({
         required:true
     },
 
-    ballothash:{
-        Type:String     
+    areaId:{
+        type: Schema.Types.ObjectId,
+        ref:'Area'
     }
 
 })
 
-mongoose.model("Ballot",ballotSchema);
+global.Ballot = global.Ballot || mongoose.model("Ballot",ballotSchema);
+module.exports = global.Ballot;
