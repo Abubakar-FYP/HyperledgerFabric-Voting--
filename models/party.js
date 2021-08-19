@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
+const {Schema} = require('mongoose')
 
-const partySchema = new mongoose.Schema({
+const partySchema = new Schema({
     
     partyId:{
         type:Number,
@@ -14,8 +15,7 @@ const partySchema = new mongoose.Schema({
 
     img:{
         data:Buffer,
-        contentType:String,
-        required:true
+        contentType:String
     },
 
     candidateList:{
@@ -24,7 +24,8 @@ const partySchema = new mongoose.Schema({
         required:true
     }
 
-})
+});
 
+mongoose.model("Party",partySchema);
 global.Party = global.Party || mongoose.model("Party",partySchema);
 module.exports = global.Party;

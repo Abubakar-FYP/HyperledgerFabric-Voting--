@@ -25,7 +25,7 @@ const Signin = () =>{
             /* value={MobileNumber} *//* 
             onChange={(e)=>setMobilenumber(e.target.value)} */
            />
-           <button class ="btn waves-effect waves-light" onClick={router}> 
+           <button className ="btn waves-effect waves-light" onClick={router}> 
            Next</button>
             <h5>
             Don't have an Account? <Link to = '/Signup'>Click here</Link>

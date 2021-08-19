@@ -11,14 +11,6 @@ const app = express()
 app.use(express.json()) //to parse outgoing json in the post req
 app.use(express.urlencoded({extended:true})) //parse html forms, like post methods etc
 
-var ballot = require("./Routes/ballot")
-var vote = require("./Routes/vote")
-var signup = require("./Routes/signup")
-
-
-/* require('./Models/hash')
-require('./Models/otp')
-for future if required or remove the models*/
 
 require('./Models/admin')
 require('./Models/voter')
@@ -30,13 +22,24 @@ require('./Models/candidate')
 require('./Models/party')
 //models registered
 
+
+
+var vote = require("./Routes/vote")
+var signup = require("./Routes/signup")
+var admin = require('./Routes/admin')
+
+/* require('./Models/hash')
+require('./Models/otp')
+for future if required or remove the models*/
+
+
 /* 
 app.use('/ballot',ballot)
 app.use('/vote',vote) */
 /* 
 app.use('/signup',signup) */
 
-app.use([signup])
+app.use([signup,admin])
 
 const serverNumber = 1970
 ///////MongoDB connection//////////////////////

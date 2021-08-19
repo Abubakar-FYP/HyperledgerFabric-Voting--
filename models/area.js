@@ -1,6 +1,7 @@
-const {Schema,mongoose} = require('mongoose');
+const {Schema} = require('mongoose');
+const mongoose = require('mongoose')
 
-const areaSchema = new mongoose.Schema({
+const areaSchema = new Schema({
     
     areaId:{
         type:Number,
@@ -15,9 +16,9 @@ const areaSchema = new mongoose.Schema({
     campaignId:{
         type: Schema.Types.ObjectId,
         ref: 'Campaign'
-    },
+    }
 
 });
 
-global.Area = global.Area || mongoose.model("Area",areaSchema) 
-module.exports = global.Area
+global.Area = global.Area || mongoose.model("Area",areaSchema); 
+module.exports = global.Area;

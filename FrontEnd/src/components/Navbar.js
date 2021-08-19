@@ -3,8 +3,8 @@ import {Link} from 'react-router-dom'; //So we will be using the link instead of
 const NavBar =() =>{
     return(
         <nav>
-        <div className="nav-wrapper white">
-          <Link to="/" className="brand-logo left"/> <img class="responsive-img" alt = "Company Logo" src="cool_pic.jpg"/>
+        <div className="nav-wrapper white">{/*Add logo image,src */}
+          <Link to="/" className="brand-logo left"/> <img className="responsive-img" alt = "Company Logo" /* src="cool_pic.jpg" *//>
           <ul id="nav-mobile" className="right ">
             <li><Link to="/Home">Home</Link></li>
             <li><Link to="/AboutUs">About Us</Link></li>

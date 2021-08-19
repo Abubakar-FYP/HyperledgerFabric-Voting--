@@ -17,8 +17,8 @@ const Signup =()=>{
     const [Country , setCountry] = useState("")
 
     const PostData =()=>{
-        let history = useHistory();
-        fetch("/signup",{
+        let history = useHistory
+        fetch("/Signup",{
         method:"post", 
         headers:{
             "Content-Type":"application/json"
@@ -86,7 +86,7 @@ const Signup =()=>{
             value={Country}
             onChange={(e)=>setCountry(e.target.value)}
            />
-           <button class ="btn waves-effect waves-light" onClick={()=>PostData()}> 
+           <button className ="btn waves-effect waves-light" onClick={()=>PostData()}> 
            Signup</button>
             <h5>
             Already have an Account? <Link to = '/Signin'>Click here</Link>

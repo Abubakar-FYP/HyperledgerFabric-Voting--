@@ -2,6 +2,8 @@ import React from 'react';
 import Navbar from './components/Navbar';
 import './App.css';
 import {BrowserRouter,Route} from 'react-router-dom';
+//Route Allows us to use Routing and use virtual dom
+//All Routes for different screens
 import Home from './components/Screens/Home';
 import AboutUs from './components/Screens/AboutUs';
 import Contact from './components/Screens/Contact';

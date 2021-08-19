@@ -1,4 +1,5 @@
-const {Schema,mongoose} = require('mongoose') //Admin editable only
+const {Schema} = require('mongoose') //Admin editable only
+const mongoose = require('mongoose')
 
 const ballotSchema = new mongoose.Schema({
 

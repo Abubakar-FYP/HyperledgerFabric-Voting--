@@ -1,7 +1,7 @@
-const {mongoose,Schema} = require('mongoose');
-const Area = require('../Models/area');
+const {Schema} = require('mongoose');
+const mongoose = require('mongoose');
 
-const campaign = new mongoose.Schema({
+const campaign = new Schema({
 
     campaignId:{
         type: Number,
