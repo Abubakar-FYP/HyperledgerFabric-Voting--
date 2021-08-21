@@ -8,8 +8,6 @@ import { useHistory } from 'react-router';
 const Signup =()=>{
     const [FirstName ,setFirstName ] = useState ("")
     const [LastName ,setLastname ] = useState ("")
-    const [CNIC ,setCnic ] = useState ("")
-    const [phone, setPhone] = useState("")
     const [HouseNo , setHouseNo] = useState("")
     const [StreetNo, setStreetNo] = useState("")
     const [Area, setArea] = useState("")
@@ -26,8 +24,6 @@ const Signup =()=>{
         body:JSON.stringify({
             FirstName:"",
             LastName:"",
-            CNIC:"",
-            phone:"",
             HouseNo:"",
             StreetNo:"",
             Area:"",
@@ -41,8 +37,10 @@ const Signup =()=>{
             }
             else{
             M.toast({html: data.message,classes:"#43a047 green darken-1"})
-            history.push('/Signup')    
+            history.push('/Signin')    
         }
+        }).catch(err =>{
+            console.log(err)
         })
     }
 
@@ -57,14 +55,6 @@ const Signup =()=>{
             <input type="text" id="lname" name="lname" placeholder="LastName" 
             value={LastName}
             onChange={(e)=>setLastname(e.target.value)}
-           />
-            <input type="text" inputMode="numeric" id="cNIC" name="cNIC" placeholder="CNIC" 
-            value={CNIC}
-            onChange={(e)=>setCnic(e.target.value)}
-           />
-            <input type="tel" id="phone" name="phone" placeholder="Mobile Number" 
-            value={phone}
-            onChange={(e)=>setPhone(e.target.value)}
            />
            <input type= "text" inputMode="numeric" id= "hNO" name="hNo" placeholder="HouseNo"
            value={HouseNo}

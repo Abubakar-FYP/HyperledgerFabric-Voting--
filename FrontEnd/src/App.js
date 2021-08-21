@@ -1,7 +1,7 @@
-import React from 'react'; 
+import React , {useContext,useEffect,createContext,useReducer} from 'react'; 
 import Navbar from './components/Navbar';
 import './App.css';
-import {BrowserRouter,Route} from 'react-router-dom';
+import {BrowserRouter,Route, useHistory} from 'react-router-dom';
 //Route Allows us to use Routing and use virtual dom
 //All Routes for different screens
 import Home from './components/Screens/Home';
@@ -11,23 +11,34 @@ import ElectionResultPortal from './components/Screens/ElectionResultPortal';
 import Signin from './components/Screens/Signin';
 import Signup from './components/Screens/Signup';
 import OTP from './components/Screens/OTP';
+import {reducer, intialState} from './reducers/userReducer';
 
-function App() {
-  return (
-    <div className="App">
-    <BrowserRouter>
-    
-    <Navbar/>
-    
-    <Route exact path="/Home">
+export const UserContext = createContext() 
+
+const Routing = ()=>{
+  const history = useHistory()
+  const {state,dispatch } = useContext(UserContext)
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"))
+    if (user) {
+      dispatch({type:"USER",payload:user})
+      history.push("/ElectionResultPortal")
+    }
+    else {
+         history.push("/")
+      }
+  }, [])
+  return(
+<switch>
+<Route exact path="/">
       <Home/>
     </Route>
     
-    <Route exact path ="/Signin">
+    <Route  path ="/Signin">
       <Signin/>
     </Route>
     
-    <Route exact path ="/Signup">
+    <Route  path ="/Signup">
       <Signup/>
     </Route>
     
@@ -47,8 +58,18 @@ function App() {
       <OTP/>
     </Route>
     
+</switch>
+  )
+}
+function App() {
+   const [state,dispatch] = useReducer(reducer, intialState)
+  return (
+    <UserContext.Provider value={{state,dispatch}} >
+    <BrowserRouter>
+    <Navbar/>
+    <Routing/>
     </BrowserRouter>
-    </div>
+    </UserContext.Provider>
   )
 }
 

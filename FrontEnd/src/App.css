@@ -53,3 +53,9 @@ h5 Link to :hover{
   right:20px;
   left: auto !important; 
 }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
