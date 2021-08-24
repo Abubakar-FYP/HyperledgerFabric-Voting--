@@ -6,10 +6,12 @@ import M from 'materialize-css';
 import { useHistory } from 'react-router';
 
 const Signup =()=>{
-    const [FirstName ,setFirstName ] = useState ("")
-    const [LastName ,setLastname ] = useState ("")
+    const [Name ,setName ] = useState ("")
+    const [CNIC ,setCNIC ] = useState ("")
     const [HouseNo , setHouseNo] = useState("")
     const [StreetNo, setStreetNo] = useState("")
+    const [Age , setAge] = useState("")
+    const [Gender , setGender] = useState("")
     const [Area, setArea] = useState("")
     const [Province,setprovince] = useState ("")
     const [Country , setCountry] = useState("")
@@ -22,10 +24,12 @@ const Signup =()=>{
             "Content-Type":"application/json"
         },
         body:JSON.stringify({
-            FirstName:"",
-            LastName:"",
+            Name:"",
+            CNIC:"",
             HouseNo:"",
             StreetNo:"",
+            Age:"",
+            Gender:"",
             Area:"",
             Province:"",
             Country:""})
@@ -46,16 +50,37 @@ const Signup =()=>{
 
     return (
         <div className="mycard">
-       <div className= "card Signup-card">
+             <div className= "card Signup-card">
            <h1>Sign Up </h1>
-            <input type="text" id="fname" name="fname" placeholder="FirstName" 
-            value={FirstName}
-            onChange={(e)=>setFirstName(e.target.value)}
+            <input type="text" id="name" name="NaMe" placeholder="Name" 
+            value={Name}
+            onChange={(e)=>setName(e.target.value)}
            />
-            <input type="text" id="lname" name="lname" placeholder="LastName" 
-            value={LastName}
-            onChange={(e)=>setLastname(e.target.value)}
+            <input type="number" id="cnic" name="cnic" placeholder="CNIC" 
+            value={CNIC}
+            onChange={(e)=>setCNIC(e.target.value)}
            />
+
+            <input type="number" id="age" name="age" placeholder="Age"
+            value={Age}
+            onChange={(e)=>setAge(e.target.value)}
+           />
+
+            
+            <input type="text" id="gender" name="gender" placeholder="Gender"
+            value={Gender}
+            onChange={(e)=>setGender(e.target.value)}
+           />
+{/* 
+            <select id="Gender" name="Gender">
+            <option value="Male">Male</option>
+             <option value="Female">Female</option>
+             </select>
+            <input type="submit" id="gender" name="gender" placeholder ="Gender"
+            value={Gender}
+            onChange={(e)=>setGender(e.target.value)}
+           /> */}
+
            <input type= "text" inputMode="numeric" id= "hNO" name="hNo" placeholder="HouseNo"
            value={HouseNo}
            onChange={(e)=>setHouseNo(e.target.value)}

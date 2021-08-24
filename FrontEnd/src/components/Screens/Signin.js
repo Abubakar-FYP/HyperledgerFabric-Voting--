@@ -4,7 +4,9 @@ import {useState} from 'react';
 import {Link} from 'react-router-dom';
 import M from 'materialize-css';
 import { useContext } from 'react';
-import { UserContext } from '../../App'
+import { UserContext } from '../../App';
+import LoginPic from "../../assets/1.jpg";
+// import {OTPredirect} from './OTP';
 
 const Signin =()=>{
     const {state,dispatch} = useContext(UserContext)
@@ -42,12 +44,20 @@ const PostData =() =>{
     })
 }
 const router =()=>{
-    let path = `FrontEnd\src\components\Screens\OTP.js`;
+    let path = '/home/abubakar/Desktop/Pakistan-Voting-System-using-HyperledgerFabric/FrontEnd/src/components/Screens/OTP.js';
     let history = useHistory;
     history.push(path);
 }
+<section className ="Signin">
+<div className= "container mt-5">
+    <div className= "Signin-content">
+
+    </div>
+</div>
+</section>
 
     return (
+
        <div className="mycard">
        <div className = "card auth-card">
            <h1>Sign in </h1>
