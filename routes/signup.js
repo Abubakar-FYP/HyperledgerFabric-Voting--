@@ -64,7 +64,7 @@
 
     router.post('/Signup',async (req,res,next)=>{
     
-    const{name,cnic,email,age,phoneNumber,gender,nationality,area,street,house} = req.body;
+    const{cnic,phoneNumber} = req.body;
     
     if(!cnic||!phoneNumber){
         return res.status(422).json({message:"one or more of the fields are empty"});
@@ -109,6 +109,14 @@
     router.post('/signupinfo',async (req,res)=>{
 
     const{name,cnic,email,age,phoneNumber,gender,nationality,area,street,house} = req.body;
+
+    if(!name||!cnic||!email||!age||!phoneNumber||!gender||!nationality||!area||!street||!house){
+        return res.status(403).json({error:"One of the fields is empty"});
+    }
+
+    if(age<18){
+        return res.status(403).json({error:"The age is not sufficient enough as voter"});     
+    }
     
     const newVoter = new Voter({
         name,

@@ -39,25 +39,23 @@ const voterSchema = new mongoose.Schema({
 
 	voteflag:{
 		type:Boolean,
-		default:false,
-		required:true
+		default:false
 	}, //to check whether he has voted or not,Initially zero
 
 	ballotid:{
 		type:Number,
-		required:true,
 		default:0000
 	}, //this will be randomly assigned upon when
 
 	area:{
 		type:String,
 		required:true
-	 },
+	},
 	 
 	street:{
 		type:String,
 		required:true
-	 },
+	},
 
 	house:{
 		type:String,
@@ -70,4 +68,4 @@ global.Voter = global.Voter || mongoose.model("Voter",voterSchema)
 module.exports = global.Voter
 
 //Voter model registered,
-//we also can export this model,but mongoose object stores it 
+//we also can export this model,but mongoose object stores it

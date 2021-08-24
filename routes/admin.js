@@ -12,7 +12,7 @@
 
     router.post('/createparty',async (req, res) => {
 
-        const {partyId,partyName,img} = req.body;
+        const {partyId,partyName,img,candidateList} = req.body;
 
         if(!partyId||!partyName||!img){
             return res.status(408).json({message:"one or more fields empty"});
@@ -22,8 +22,10 @@
         .then((found=>{
           return res.status(408).json({message:`party ${found} with this id is already present`});
         }).catch(err=>{
-            console.log(err);
+          return console.log(err);
         }));
+
+        //criminal,age,cnic(skip them if they dont meet conditions)
 
         const partyObj = new Party({
             partyId,
@@ -59,47 +61,6 @@
     })
 
     router.put('/updateparty/:partyId',async (req, res) => {
-
-        const {partyId,partyName,img} = req.body;
-        const findQuery = req.params.partyId;
-
-        if(partyId){ 
-    
-        Party.findOneAndUpdate({partyId:findQuery},{partyId:partyId})
-        .then(updated=>{
-            res.status(200).json({message:`${updated} has been updated`});
-        }).catch(err=>{
-            console.log(`${err}, error updating party`);
-        })          
-
-        }else{
-            res.status(408).json({message:"one or more fields empty"});
-        }
-    
-        if(partyName){
-            Party.findOneAndUpdate({partyId:findQuery},{name:partyName})
-            .then(updated=>{
-                res.status(200).json({message:`${updated} has been updated`});
-            }).catch(err=>{
-                console.log(`${err}, error updating party`);
-            })
-    
-        }else{
-            res.status(408).json({message:"one or more fields empty"});
-        }
-
-        if(img){
-            Party.findOneAndUpdate({partyId:findQuery},{img:img})
-            .then(updated=>{
-                res.status(200).json({message:`${updated} has been updated`})
-            })
-            .catch(err=>{
-                console.log(`${err}, error updating party`);
-            })
-        
-        }else{
-            return res.status(408).json({message:"one or more fields empty"});
-        }
     
     })
 
