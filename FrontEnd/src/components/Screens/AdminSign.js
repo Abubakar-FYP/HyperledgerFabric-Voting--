@@ -41,9 +41,9 @@ const router =()=>{
 }
 
     return (
-       <div className="AdminSignin">
-       <div className = "card AdminSignin">
-           <h1>Admin Login </h1>
+       <div className="mycard">
+       <div className = "card auth-card">
+           <h1>Sign in </h1>
             <input type="number" id="cnic" placeholder="CNIC"
             value={CNIC}
             onChange={(e)=> setCNIC (e.target.value)}
