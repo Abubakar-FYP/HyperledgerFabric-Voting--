@@ -62,12 +62,12 @@
     
     })
 
-    router.post('/signup',async (req,res,next)=>{
+    router.post('/Signup',async (req,res,next)=>{
     
-    const {cnic,phoneNumber} = req.body;
+    const{name,cnic,email,age,phoneNumber,gender,nationality,area,street,house} = req.body;
     
     if(!cnic||!phoneNumber){
-        return res.status(404).json({message:"one or more of the fields are empty"});
+        return res.status(422).json({message:"one or more of the fields are empty"});
     }
     
     await Voter
@@ -84,6 +84,10 @@
     })
 
     const genOtp = otp.otpSender(phoneNumber); //middleware,for sending otp, and saves the otp in variable
+    
+    if(typeof(genOtp)=="string"){
+        res.json({message:genOtp.toString()});
+    }
 
     localStorage.setItem('myOtp',genOtp); //saves otp for use in next route
     
