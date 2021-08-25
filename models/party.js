@@ -18,12 +18,6 @@ const partySchema = new Schema({
         contentType:String
     },
 
-    candidateList:{
-        type: [mongoose.Schema.Types.ObjectId],
-        ref:'Candidate',
-        required:true
-    }
-
 });
 
 mongoose.model("Party",partySchema);

@@ -20,6 +20,7 @@ require('./Models/area')
 require('./Models/ballot')
 require('./Models/candidate')
 require('./Models/party')
+require('./Models/criminal')
 //models registered
 
 

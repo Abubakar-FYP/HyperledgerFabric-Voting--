@@ -7,29 +7,30 @@
 
     require('../models/ballot');
 
-    const Ballot = mongoose.model('Ballot');
     const Party  = mongoose.model('Party');
+    /* const Ballot = mongoose.model('Ballot');
+    const Candidate = mongoose.model('Candidate');
+    const Criminal = mongoose.model('Criminal');
+ */
 
     router.post('/createparty',async (req, res) => {
 
-        const {partyId,partyName,img,candidateList} = req.body;
+        const {partyId,name,img} = req.body;
 
-        if(!partyId||!partyName||!img){
+        if(!partyId||!name||!img){
             return res.status(408).json({message:"one or more fields empty"});
         }
 
-        Party.findOne({partyid})
+        Party.findOne({partyId})
         .then((found=>{
           return res.status(408).json({message:`party ${found} with this id is already present`});
         }).catch(err=>{
           return console.log(err);
         }));
 
-        //criminal,age,cnic(skip them if they dont meet conditions)
-
         const partyObj = new Party({
             partyId,
-            partyName,
+            name,
             img
         });
 

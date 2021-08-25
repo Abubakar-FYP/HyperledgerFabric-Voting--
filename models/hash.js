@@ -10,5 +10,5 @@ const hashSchema = new mongoose.Schema({
 
 })
 
-global.Hash = global.Hash || mongoose.model("Hash",hashSchema) 
-module.exports = global.Hash
+global.Hash = global.Hash || mongoose.model("Hash",hashSchema); 
+module.exports = global.Hash;

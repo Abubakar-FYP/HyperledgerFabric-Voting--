@@ -27,11 +27,21 @@ const candidate = new mongoose.Schema({
 		  required:true
 	},
 	
-	address:{
-		 type:String,
-		 required:true
+	area:{
+		type:String,
+		required:true
 	},
-	
+	 
+	street:{
+		type:String,
+		required:true
+	},
+
+	house:{
+		type:String,
+		required:true
+	},
+
 	gender:{
 		  type:String,
 		  required:true
@@ -41,12 +51,7 @@ const candidate = new mongoose.Schema({
 		  type:String,
 		  required:true
 	},
-	
-	party:{
-		type:String,
-		required:true
-	},
-	  
+		  
 	religion:{
 		type:String,
 		required:true,
@@ -54,10 +59,20 @@ const candidate = new mongoose.Schema({
 
 	ballotid:{
 		  type: mongoose.Schema.Types.ObjectId,
-		  required:true
+		  ref:'Ballot'
+	},
+
+	partyId:{
+		type:mongoose.Schema.Types.ObjectId,
+		ref:'Party'
+	},
+
+	invalid:{
+		type:Boolean,
+		default:0
 	}
 
-})
+});
 
 global.Cadidate = global.Candidate || mongoose.model("Candidate",candidate); 
 module.exports = global.Candidate;
