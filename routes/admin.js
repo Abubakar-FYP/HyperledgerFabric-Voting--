@@ -62,16 +62,66 @@
     })
 
     router.put('/updateparty/:partyId',async (req, res) => {
-    
+        const {partyId,name,img} = req.body;
+        
+        if(partyId){
+            
+            Party.findOneAndUpdate({partyId:req.params.partyId},{partyId},(resp)=>{
+                if(resp){
+                    res.status(200).json({message:"party updated successfully"});
+                }
+            })
+            .catch(err=>{
+                res.status(403).json({error:"error in updating party-id"});
+            });
+
+           res.status(404).json({message:"party-id successfully updated"});
+        } 
+        
+        if(name){
+            
+            Party.findOneAndUpdate({partyId:req.params.partyId},{partyId},(resp)=>{
+                if(resp){
+                    res.status(200).json({message:"party-name updated successfully"})
+                }
+            })
+            .catch(err=>{
+                  res.status(403).json({error:"error in updating party-name"});
+            });
+        } 
+
+        if(img){
+            
+            Party.findOneAndUpdate({partyId:req.params.partyId},{partyId},(resp)=>{
+                if(resp){
+                    res.status(200).json({message:"party-name updated successfully"})
+                }
+            })
+            .catch(err=>{
+                res.status(403).json({error:"error in updating party image"});
+            });
+        }
+
+        if(!partyId||!name||!img){
+          return res.status(403).json({error:"one of the fields is empty"});
+        }
+       
     })
 
-    router.post('/deleteparty',async (req, res) => {
-    
-    
+    router.delete('/deleteparty/:partyId',async (req, res) => {
+        if(!req.params.partyId){
+            return res.status(403).json({error:"party Id in the params is not present"});
+        }
+
+        Party.findOneAndDelete({partyId:req.params.partyId},(resp)=>{
+            if(resp){
+                return res.status(200).json({message:`The party with ${req.params.partyId} Id has been deleted`});
+            }
+        })
+        .catch((err)=>{
+            return res.status(403).json({error:"There was a problem finding the party or couldn't delete it"}); 
+        })
+
     })
 
-    router.post('/searchballot',async (req,res)=>{
-
-    })
-    
-    module.exports = router
+    module.exports = router;
