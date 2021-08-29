@@ -74,5 +74,5 @@ const candidate = new mongoose.Schema({
 
 });
 
-global.Cadidate = global.Candidate || mongoose.model("Candidate",candidate); 
+global.Candidate = global.Candidate || mongoose.model("Candidate",candidate); 
 module.exports = global.Candidate;

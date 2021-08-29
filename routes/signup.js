@@ -21,8 +21,6 @@
     const Admin = mongoose.model('Admin');
     const Voter = mongoose.model('Voter'); 
     const Hash = mongoose.model('Hash');
-    router.use(express.urlencoded({extended:false})) //take form data and access them in our post method 
-
 
     router.post('/',(req,res)=>{
         res.send('signup home');

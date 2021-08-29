@@ -18,7 +18,7 @@ const ballotSchema = new mongoose.Schema({
         ref:'Area'
     }
 
-})
+});
 
 global.Ballot = global.Ballot || mongoose.model("Ballot",ballotSchema);
 module.exports = global.Ballot;
