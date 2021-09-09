@@ -4,7 +4,6 @@ const { MONGOURI } = require("./Urls/keys");
 const bodyparser = require("body-parser");
 
 const requirelogin = require("./Middleware/requirelogin"); //middleware
-const bodyParser = require("body-parser");
 
 const app = express();
 
@@ -28,12 +27,13 @@ var admin = require("./Routes/admin");
 var ballot = require("./Routes/ballot");
 var campaign = require("./Routes/campaign");
 var area = require("./Routes/area");
+var party = require("./Routes/party");
 
-app.use([signup,vote,admin,ballot,campaign,area]); //using the routes
+app.use([signup,vote,party,admin,ballot,campaign,area]); //using the routes
 
 const serverNumber = 1970;
 
-///////MongoDB connection//////////////////////
+///////MongoDB connection/////////////////////
 
 mongoose.connect(MONGOURI, {
   useNewUrlParser: true,

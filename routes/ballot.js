@@ -11,11 +11,11 @@ const Ballot = mongoose.model('Ballot');
 
     
 
-router.post('/createBallot',async (req,res)=>{
+router.post('/createballot',async (req,res)=>{
     
 });
-router.get('/findBallot',async (req,res)=>{});
-router.put('/updateBallot',async (req,res)=>{});
-router.delete('/deleteBallot',async (req,res)=>{});
+router.get('/findballot',async (req,res)=>{});
+router.put('/updateballot',async (req,res)=>{});
+router.delete('/deleteballot',async (req,res)=>{});
 
 module.exports = router;

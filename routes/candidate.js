@@ -14,10 +14,30 @@ const Criminal = mongoose.model('Criminal');
 
     
 
-router.post('/createCandidate', async (req,res)=>{});
-router.put('/updateCandidate', async (req,res)=>{});
-router.post('/findCandidate', async (req,res)=>{});
-router.delete('/deleteCandidate', async (req,res)=>{});
+router.post('/createcandidate', async (req,res)=>{});
+router.put('/updatecandidate', async (req,res)=>{});
+router.post('/findcandidate', async (req,res)=>{});
+router.delete('/deletecandidate', async (req,res)=>{});
+router.get("/findallcandidate",async (req,res)=>{
+
+    Candidate.find()
+    .then((resp)=>{
+        return res.status(200).json({message:resp});
+    }).catch((err=>{
+        return res.status(400).json({message:err});
+    }));
+
+});
+
+router.get('/findcandidatebyballotid/:ballotId',async (req,res)=>{
+    Candidate.find({ballotid:req.params.ballotId})
+    .then((resp)=>{
+        return res.status(200).json({message:resp});
+    })
+    .catch((err)=>{
+        return res.status(400).json({message:err});
+    });
+});
 
 
 module.exports = router;

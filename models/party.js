@@ -14,12 +14,13 @@ const partySchema = new Schema({
     },
 
     img:{
-        data:Buffer,
-        contentType:String
+        type:String,
+        default:'...'
     },
 
 });
 
 mongoose.model("Party",partySchema);
 global.Party = global.Party || mongoose.model("Party",partySchema);
+
 module.exports = global.Party;

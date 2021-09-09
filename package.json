@@ -2,6 +2,7 @@
   "name": "fyp1",
   "version": "1.0.0",
   "description": "",
+  "type": "commonjs",
   "main": "app.js",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
@@ -22,11 +23,13 @@
     "jsonwebtoken": "^8.5.1",
     "messagebird": "^3.6.4",
     "mongoose": "^5.12.8",
+    "node-fetch": "^3.0.0",
     "nodemon": "^2.0.7",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^1.1.5",
+    "request": "^2.88.2",
     "web-vitals": "^1.0.1"
   },
   "devDependencies": {},

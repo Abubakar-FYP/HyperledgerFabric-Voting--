@@ -3,119 +3,144 @@ const express = require('express');
 const router = express.Router();
 const requireLogin = require('../middleware/requirelogin');
 
-require('../Models/party');
+//Registering Models
+require("../Models/party");
 
-const Party = mongoose.model('../Models/party');
+//Models
+const Party = mongoose.model('Party');
     
     router.post('/createparty',async (req, res) => {
 
         const {partyId,name,img} = req.body;
 
         if(!partyId||!name||!img){
-            return res.status(408).json({message:"one or more fields empty"});
+            return res.status(408).json({message:"one or more fields are empty"});
         }
 
-        await Party.findOne({partyId})
-        .then((found=>{
-        return res.status(408).json({message:`party ${found} with this id is already present`});
-        }).catch(err=>{
-        return console.log(err);
-        }));
+        const found = await Party.findOne({partyId})
+        .then((resp=>{
+            if(resp){
+                return res.status(400).json({message:`party with this id is already present`});
+            }
+        })).catch((err)=>{
+            return res.status(208).json({message:err});
+        });
 
-        const partyObj = new Party({
+        if(found){
+            console.log(found);
+            return res.status(401).json({message:`party with this id is already present`});
+        }
+
+        const newParty = new Party({
             partyId,
             name,
             img
         });
 
-        await partyObj.save()
+        newParty.save()
         .then((resp)=>{
             res.status(408).json({message:"party successfully saved"});
         })
         .catch((err)=>{
-            res.status(408).json({message:"there has been some error registering the new party"});
-        })
+            res.status(408).json({message:err});
+        });
 
-    })
+    });
+
     router.get('/findparty',async (req, res) => {
 
-        const {partyid} = req.body;
+        const {partyId} = req.body;
 
-        if(!partyid){
-            return res.status(408).json({message:"field empty"});
+        if(!partyId){
+            return res.status(400).json({message:"field empty"});
         }
 
-        await Party.findOne({partyid})
+        Party.findOne({partyId})
         .then((found=>{
-            console.log(`found party is: ${found}`);
-        }).catch(err=>{
-            console.log(err)
-        }));
+            return res.status(200).json({message:found});
+        }))
+        .catch((err)=>{
+            return res.status(400).json({message:err});
+        });
 
-    })
-    
-    router.put('/updateparty/:partyId',async (req, res) => {
-        const {partyId,name,img} = req.body;
+    });
+
+    router.put('/updateparty',async (req, res) => {
         
-        if(partyId){
-            
-            await  Party.findOneAndUpdate({partyId:req.params.partyId},{partyId},(resp)=>{
-                if(resp){
-                    res.status(200).json({message:"party updated successfully"});
-                }
-            })
-            .catch(err=>{
-                res.status(403).json({error:"error in updating party-id"});
-            });
+        const {partyId,name,img} = req.body;
 
-        res.status(404).json({error:"one or more fields are empty"});
-        } 
+        if(!partyId){
+            return res.status(400).json({message:"field is empty"});
+        }
+        else{
+        
+           const found = await Party.find({partyId});
+           
+           if(!found){
+            return res.status(400).json({message:"party does not exist with this id"});
+           }
+
+        }
         
         if(name){
-            
-            await  Party.findOneAndUpdate({partyId:req.params.partyId},{partyId},(resp)=>{
+
+            Party.findOneAndUpdate({partyId},{name},(resp)=>{
                 if(resp){
-                    res.status(200).json({message:"party-name updated successfully"})
+                    res.status(200).json({message:"party-name updated successfully"});
                 }
             })
             .catch(err=>{
-                res.status(403).json({error:"error in updating party-name"});
+                res.status(403).json({error:err});
             });
+
         } 
 
         if(img){
             
-            await  Party.findOneAndUpdate({partyId:req.params.partyId},{partyId},(resp)=>{
+            Party.findOneAndUpdate({partyId},{img},(resp)=>{
                 if(resp){
-                    res.status(200).json({message:"party-name updated successfully"})
+                    res.status(200).json({message:"party-image updated successfully"});
                 }
             })
             .catch(err=>{
-                res.status(403).json({error:"error in updating party image"});
+                res.status(403).json({error:err});
             });
+
         }
 
-        if(!partyId&&!name&&!img){
-        return res.status(403).json({error:"all of the fields is empty"});
+        if(name&&img){
+            return res.status(200).json({message:"all fields updated"}); 
         }
-    
-    })
 
-    router.delete('/deleteparty/:partyId',async (req, res) => {
-        
+        if(name&&!img){
+            return res.status(200).json({message:"party-name updated successfully"}); 
+        }
+
+        if(!name&&img){
+            return res.status(200).json({message:"party-image updated successfully"});
+        }
+
+        if(!name&&!img){
+        return res.status(403).json({error:"no updation fields entered"});
+        }
+
+    });
+
+    router.delete('/deleteparty',async (req, res) => { 
+
         const {partyId} = req.body;
        
         if(!partyId){
-            return res.status(403).json({error:"party Id in the params is not present"});
+            return res.status(400).json({message:"field is empty"});
         }
 
-        await Party.findOneAndDelete({partyId},(resp)=>{
-            if(resp){
-                return res.status(200).json({message:`The party with ${ partyId } Id has been deleted`});
-            }
+        Party.findOneAndDelete({partyId},(resp)=>{
+            return res.status(200).json({message:`party has been successfully deleted`}); 
         })
         .catch((err)=>{
-            return res.status(403).json({error:"There was a problem finding the party or couldn't delete it"}); 
+            return res.status(403).json({error:err}); 
         });
 
-    })
+    });
+
+module.exports = router;

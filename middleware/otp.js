@@ -1,18 +1,22 @@
-var messagebird = require('messagebird')('IzsjzHBmGCH4WG3RcFQxMybtk');
+const messagebird = require('messagebird')('Ap7JSDW0NMLxZMppeBGsG3Wn9');
+var checkStatus=1;
+var checkLength=0;
 
-const bird = (from,to,message,next,req)=>{
+const bird = (from,to,message)=>{
   
-  var i = 0
-  for(;i<to.length ;i++){}
-  if(i!=11){
+  console.log(to.length);
+
+  if(to.length!=11){
     return "Entered Phone Number is not a 11 digit number";
   }
+
+  checkLength=1;
 
   const code = "+92";
 
   to = to.slice(1);
   const number = code+to;
-
+  
   var params = {
     'originator':"PVS",
     'recipients': [number],
@@ -20,10 +24,11 @@ const bird = (from,to,message,next,req)=>{
   };
 
   messagebird.messages.create(params, function (err, response) {
-    if (err) {
+    if (err) { 
+      checkStatus=0;
       return console.log(err);
     }
-    console.log(response);
+    return console.log(response);
   });
 }
 
@@ -34,18 +39,20 @@ const otpGenerator = ()=>{
 
 const otpSender = (to,next)=>{
   
-  const otp4digit = otpGenerator()
+  const otp4digit = otpGenerator();
     
-  const response = bird("",to,otp4digit) 
+  const response = bird("",to,otp4digit); 
 
-  if(!response){
-    console.log('No response was given by otp Manager');
-    return "Entered Number is Wrong";
+  if(checkLength==0){
+    return response;
   }
-
-  console.log(response)
   
-  return otp4digit
+  if(checkStatus==0){
+    console.log(checkStatus);
+    return "Entered Number is Wrong or a server issue";
+  }
+  
+  return otp4digit;
 }
 
 

@@ -12,20 +12,19 @@ const voteSchema = new mongoose.Schema({
         required:true
     },
 
-    voterId:{
+    voterCnic:{
         type:Number,
         required:true
     },
 
-    candidateId:{
+    candidateCnic:{
         type:Number,
         required:true
     },
 
     time:{
         type:Date,
-        default:Date.now,         
-        required:true
+        default:Date.now
     }, //automatically gets the current date and time
 
     ballotid:{

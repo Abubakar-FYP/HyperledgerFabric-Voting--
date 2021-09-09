@@ -45,7 +45,7 @@ const voterSchema = new mongoose.Schema({
 	ballotid:{
 		type:Number,
 		default:0000
-	}, //this will be randomly assigned upon when
+	}, //this will be assigned based on the area
 
 	area:{
 		type:String,
@@ -62,7 +62,7 @@ const voterSchema = new mongoose.Schema({
 		required:true
 	},
 
-})  //all the data's hash will be created to login next time*
+});  //all the data's hash will be created to login next time*
 
 global.Voter = global.Voter || mongoose.model("Voter",voterSchema) 
 module.exports = global.Voter

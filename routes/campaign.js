@@ -3,33 +3,33 @@ const express = require("express");
 const router = express.Router();
 const requireLogin = require("../middleware/requirelogin");
 
+
 //Register Models
 require("../Models/campaign");
 
 //Models
 const Campaign = mongoose.model("Campaign");
 
-router.post("/createCampaign", async (req, res) => {
+router.post("/createcampaign", async (req, res) => {
   const { campaignId, campaignName } = req.body;
 
-  if (!campaignId || !campaignId) {
+  if (!campaignId || !campaignName) {
     return res.status(403).json({ error: "one or more fields are empty" });
   }
 
-  Campaign.findOne({ campaignId })
+  const found = await Campaign.findOne({ campaignId })
     .then((resp) => {
-      if (resp) {
-        return res.status(403).json({ message: "campaign is already present" });
+      if(resp) {
+        return res.status(200).json({ message: "campaign is already present" });
       }
+    }).catch((err)=>{
+      return res.status(400).json({message:err});
     })
-    .catch((err) => {
-      if (err) {
-        return res
-          .status(200)
-          .json({ error: "campain not found,Ready to register" });
-      }
-    });
 
+    if(found) {
+      return res.status(200).json({ message: "campaign is already present" });
+    }
+    
   const newCampaign = new Campaign({
     campaignId,
     campaignName,
@@ -49,9 +49,10 @@ router.post("/createCampaign", async (req, res) => {
           .json({ error: "there seems to be an error saving the campaign" });
       }
     });
+
 });
 
-router.get("/findCampaign", async (req, res) => {
+router.get("/findcampaign", async (req, res) => {
   const { campaignId } = req.body;
 
   if (!campaignId) {
@@ -65,57 +66,59 @@ router.get("/findCampaign", async (req, res) => {
       }
     })
     .catch((err) => {
-      return res
-        .status(403)
-        .json({ error: "couldn't find the campaignId given" });
+      return res.status(403).json({message:err});
     });
 });
 
-router.put("/updateCampaign/:campaignId", async (req, res) => {
-  const { campaignId, campaignName } = req.body;
+router.put("/updatecampaign", async (req, res) => {
+  
+  const {campaignId,campaignName} = req.body;
 
-  if (campaignId) {
-    Campaign.findOneAndUpdate(req.params.campaignId, campaignId, (resp) => {
-      if (resp) {
-        res.status(200).json({ message: "Successfully updated" });
-      }
-    }).catch((err) => {
-      res.status(403).json({ error: "couldn't update campaign-id" });
-    });
+  if(!campaignId){
+    return res.status(403).json({error:"field is empty"});
   }
 
-  if (campaignName) {
-    Campaign.findOneAndUpdate(req.params.campaignId, campaignName, (resp) => {
-      if (resp) {
-        res.status(200).json({ message: "Successfully updated" });
-      }
-    }).catch((err) => {
-      res.status(403).json({ error: "couldn't update campaign-name" });
+  if(campaignName){
+    Campaign.findOneAndUpdate({campaignId},{campaignName},(resp=>{
+      return res.status(200).json({message:resp});
+    }))
+    .catch(err=>{
+      return res.status(400).json({message:err});
     });
   }
 
   if(!campaignId&&!campaignName){
-    return res.status(403).json({error:"all of the fields is empty"});
+    return res.status(403).json({error:"fields are empty"});
   }
 
-});
+})
 
-router.delete("/deleteCampaign", async (req, res) => {
+router.delete("/deletecampaign", async (req, res) => {
     const {campaignId} = req.body;
     
     if(!campaignId){
         return res.status(403).json({ error: "campaign-id field is empty" });
     }
 
-    Campaign.findOneAndDelete(campaignId,(resp)=>{
-        if(resp){
-            return res.status(403).json({ message: "campaign successfully deleted" });
-        }
+    Campaign.findOneAndDelete({campaignId},(resp)=>{
+            return res.status(200).json({ message: `campaign ${campaignId} successfully deleted`});
     })
     .catch((err)=>{
-        return res.status(403).json({error:"couldn't delete campaign"});
-    })
+        return res.status(403).json({error:err});
+    });
+    
+});
 
+router.get('/findallcampaigns',async (req,res)=>{
+    
+    Campaign.find()
+    .then((resp)=>{
+      return res.status(200).json({message:resp});
+    })
+    .catch((err)=>{
+      return res.status(400).json({message:err});
+    });    
+    
 });
 
 module.exports = router;
