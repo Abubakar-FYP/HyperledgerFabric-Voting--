@@ -11,6 +11,11 @@ const candidate = new mongoose.Schema({
 		type:String,
 		required:true
 	},
+
+	candidateId:{
+		type:Number,
+		required:true
+	},
 	
 	cnic:{ 
 		  type:Number,

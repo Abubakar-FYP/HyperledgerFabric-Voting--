@@ -91,7 +91,7 @@ router.put("/updatecampaign", async (req, res) => {
     return res.status(403).json({error:"fields are empty"});
   }
 
-})
+});
 
 router.delete("/deletecampaign", async (req, res) => {
     const {campaignId} = req.body;
