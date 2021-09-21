@@ -15,7 +15,6 @@ require("./Models/admin");
 require("./Models/voter");
 require("./Models/vote");
 require("./Models/campaign");
-require("./Models/area");
 require("./Models/ballot");
 require("./Models/party");
 require("./Models/criminal");
@@ -26,10 +25,9 @@ var signup = require("./Routes/signup");
 var admin = require("./Routes/admin");
 var ballot = require("./Routes/ballot");
 var campaign = require("./Routes/campaign");
-var area = require("./Routes/area");
 var party = require("./Routes/party");
 
-app.use([signup,vote,party,admin,ballot,campaign,area]); //using the routes
+app.use([signup,vote,party,admin,ballot,campaign]); //using the routes
 
 const serverNumber = 1970;
 

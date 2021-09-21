@@ -123,15 +123,15 @@ router.delete("/deleteballot", async (req, res) => {
       ballotid: ballotid,
     },
   })
-  .then((resp) => {
-    console.log(resp.data);
-    if (resp.data["message"] == null) {
-      return res
-        .status(403)
-        .json({ message: "ballot not present with this id" });
-    }
-  })
-  .catch(err=>console.log(err));
+    .then((resp) => {
+      console.log(resp.data);
+      if (resp.data["message"] == null) {
+        return res
+          .status(403)
+          .json({ message: "ballot not present with this id" });
+      }
+    })
+    .catch((err) => console.log(err));
 
   Ballot.findOneAndDelete({ ballotid })
     .then(() => {

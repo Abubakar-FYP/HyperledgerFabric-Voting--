@@ -1,146 +1,179 @@
-const mongoose = require('mongoose');
-const express = require('express');
+const mongoose = require("mongoose");
+const express = require("express");
 const router = express.Router();
-const requireLogin = require('../middleware/requirelogin');
+const axios = require("axios");
+const requireLogin = require("../middleware/requirelogin");
 
 //Registering Models
 require("../Models/party");
+require('../Models/criminal')
 
 //Models
-const Party = mongoose.model('Party');
-    
-    router.post('/createparty',async (req, res) => {
+const Party = mongoose.model("Party");
+const Criminal = mongoose.model("Criminal");
 
-        const {partyId,name,img} = req.body;
+router.post("/createparty", async (req, res) => {
+  const {
+    partyId,
+    partyName,
+    partyImg,
+    partyLeaderName,
+    partyLeaderCnic,
+    partyLeaderPhoneNumber,
+    partyLeaderGender,
+    partyLeaderAge,
+    partyLeaderReligion,
+    partyLeaderAddress,
+  } = req.body;
 
-        if(!partyId||!name||!img){
-            return res.status(408).json({message:"one or more fields are empty"});
-        }
+  if (
+    !partyId ||
+    !partyName ||
+    !partyImg ||
+    !partyLeaderName ||
+    !partyLeaderCnic ||
+    !partyLeaderPhoneNumber ||
+    !partyLeaderGender ||
+    !partyLeaderAge ||
+    !partyLeaderReligion ||
+    !partyLeaderAddress
+  ) {
+    return res.status(408).json({ message: "one or more fields are empty" });
+  }
 
-        const found = await Party.findOne({partyId})
-        .then((resp=>{
-            if(resp){
-                return res.status(400).json({message:`party with this id is already present`});
-            }
-        })).catch((err)=>{
-            return res.status(208).json({message:err});
-        });
+  //find
 
-        if(found){
-            console.log(found);
-            return res.status(401).json({message:`party with this id is already present`});
-        }
-
-        const newParty = new Party({
-            partyId,
-            name,
-            img
-        });
-
-        newParty.save()
-        .then((resp)=>{
-            res.status(408).json({message:"party successfully saved"});
-        })
-        .catch((err)=>{
-            res.status(408).json({message:err});
-        });
-
+  const found = await axios({
+    method: "get",
+    url: "http://localhost:1970/findparty",
+    data: { partyId },
+  })
+    .then((resp) => {
+      if (resp.data["message"] != null) {
+        return res
+          .status(200)
+          .json({ message: "Party with this ID already present" });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
     });
 
-    router.get('/findparty',async (req, res) => {
+  const newParty = new Party({
+    partyId,
+    partyName,
+    partyImg,
+    partyLeaderName,
+    partyLeaderCnic,
+    partyLeaderPhoneNumber,
+    partyLeaderGender,
+    partyLeaderAge,
+    partyLeaderReligion,
+    partyLeaderAddress,
+  });
 
-        const {partyId} = req.body;
-
-        if(!partyId){
-            return res.status(400).json({message:"field empty"});
-        }
-
-        Party.findOne({partyId})
-        .then((found=>{
-            return res.status(200).json({message:found});
-        }))
-        .catch((err)=>{
-            return res.status(400).json({message:err});
-        });
-
+  newParty
+    .save()
+    .then((resp) => {
+      res.status(408).json({ message: "party successfully saved" });
+    })
+    .catch((err) => {
+      res.status(408).json({ message: err });
     });
 
-    router.put('/updateparty',async (req, res) => {
-        
-        const {partyId,name,img} = req.body;
+  //party created,Now create the candidate list, save the partyID for candidates
+});
 
-        if(!partyId){
-            return res.status(400).json({message:"field is empty"});
-        }
-        else{
-        
-           const found = await Party.find({partyId});
-           
-           if(!found){
-            return res.status(400).json({message:"party does not exist with this id"});
-           }
+router.post("/createcandidatelist/:partyId", async (req, res) => {
+  const { candidate } = req.body;
 
-        }
-        
-        if(name){
+  if (!candidate) {
+    return res.status(400).json({ message: "field is empty" });
+  }
 
-            Party.findOneAndUpdate({partyId},{name},(resp)=>{
-                if(resp){
-                    res.status(200).json({message:"party-name updated successfully"});
-                }
-            })
-            .catch(err=>{
-                res.status(403).json({error:err});
-            });
+  for(var i=0;i<candidate.length;i++){  
 
-        } 
-
-        if(img){
-            
-            Party.findOneAndUpdate({partyId},{img},(resp)=>{
-                if(resp){
-                    res.status(200).json({message:"party-image updated successfully"});
-                }
-            })
-            .catch(err=>{
-                res.status(403).json({error:err});
-            });
-
-        }
-
-        if(name&&img){
-            return res.status(200).json({message:"all fields updated"}); 
-        }
-
-        if(name&&!img){
-            return res.status(200).json({message:"party-name updated successfully"}); 
-        }
-
-        if(!name&&img){
-            return res.status(200).json({message:"party-image updated successfully"});
-        }
-
-        if(!name&&!img){
-        return res.status(403).json({error:"no updation fields entered"});
-        }
-
+/*     const found = axios({
+      url:"http://localhost:1970/getcriminal",
+      method:"get",
+      data: candidate[i].cnic
+    })
+    .then((resp)=>{
+      if(resp.data["message"]!=null){
+        return res.status(400).json({message:"candidate is a criminal"});
+      }
     });
+ */
 
-    router.delete('/deleteparty',async (req, res) => { 
+  }
 
-        const {partyId} = req.body;
-       
-        if(!partyId){
-            return res.status(400).json({message:"field is empty"});
-        }
+  //found
 
-        Party.findOneAndDelete({partyId},(resp)=>{
-            return res.status(200).json({message:`party has been successfully deleted`}); 
-        })
-        .catch((err)=>{
-            return res.status(403).json({error:err}); 
-        });
+  //update
+});
 
+router.get("/getcriminal",async (req,res)=>{
+  const {cnic} = req.body;
+
+  if(!cnic){
+    return res.status(400).json({message:"field is empty"});
+  }
+
+  Criminal.findOne({cnic})
+  .then((resp)=>{
+    if(resp){
+      return res.status(200).json({message:resp});
+    }
+  })
+  .catch((err)=>{
+    console.log(err);
+  });
+
+})
+
+router.get('/findparentdoc',async (req,res)=>{
+  const {_id} = req.body;
+
+  Party.findOne({_id})
+  then((resp)=>{
+    return res.status(200).json({message:resp});
+  }).
+  catch((err)=>{
+    console.log(err);
+  });
+
+})
+
+router.get("/findparty", async (req, res) => {
+  const { partyId } = req.body;
+
+  if (!partyId) {
+    return res.status(400).json({ message: "field empty" });
+  }
+
+  Party.findOne({ partyId })
+    .then((found) => {
+      return res.status(200).json({ message: found });
+    })
+    .catch((err) => {
+      return res.status(400).json({ message: err });
     });
+});
+
+router.delete("/deleteparty", async (req, res) => {
+  const { partyId } = req.body;
+
+  if (!partyId) {
+    return res.status(400).json({ message: "field is empty" });
+  }
+
+  Party.findOneAndDelete({ partyId }, (resp) => {
+    return res
+      .status(200)
+      .json({ message: `party has been successfully deleted` });
+  }).catch((err) => {
+    return res.status(403).json({ error: err });
+  });
+});
 
 module.exports = router;

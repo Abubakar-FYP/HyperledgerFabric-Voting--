@@ -1,97 +1,101 @@
-import React, { useContext } from 'react';
-import {Link} from 'react-router-dom'; //So we will be using the link instead of anchor tag in order to stop the refreshing of the pages
-import {UserContext} from '../App';
-import styled from 'styled-components';
+import React, { useContext } from "react";
+import { Link } from "react-router-dom"; //So we will be using the link instead of anchor tag in order to stop the refreshing of the pages
+import { UserContext } from "../App";
+import styled, { css } from "styled-components/macro";
 import logo from "../../src/logo.png";
-import { NavItem } from 'react-bootstrap';
-import { menuData } from '../data/MenuData';
+import { NavItem } from "react-bootstrap";
+import { menuData } from "../data/MenuData";
+import { MenuItem } from "@material-ui/core";
+import { Button } from "./Button";
+import { FaBars } from "react-icons/fa";
 
-// const Nav = styled.nav`
-// height: 100px;
-// background:transparent;
+const Nav = styled.nav` #navbar
+  height: 60px;
+  display: flex;
 
-// justify-content: space-between;
-// padding: 1rem 2rem;
-// z-index:100;
-// position:fixed;
-// width:100;
-// `;
+  justify-content: space-between;
+  padding: 3rem 2rem;
+  z-index: 100;
+  position: fixed;
+  width: 100%;
+  box-shadow: none;
+  background-color:transparent;
+`;
 
-// // const NavLink = css`
+const NavLink = css` #links
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  height: 100%;
+  cursor: pointer;
+  text-decoration: none;
+`;
 
-// // `;
+const Logo = styled(Link)`
+  ${NavLink}
+  font-style:italic;
+`;
 
-// const Logo = styled(Link)`
-// height: 60px;
-// padding: 0px;
-
-// `;
-
-// const MenuBars = styled.i`
-
-
-// `;
-
-// const NavMenu = styled.div `
-
-
-// `;
-
-// const styles = styled.div `
-// height: 60px;
-// padding: 0px;
-// `;
-
-
-// const NavMenuLinks = styled(Link) `
-
-// `;
-const NavBar =() =>{
-  const {state,dispatch} = useContext(UserContext)
-  const renderlist=()=>{
-    if(state){
-      return[
-        <li><Link to="/ElectionResultPortal">Election Result Portal</Link></li>
-      ]
-    }else{
-      return [
-        <li><Link to="/Signin">Sign In</Link></li>
-      ]
-    }
+const MenuBars = styled(FaBars)`
+  display: none;
+  @media screen and (max-width: 768px) {
+    display: block;
+    color: white;
+    background-size: contain;
+    height: 35px;
+    width: 35px;
+    curson: pointer;
+    position: absolute;
+    top: 41px;
+    right: 65px;
+    transform: translate(-50%, 35%);
   }
-    return(
+`;
 
-      // <Nav>
-      //   <Link to= {state?"/" :"/Signin"} />
-      //    <Logo to = '/'> <img src= {logo} width={90} /></Logo>
-      //   <MenuBars />
-      //   <NavMenu>
-      //   {menuData.map((item,index)=>(
-      //     <NavMenuLinks to ={item,Link} key= {index}>
-      //         {item.title}
-      //     </NavMenuLinks>
-      //   ))}
-      //   </NavMenu>
-      // </Nav>
+const NavMenu = styled.div`
+  display: flex;
+  align-items: center;
+  margin-right: -48px;
 
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
+`;
 
+const NavMenuLinks = styled(Link)`
+  ${NavLink}
+`;
 
+const NavBtn = styled.div`
+  display: flex;
+  align-items: center;
+  margin-right: 24px;
 
-        <nav>
-        <div className="nav-wrapper no-color">
-          <Link to= {state?"/" :"/Signin"}className="brand-logo left"/> <img className="responsive-img" alt = "Company Logo" src={logo} width= {70}/>
-          <ul id="nav-mobile" className="right " >
-            <li><Link to="/Home">Home</Link></li>
-            <li><Link to="/AboutUs">About Us</Link></li>
-            <li><Link to="/Contact">Contact</Link></li>
-            {renderlist()}
-            {/* <li><Link to="/ElectionResultPortal">Election Result Portal</Link></li>
-            <li><Link to="/Signin">Sign In</Link></li> */}
-          </ul>
-        </div>
-      </nav>
-    );
-}
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
+`;
 
+const Navbar = ({ toggle }) => {
+  return (
+    <Nav>
+      <Logo to='/'>ELIXR</Logo>
+      <MenuBars onClick={toggle} />
+      <NavMenu>
+        {menuData.map((item, index) => (
+          <NavMenuLinks to={item.link} key={index}>
+            {item.title}
+          </NavMenuLinks>
+        ))}
+      </NavMenu>
+      <NavBtn>
+        <Button to='/PartyRegistration' primary='true'>
+          PartyRegistration
+        </Button>
+      </NavBtn>
+    </Nav>
+  );
+};
 
-export default NavBar;
+export default Navbar;

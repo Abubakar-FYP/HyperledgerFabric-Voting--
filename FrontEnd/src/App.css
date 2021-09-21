@@ -1,7 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap');
 
+*{
+  object-fit: contain;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box !important;
+}
+
 a{
-  color:black !important;
+  color:white;
+  transition: .4s;
+}
+
+a:hover{
+  color:green !important;
 }
 
 .li{

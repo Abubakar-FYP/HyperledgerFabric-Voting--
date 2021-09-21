@@ -13,9 +13,9 @@ const ballotSchema = new mongoose.Schema({
         required:true
     },
 
-    areaId:{
+    campaignId:{
         type: Schema.Types.ObjectId,
-        ref:'Area'
+        ref:'Campaign'
     }
 
 });

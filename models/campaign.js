@@ -11,6 +11,11 @@ const campaign = new Schema({
     campaignName:{
         type: String,
         required: true
+    },
+
+    areaId:{
+        type:[Schema.Types.ObjectId],
+        ref:"Ballot"
     }
 
 });

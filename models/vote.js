@@ -29,6 +29,7 @@ const voteSchema = new mongoose.Schema({
 
     ballotid:{
         type:mongoose.Schema.Types.ObjectId,
+        ref:"Ballot",
         required:true
     }
 
