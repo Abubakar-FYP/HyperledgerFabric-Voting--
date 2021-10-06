@@ -44,12 +44,13 @@ const voterSchema = new mongoose.Schema({
   ballotId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Ballot",
+    default: null,
   }, //this will be assigned based on the area
 
   area: {
     type: String,
     required: true,
-  },//by area I will search ballot by name then get its ballot _id for ballot id
+  }, //by area I will search ballot by name then get its ballot _id for ballot id
 
   street: {
     type: String,
