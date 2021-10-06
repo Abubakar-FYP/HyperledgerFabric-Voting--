@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const { MONGOURI } = require("./Urls/keys");
+const { MONGOURI } = require("./Keys/keys");
 const bodyparser = require("body-parser");
 
 const requirelogin = require("./Middleware/requirelogin"); //middleware
@@ -27,7 +27,7 @@ var ballot = require("./Routes/ballot");
 var campaign = require("./Routes/campaign");
 var party = require("./Routes/party");
 
-app.use([signup,vote,party,admin,ballot,campaign]); //using the routes
+app.use([signup, vote, party, admin, ballot, campaign]); //using the routes
 
 const serverNumber = 1970;
 

@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 
 //middleware
 const jwt = require("jsonwebtoken");
-const { JWTKEY } = require("../Urls/keys");
+const { JWTKEY } = require("../Keys/keys");
 const requireLogin = require("../Middleware/requirelogin");
 const otp = require("../Middleware/otp");
 
@@ -43,14 +43,15 @@ router.post("/signinadmin", requireLogin, (req, res) => {
 });
 
 router.post("/signup", async (req, res, next) => {
-  
-  const {cnic, phoneNumber} = req.body;
+  const { cnic, phoneNumber } = req.body;
 
   if (!cnic || !phoneNumber) {
-    return res.status(422).json({ message: "one or more of the fields are empty" });
+    return res
+      .status(422)
+      .json({ message: "one or more of the fields are empty" });
   }
 
-  Voter.findOne({cnic}).then((found) => {
+  Voter.findOne({ cnic }).then((found) => {
     if (found) {
       return res.status(400).json({ message: "voter already registered" });
     }
@@ -58,13 +59,12 @@ router.post("/signup", async (req, res, next) => {
 
   const genOtp = otp.otpSender(phoneNumber); //middleware,for sending otp, and saves the otp in variable
   console.log(genOtp);
-  
+
   if (typeof genOtp == "string") {
     res.json({ message: genOtp.toString() });
   }
- 
-  res.status(200).json({ message: "successufully otp sent" });
 
+  res.status(200).json({ message: "successufully otp sent" });
 });
 
 router.post("/signupotp", async (req, res, next) => {
@@ -134,7 +134,7 @@ router.post("/signupinfo", async (req, res) => {
 });
 
 router.post("/signin", async (req, res, next) => {
-  const {cnic,phoneNumber} = req.body;
+  const { cnic, phoneNumber } = req.body;
 
   if (!cnic) {
     return res.status(400).json({ message: "field is empty" });
@@ -144,10 +144,10 @@ router.post("/signin", async (req, res, next) => {
     .then((resp) => {
       console.log(resp);
       const token = jwt.sign({ _id: resp._id }, JWTKEY);
-      res.status(200).json({ token});
+      res.status(200).json({ token });
     })
     .catch((err) => {
-      if(err){
+      if (err) {
         return res.status(403).json({ message: err });
       }
     });
@@ -161,11 +161,9 @@ router.post("/signinotp", async (req, res) => {
   const genOtp = localStorage.getItem("sOtp");
 
   if (genOtp != (await req.body.otpNumber)) {
-    return await res
-      .status(400)
-      .json({
-        message: "otp entered in the field does not match otp generated",
-      });
+    return await res.status(400).json({
+      message: "otp entered in the field does not match otp generated",
+    });
   }
 
   res.status(200).json({ message: "successfully login" });

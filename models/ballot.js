@@ -17,10 +17,12 @@ const ballotSchema = new mongoose.Schema({
     ref: "Campaign",
   },
 
-  candidateId: {
-    type: Schema.Types.ObjectId,
-    ref: "Party",
-  },
+  candidateId: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Party.candidate",
+    },
+  ],
 });
 
 global.Ballot = global.Ballot || mongoose.model("Ballot", ballotSchema);
