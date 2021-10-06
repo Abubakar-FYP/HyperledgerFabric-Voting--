@@ -15,8 +15,8 @@ Twitter: @MurtazaAli7786
 
 Abubakar Mujahid
 
-Email:
+Email: abubakarmujahid672@gmail.com
 
-LinkedIn:
+LinkedIn: https://www.linkedin.com/in/abubakar-m-747940103/
 
-Twitter:
+Twitter: abubakar_672
