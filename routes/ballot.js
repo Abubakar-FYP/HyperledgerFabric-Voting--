@@ -11,9 +11,9 @@ require("../Models/ballot");
 const Ballot = mongoose.model("Ballot");
 
 router.post("/createballot", async (req, res) => {
-  const { ballotid, ballotname, areaId } = req.body; //send objectId of AreaId
+  const { ballotid, ballotname } = req.body; //send objectId of AreaId
 
-  if (!ballotid || !ballotname || !areaId) {
+  if (!ballotid || !ballotname) {
     return res.status(400).json({ message: "one or more fields are empty" });
   }
 
@@ -30,7 +30,6 @@ router.post("/createballot", async (req, res) => {
   const newBallot = new Ballot({
     ballotid,
     ballotname,
-    areaId,
   });
 
   newBallot
@@ -44,6 +43,8 @@ router.post("/createballot", async (req, res) => {
 });
 
 router.get("/findballot", async (req, res) => {
+  //use this on every insertion of ballot,
+  //verifies if ballot is ok or not
   const { ballotid } = req.body;
 
   if (!ballotid) {
@@ -51,62 +52,14 @@ router.get("/findballot", async (req, res) => {
   }
 
   Ballot.findOne({ ballotid })
-    .populate("areaId")
+    .populate("campaignId")
     .exec((err, docs) => {
       if (err) {
-        return res.json({ message: err });
+        return res.status(400).json({ message: err });
       } else {
-        return res.json({ message: docs });
+        return res.status(200).json({ message: docs });
       }
     });
-});
-
-router.put("/updateballot", async (req, res) => {
-  const { ballotid, ballotname, areaId } = req.body;
-
-  const found = await axios({
-    method: "get",
-    url: "http://localhost:1970/findballot",
-    data: {
-      ballotid: ballotid,
-    },
-  })
-    .then((resp) => {
-      if (resp.data["message"] == null) {
-        return res
-          .status(403)
-          .json({ message: "ballot not present with this id" });
-      }
-    })
-    .catch((err) => console.log(err));
-
-  try {
-    if (!ballotid) {
-      return res.status(400).json({ message: "field is empty" });
-    }
-
-    if (!areaId && !ballotname) {
-      return res
-        .status(400)
-        .json({ message: "no updation fields are entered" });
-    }
-  } catch {
-    /*empty*/
-  }
-
-  if (ballotname) {
-    Ballot.findOneAndUpdate({ ballotid }, { ballotname }).catch((err) => {
-      return res.status(403).json({ message: err });
-    });
-  }
-
-  if (areaId) {
-    Ballot.findOneAndUpdate({ ballotid }, { areaId }).catch((err) => {
-      return res.status(403).json({ message: err });
-    });
-  }
-
-  return res.status(200).json({ message: "ballot successfully updated" });
 });
 
 router.delete("/deleteballot", async (req, res) => {
@@ -144,7 +97,7 @@ router.delete("/deleteballot", async (req, res) => {
 
 router.get("/findallballot", async (req, res) => {
   Ballot.find({})
-    .populate("areaId")
+    .populate("campaignId")
     .exec((err, docs) => {
       if (err) {
         return res.json({ message: err });

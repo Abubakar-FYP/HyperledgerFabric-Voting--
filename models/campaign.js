@@ -13,7 +13,7 @@ const campaign = new Schema({
         required: true
     },
 
-    areaId:{
+    ballotId:{
         type:[Schema.Types.ObjectId],
         ref:"Ballot"
     }

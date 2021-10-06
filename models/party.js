@@ -64,12 +64,12 @@ const partySchema = new Schema({
         type: Number,
         default: 0000,
       },
-      
-      position:{
-        type:String,
-        default:""
+
+      position: {
+        type: String,
+        default: "",
       },
-      
+
       ballotid: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Ballot",
@@ -80,12 +80,7 @@ const partySchema = new Schema({
         ref: "Party",
       },
 
-      is_criminal:{
-        type: Boolean,
-        default: false
-      },
-
-      candidate_valid: {
+      is_criminal: {
         type: Boolean,
         default: false,
       },

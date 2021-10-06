@@ -1,24 +1,27 @@
-const {Schema} = require('mongoose') //Admin editable only
-const mongoose = require('mongoose')
+const { Schema } = require("mongoose"); //Admin editable only
+const mongoose = require("mongoose");
 
 const ballotSchema = new mongoose.Schema({
+  ballotname: {
+    type: String,
+    required: true,
+  },
 
-    ballotname:{
-        type:String,
-        required:true
-    },
- 
-    ballotid:{
-        type:Number,
-        required:true
-    },
+  ballotid: {
+    type: Number,
+    required: true,
+  },
 
-    campaignId:{
-        type: Schema.Types.ObjectId,
-        ref:'Campaign'
-    }
+  campaignId: {
+    type: Schema.Types.ObjectId,
+    ref: "Campaign",
+  },
 
+  candidateId: {
+    type: Schema.Types.ObjectId,
+    ref: "Party",
+  },
 });
 
-global.Ballot = global.Ballot || mongoose.model("Ballot",ballotSchema);
+global.Ballot = global.Ballot || mongoose.model("Ballot", ballotSchema);
 module.exports = global.Ballot;
