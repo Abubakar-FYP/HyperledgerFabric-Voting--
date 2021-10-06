@@ -12,3 +12,11 @@ Email: murtazaalimashadi1999@gmail.com
 LinkedIn: https://www.linkedin.com/in/syed-murtaza-ali-shah
 
 Twitter: @MurtazaAli7786
+
+Abubakar Mujahid
+
+Email:
+
+LinkedIn:
+
+Twitter:
