@@ -51,4 +51,24 @@ router.get("/checkifvotedalready/:cnic", async (req, res) => {
   }
 });
 
-router.put("/assignballotuser/:cnic/:ballotid", async (req, res) => {});
+//voter will be assigned ballot as per, ballot names will be shown to him
+//he selects one,the whole object of that ballot will be saved
+//now that ballotid from that object will be inserted the voter's ballot
+router.put("/assignballotuser/:cnic/:ballotid", async (req, res) => {
+  const { cnic, ballotid } = req.params;
+  if (!cnic || !ballotid) {
+    return res.status(400).json({ message: "field or fields are empty" });
+  }
+
+  Voter.findOneAndUpdate({ cnic }, { ballotid }, (err, result) => {
+    if (!err) {
+      return res
+        .status(200)
+        .json({ message: "ballot successfully assigned to voter" });
+    } else {
+      return res
+        .status(400)
+        .json({ message: "there was a problem inserting ballot" });
+    }
+  });
+});
