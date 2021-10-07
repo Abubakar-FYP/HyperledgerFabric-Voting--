@@ -3,12 +3,14 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 const requireLogin = require("../middleware/requirelogin");
+const { restart } = require("nodemon");
 
 //Register Models
 require("../Models/ballot");
-
+require("../Models/party");
 //Models
 const Ballot = mongoose.model("Ballot");
+const Party = require("../Models/party");
 
 router.post("/createballot", async (req, res) => {
   const { ballotid, ballotname } = req.body; //send objectId of AreaId
@@ -107,5 +109,67 @@ router.get("/findallballot", async (req, res) => {
       }
     });
 });
+
+//gets all the name of the ballots
+router.get("/getballotname", async (req, res) => {
+  Ballot.find({})
+    .select("ballotname")
+    .exec((err, docs) => {
+      if (!err) {
+        return res.status(200).json({ message: docs });
+      } else {
+        return res.status(400).json({ message: err });
+      }
+    })
+    .catch((err) => console.log(err));
+});
+
+//first candidateid will be fetched from candidate after its creation
+//then found and inserted in ballot
+router.put(
+  "/updatecandidatesinballot/:ballotid/:candidateid", //have to be _id
+  async (req, res) => {
+    const { ballotid, candidateid } = req.params;
+
+    if (!ballotid || !candidateid) {
+      res.status(400).json({ message: "field is empty" });
+    }
+
+    Ballot.findOne({ ballotid })
+      .exec((err, doc) => {
+        doc.candidate.push(candidateid);
+        doc
+          .save((err, res) => {
+            if (!err) {
+              res
+                .status(200)
+                .json({ message: "candidate successfully saved in ballot" });
+            } else {
+              res
+                .status(400)
+                .json({ message: "error in saving candidate in ballot" });
+            }
+          })
+          .catch((err) => console.log(err));
+      })
+      .catch((err) => console.log(err));
+  }
+);
+
+router.get("/getcandidateswithballotid/:ballotid", async (req, res) => {
+  const { ballotid } = req.params;
+  if (!ballotid) {
+    return res.status(400).json({ message: "field is empty" });
+  }
+  Party.find({ "candidate.ballotid": ballotid }).exec((err, docs) => {
+    if (!err) {
+      return res.status(200).json({ message: docs });
+    } else {
+      return res.status(400).json({ message: err });
+    }
+  });
+});
+
+//get candidates with a specific ballot id
 
 module.exports = router;

@@ -93,7 +93,6 @@ const partySchema = new Schema({
   },
 });
 
-mongoose.model("Party", partySchema);
 global.Party = global.Party || mongoose.model("Party", partySchema);
 
 module.exports = global.Party;

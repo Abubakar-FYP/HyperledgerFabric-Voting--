@@ -193,6 +193,44 @@ router.put("/updatepartyid", async (req, res) => {
     .catch((err) => console.log(err));
 });
 
+//this route will execute when a user is selected for a ballot
+//a ballot id will be assigned to him
+router.put(
+  "/updatepartycandidateballot/:ballotid/:partyId",
+  async (req, res) => {
+    const { ballotid } = req.params.ballotid;
+    if (!ballotid) {
+      return res.status(400).json({ message: "field is empty" });
+    }
+    Party.findOne({ partyId })
+      .exec((err, doc) => {
+        doc.ballotid = ballotid;
+        doc.save().catch((err) => console.log(err));
+        res.status(200).json({ message: "candidate is given a partId" });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+);
+
+router.get("/getcandidateid/:candidateid", async (req, res) => {
+  const { candidateid } = req.params;
+  if (!candidateid) {
+    res.status(400).json({ message: "field is empty" });
+  }
+
+  Party.findOne({ "candidate.candidateId": candidateid })
+    .select("_id")
+    .exec((err, doc) => {
+      if (!err) {
+        res.status(200).json({ message: doc });
+      } else {
+        res.status(400).json({ message: err });
+      }
+    });
+});
+
 const removeNull = (array) => {
   return array.filter((item) => {
     item !== null;
