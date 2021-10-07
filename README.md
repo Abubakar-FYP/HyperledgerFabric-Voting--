@@ -5,7 +5,7 @@ Weve used MERN stack as our main tech stack, incroporating MongoDB,ExpressJS, Re
 
 # Contact:
 
-Syed Murtaza Ali Shah
+## Syed Murtaza Ali Shah
 
 Email: murtazaalimashadi1999@gmail.com
 
@@ -13,10 +13,10 @@ LinkedIn: https://www.linkedin.com/in/syed-murtaza-ali-shah
 
 Twitter: @MurtazaAli7786
 
-Abubakar Mujahid
+## Abubakar Mujahid
 
-Email:
+Email: abubakarmujahid672@gmail.com
 
-LinkedIn:
+LinkedIn: https://www.linkedin.com/in/abubakar-m-747940103/
 
-Twitter:
+Twitter: abubakar_672
