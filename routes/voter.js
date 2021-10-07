@@ -60,15 +60,19 @@ router.put("/assignballotuser/:cnic/:ballotid", async (req, res) => {
     return res.status(400).json({ message: "field or fields are empty" });
   }
 
-  Voter.findOneAndUpdate({ cnic }, { ballotid }, (err, result) => {
-    if (!err) {
-      return res
-        .status(200)
-        .json({ message: "ballot successfully assigned to voter" });
-    } else {
-      return res
-        .status(400)
-        .json({ message: "there was a problem inserting ballot" });
+  Voter.findOneAndUpdate(
+    { cnic: cnic },
+    { ballotid: ballotid },
+    (err, result) => {
+      if (!err) {
+        return res
+          .status(200)
+          .json({ message: "ballot successfully assigned to voter" });
+      } else {
+        return res
+          .status(400)
+          .json({ message: "there was a problem inserting ballot" });
+      }
     }
-  });
+  );
 });
