@@ -43,12 +43,24 @@ router.post("/vote/:v_cnic/:c_cnic", async (req, res) => {
 
   newVote
     .save()
-    .then((resp) =>
-      res.status(200).json({ message: "you have successfully voted" })
-    )
+    .then((resp) => console.log(resp))
     .catch((err) => {
-      res.status(400).json({ message: err });
+      console.log(err);
     });
+
+  Voter.findOneAndUpdate({ cnic: req.params.v_cnic }, { voteflag: true })
+    .exec((err, doc) => {
+      if (!err) {
+        return res
+          .status(200)
+          .json({ message: "now you are logged out,Because you have voted" });
+      } else {
+        return res
+          .status(400)
+          .json({ message: "there was an error in voting,try again" });
+      }
+    })
+    .catch((err) => console.log(err));
 });
 
 module.exports = router;
