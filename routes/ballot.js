@@ -55,6 +55,7 @@ router.get("/findballot", async (req, res) => {
 
   Ballot.findOne({ ballotid })
     .populate("campaignId")
+    .populate("candidate")
     .exec((err, docs) => {
       if (err) {
         return res.status(400).json({ message: err });
@@ -100,6 +101,7 @@ router.delete("/deleteballot", async (req, res) => {
 router.get("/findallballot", async (req, res) => {
   Ballot.find({})
     .populate("campaignId")
+    .populate("candidate")
     .exec((err, docs) => {
       if (err) {
         return res.json({ message: err });
@@ -129,15 +131,15 @@ router.get("/getballotname", async (req, res) => {
 router.put(
   "/updatecandidatesinballot/:ballotid/:candidateid", //have to be _id
   async (req, res) => {
-    const { ballotid, candidateid } = req.params;
+    const { ballotid, candidate } = req.params;
 
-    if (!ballotid || !candidateid) {
+    if (!ballotid || !candidate) {
       res.status(400).json({ message: "field is empty" });
     }
 
     Ballot.findOne({ ballotid })
       .exec((err, doc) => {
-        doc.candidate.push(candidateid);
+        doc.candidate.push(candidate);
         doc
           .save((err, res) => {
             if (!err) {
@@ -170,6 +172,4 @@ router.get("/getcandidateswithballotid/:ballotid", async (req, res) => {
   });
 });
 
-//get candidates with a specific ballot id
-//populate with candidateID
 module.exports = router;
