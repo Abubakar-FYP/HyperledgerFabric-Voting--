@@ -60,15 +60,17 @@ router.get("/findcampaign", async (req, res) => {
     return res.status(403).json({ error: "field is empty" });
   }
 
-  Campaign.findOne({ campaignId }).exec((err, doc) => {
-    if (err) {
-      console.log(err);
-      return res.status(400).json({ message: err });
-    } else {
-      console.log(doc);
-      return res.status(200).json({ message: doc });
-    }
-  });
+  Campaign.findOne({ campaignId })
+    .populate("ballotId")
+    .exec((err, doc) => {
+      if (err) {
+        console.log(err);
+        return res.status(400).json({ message: err });
+      } else {
+        console.log(doc);
+        return res.status(200).json({ message: doc });
+      }
+    });
 });
 
 router.delete("/deletecampaign", async (req, res) => {
