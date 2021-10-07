@@ -96,7 +96,7 @@ router.delete("/deleteballot", async (req, res) => {
       res.status(400).json({ message: err });
     });
 });
-
+//finds all ballots and their campaigns
 router.get("/findallballot", async (req, res) => {
   Ballot.find({})
     .populate("campaignId")
@@ -171,5 +171,5 @@ router.get("/getcandidateswithballotid/:ballotid", async (req, res) => {
 });
 
 //get candidates with a specific ballot id
-
+//populate with candidateID
 module.exports = router;
