@@ -46,6 +46,7 @@ const partySchema = new Schema({
     type: String,
     required: true,
   },
+
   candidate: [
     {
       type: mongoose.Types.ObjectId,

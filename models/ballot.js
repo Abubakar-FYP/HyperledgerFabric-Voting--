@@ -18,10 +18,10 @@ const ballotSchema = new mongoose.Schema({
     ref: "Campaign",
   },
 
-  partyId: [
+  candidate: [
     {
       type: mongoose.Types.ObjectId,
-      ref: "Party",
+      ref: "Candidate",
     },
   ],
 });

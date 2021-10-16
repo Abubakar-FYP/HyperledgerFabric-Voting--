@@ -119,10 +119,35 @@ router.get("/getballotname", async (req, res) => {
 
 //first candidateid will be fetched from party.candidate after its creation
 //then found and inserted in ballot
-//have to be _id
+//!!!!TEST THIS ONE(REPORT THIS IF THERES A WARNING AHEAD,NOT RIGHT NOW))
 router.put(
-  "/updatecandidatesinballot/:ballotid/:candidateid",
-  async (req, res) => {}
+  "/updatecandidatesinballot/:ballotid/:candidateid", //have to be _id
+  async (req, res) => {
+    const { ballotid, candidate } = req.params;
+
+    if (!ballotid || !candidate) {
+      res.status(400).json({ message: "field is empty" });
+    }
+
+    Ballot.findOne({ ballotid })
+      .exec((err, doc) => {
+        doc.candidate.push(candidate);
+        doc
+          .save((err, res) => {
+            if (!err) {
+              res
+                .status(200)
+                .json({ message: "candidate successfully saved in ballot" });
+            } else {
+              res
+                .status(400)
+                .json({ message: "error in saving candidate in ballot" });
+            }
+          })
+          .catch((err) => console.log(err));
+      })
+      .catch((err) => console.log(err));
+  }
 );
 
 //it gets the candidate having the same ballotid

@@ -8,4 +8,15 @@ require("../Models/candidate");
 
 const Candidate = mongoose.model("Candidate");
 
+router.post("/createcandidate", async (req, res) => {
+    const 
+});
+
+router.delete("/deletecandidate", async (req, res) => {});
+
+router.get("/findcandidate", async (req, res) => {});
+
+router.get("/findallcandidate", async (req, res) => {});
+
+
 module.exports = router;
