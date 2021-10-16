@@ -48,40 +48,11 @@ const partySchema = new Schema({
   },
   candidate: [
     {
-      name: {
-        type: String,
-        default: "",
-      },
-
-      cnic: {
-        type: Number,
-        default: 0000,
-      },
-
-      position: {
-        type: String,
-        default: "",
-      },
-
-      ballotid: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Ballot",
-        default: null,
-      },
-
-      partyId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Party",
-        default: null,
-      },
-
-      is_criminal: {
-        type: Boolean,
-        default: false,
-      },
+      type: mongoose.Types.ObjectId,
+      ref: "Candidate",
     },
-  ], //SUBDOCUMENT
-
+  ],
+  //ballot reference ? reverse...
   is_valid: {
     type: Boolean,
     default: false,

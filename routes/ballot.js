@@ -99,14 +99,7 @@ router.delete("/deleteballot", async (req, res) => {
 });
 
 //finds all ballots and their campaigns
-//tested multiple times,populate does'nt work
-router.get("/findallballot", async (req, res) => {
-  Ballot.aggregate({
-    $unwind: "$candidateList.candidate",
-    from: "Ballot",
-    localField: "candidateList",
-  });
-});
+router.get("/findallballot", async (req, res) => {});
 
 //gets all the name of the ballots
 //tested
@@ -126,67 +119,18 @@ router.get("/getballotname", async (req, res) => {
 
 //first candidateid will be fetched from party.candidate after its creation
 //then found and inserted in ballot
-//!!!!TEST THIS ONE(REPORT THIS IF THERES A WARNING AHEAD,NOT RIGHT NOW))
+//have to be _id
 router.put(
-  "/updatecandidatesinballot/:ballotid/:candidateid", //have to be _id
-  async (req, res) => {
-    const { ballotid, candidate } = req.params;
-
-    if (!ballotid || !candidate) {
-      res.status(400).json({ message: "field is empty" });
-    }
-
-    Ballot.findOne({ ballotid })
-      .exec((err, doc) => {
-        doc.candidate.push(candidate);
-        doc
-          .save((err, res) => {
-            if (!err) {
-              res
-                .status(200)
-                .json({ message: "candidate successfully saved in ballot" });
-            } else {
-              res
-                .status(400)
-                .json({ message: "error in saving candidate in ballot" });
-            }
-          })
-          .catch((err) => console.log(err));
-      })
-      .catch((err) => console.log(err));
-  }
+  "/updatecandidatesinballot/:ballotid/:candidateid",
+  async (req, res) => {}
 );
 
 //it gets the candidate having the same ballotid
 //the candidats belonging to the same ballot
-router.get("/getcandidateswithballotid/:ballotid", async (req, res) => {
-  const { ballotid } = req.params;
-  if (!ballotid) {
-    return res.status(400).json({ message: "field is empty" });
-  }
-  Party.find({ "candidate.ballotid": ballotid }).exec((err, docs) => {
-    if (!err) {
-      return res.status(200).json({ message: docs });
-    } else {
-      return res.status(400).json({ message: err });
-    }
-  });
-});
+router.get("/getcandidateswithballotid/:ballotid", async (req, res) => {});
 
 //single ballot winner (candidate)
-router.get("/getballotwinner", async (req, res) => {
-  const ballot = await Ballot.find()
-    .populate({
-      model: Party,
-      path: "candidate",
-      select: "name",
-    })
-    .exec((err, docs) => {
-      if (!err) {
-        res.json(docs);
-      }
-    }); //list of ballots
-});
+router.get("/getballotwinner", async (req, res) => {});
 //overall winner (party)
 //campaign winner (party)
 

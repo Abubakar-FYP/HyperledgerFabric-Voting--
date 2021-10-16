@@ -78,26 +78,7 @@ router.post("/createparty", async (req, res) => {
 //use this api on the front-end using axios, for one by one check during insertion
 //front end check while inserting single candidate
 //returns a list of objects,A candidate if found, or null
-router.get("/findcandidate", async (req, res) => {
-  const { cnic } = req.body;
-  if (!cnic) {
-    return res.status(400).json({ message: "field is empty" });
-  }
-  const found = await Party.findOne({ "candidate.cnic": cnic }).lean();
-  if (found == null) {
-    return res.status(400).json({ message: null });
-  } else {
-    const candidate = found.candidate
-      .map((item) => {
-        return item.cnic == cnic ? item : null;
-      })
-      .filter((item) => {
-        return item !== null;
-      });
-    console.log(candidate);
-    return res.status(200).json({ message: candidate });
-  }
-});
+router.get("/findcandidate", async (req, res) => {});
 
 //returns string or null if not criminal
 router.get("/getcriminal", async (req, res) => {
@@ -137,6 +118,8 @@ router.get("/findparty", async (req, res) => {
 
   return res.status(200).json({ message: findParty });
 });
+
+router.get("/findallparty", async (req, res) => {});
 
 router.delete("/deleteparty", async (req, res) => {
   const { partyId } = req.body;
@@ -206,39 +189,8 @@ router.put("/updatepartyid", async (req, res) => {
 //a ballot id will be assigned to him
 router.put(
   "/updatepartycandidateballot/:ballotid/:partyId",
-  async (req, res) => {
-    const { ballotid } = req.params.ballotid;
-    if (!ballotid) {
-      return res.status(400).json({ message: "field is empty" });
-    }
-    Party.findOne({ partyId })
-      .exec((err, doc) => {
-        doc.ballotid = ballotid;
-        doc.save().catch((err) => console.log(err));
-        res.status(200).json({ message: "candidate is given a ballotid" });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
+  async (req, res) => {}
 );
-
-router.get("/getcandidateid/:candidateid", async (req, res) => {
-  const { candidateid } = req.params;
-  if (!candidateid) {
-    res.status(400).json({ message: "field is empty" });
-  }
-
-  Party.findOne({ "candidate.candidateId": candidateid })
-    .select("_id")
-    .exec((err, doc) => {
-      if (!err) {
-        res.status(200).json({ message: doc });
-      } else {
-        res.status(400).json({ message: err });
-      }
-    });
-});
 
 //returns mpa and mna
 //hard coded
