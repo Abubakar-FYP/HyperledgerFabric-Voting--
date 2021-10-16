@@ -12,12 +12,10 @@ const otp = require("../Middleware/otp");
 //registering models
 require("../Models/admin");
 require("../Models/voter");
-require("../Models/hash");
 
 //models
 const Admin = mongoose.model("Admin");
 const Voter = mongoose.model("Voter");
-const Hash = mongoose.model("Hash");
 
 router.post("/signinadmin", requireLogin, (req, res) => {
   const { email, password } = req.body;

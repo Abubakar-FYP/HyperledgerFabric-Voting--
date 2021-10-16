@@ -7,10 +7,20 @@ require("../Models/party");
 
 const Party = mongoose.model("Party");
 
-
 //gets all the parties that are unapproved
 router.get("/findallunapprovedparties", async (req, res) => {
   Party.find({ is_valid: false })
+    .then((resp) => {
+      res.status(200).json({ message: resp });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+//gets all the parties that are approved
+router.get("/findallapprovedparties", async (req, res) => {
+  Party.find({ is_valid: true })
     .then((resp) => {
       res.status(200).json({ message: resp });
     })
@@ -25,9 +35,7 @@ router.put("/approveparty/:partyId", async (req, res) => {
     { partyId: req.params.partyId },
     { is_valid: true },
     (resp) => {
-      res
-        .status(200)
-        .json({ message: `${req.params.partyId} has been approved` });
+      res.status(200).json({ message: `party has been approved` });
     }
   ).catch((err) => {
     console.log(err);

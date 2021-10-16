@@ -12,7 +12,8 @@ require("../Models/criminal");
 const Party = mongoose.model("Party");
 const Criminal = mongoose.model("Criminal");
 
-//use the find candidate on front end
+//use findparty before running this to find that if there is not any other party than this party
+//use the find candidate on front end before running this to make sure candidates are not duplicated
 //collect all the data from different forms then make this request
 router.post("/createparty", async (req, res) => {
   const {
@@ -45,7 +46,7 @@ router.post("/createparty", async (req, res) => {
     return res.status(408).json({ message: "one or more fields are empty" });
   }
 
-  const newParty = new Party({
+  let newParty = new Party({
     partyId,
     partyName,
     partyImg,
@@ -59,17 +60,19 @@ router.post("/createparty", async (req, res) => {
     candidate,
   });
 
+  const _id = newParty._id;
+  const updatedParty = newParty.candidate.map((item) => {
+    item.partyId = _id;
+    item.ballotid = null;
+    return item;
+  });
+
+  newParty.candidate.splice(0, newParty.candidate.length, ...updatedParty);
+
   newParty
     .save()
-    .then((resp) => {
-      res.status(408).json({ message: "party successfully saved" });
-    })
-    .catch((err) => {
-      res.status(408).json({ message: err });
-    });
-
-  //party created,Now create the candidate list, save the partyID for
-  //dont give partyID to candidate,it will be set afterwards the creation of party,API
+    .then(res.status(200).json({ message: "a new party is created" }))
+    .catch((err) => res.status(200).json({ message: err }));
 });
 
 //use this api on the front-end using axios, for one by one check during insertion
@@ -158,6 +161,10 @@ router.delete("/deleteparty", async (req, res) => {
   }
 });
 
+{
+  /* 
+//a substitute has been made in the createparty,to solve this problem
+//dont use this
 //inserts party id into candidate info,after
 //for single and many candidates
 router.put("/updatepartyid", async (req, res) => {
@@ -192,6 +199,8 @@ router.put("/updatepartyid", async (req, res) => {
     })
     .catch((err) => console.log(err));
 });
+ */
+}
 
 //this route will execute when a user is selected for a ballot
 //a ballot id will be assigned to him
@@ -206,7 +215,7 @@ router.put(
       .exec((err, doc) => {
         doc.ballotid = ballotid;
         doc.save().catch((err) => console.log(err));
-        res.status(200).json({ message: "candidate is given a partId" });
+        res.status(200).json({ message: "candidate is given a ballotid" });
       })
       .catch((err) => {
         console.log(err);
@@ -231,10 +240,11 @@ router.get("/getcandidateid/:candidateid", async (req, res) => {
     });
 });
 
-const removeNull = (array) => {
-  return array.filter((item) => {
-    item !== null;
-  });
-};
+//returns mpa and mna
+//hard coded
+router.get("/getpositions", async (req, res) => {
+  const positions = { MPA: "MPA", MNA: "MNA" };
+  return res.status(200).json({ positions });
+});
 
 module.exports = router;

@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 const requireLogin = require("../middleware/requirelogin");
-const { restart } = require("nodemon");
+const ObjectId = mongoose.Types.ObjectId;
 
 //Register Models
 require("../Models/ballot");
@@ -97,37 +97,36 @@ router.delete("/deleteballot", async (req, res) => {
       res.status(400).json({ message: err });
     });
 });
+
 //finds all ballots and their campaigns
+//tested multiple times,populate does'nt work
 router.get("/findallballot", async (req, res) => {
-  Ballot.find({})
-    .populate("campaignId")
-    .populate("candidate")
-    .exec((err, docs) => {
-      if (err) {
-        return res.json({ message: err });
-      } else {
-        console.log(docs);
-        return res.json({ message: docs });
-      }
-    });
+  Ballot.aggregate({
+    $unwind: "$candidateList.candidate",
+    from: "Ballot",
+    localField: "candidateList",
+  });
 });
 
 //gets all the name of the ballots
+//tested
+//check again
 router.get("/getballotname", async (req, res) => {
-  Ballot.find({})
+  await Ballot.find({})
     .select("ballotname")
     .exec((err, docs) => {
       if (!err) {
         return res.status(200).json({ message: docs });
       } else {
+        console.log(err);
         return res.status(400).json({ message: err });
       }
-    })
-    .catch((err) => console.log(err));
+    });
 });
 
-//first candidateid will be fetched from candidate after its creation
+//first candidateid will be fetched from party.candidate after its creation
 //then found and inserted in ballot
+//!!!!TEST THIS ONE(REPORT THIS IF THERES A WARNING AHEAD,NOT RIGHT NOW))
 router.put(
   "/updatecandidatesinballot/:ballotid/:candidateid", //have to be _id
   async (req, res) => {
@@ -158,6 +157,8 @@ router.put(
   }
 );
 
+//it gets the candidate having the same ballotid
+//the candidats belonging to the same ballot
 router.get("/getcandidateswithballotid/:ballotid", async (req, res) => {
   const { ballotid } = req.params;
   if (!ballotid) {
@@ -171,5 +172,27 @@ router.get("/getcandidateswithballotid/:ballotid", async (req, res) => {
     }
   });
 });
+
+//single ballot winner (candidate)
+router.get("/getballotwinner", async (req, res) => {
+  const ballot = await Ballot.find()
+    .populate({
+      model: Party,
+      path: "candidate",
+      select: "name",
+    })
+    .exec((err, docs) => {
+      if (!err) {
+        res.json(docs);
+      }
+    }); //list of ballots
+});
+//overall winner (party)
+//campaign winner (party)
+
+//returns unique values
+const unique = (value, index, self) => {
+  return self.indexOf(value) === index;
+};
 
 module.exports = router;

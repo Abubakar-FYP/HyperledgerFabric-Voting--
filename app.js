@@ -27,7 +27,7 @@ var ballot = require("./Routes/ballot");
 var campaign = require("./Routes/campaign");
 var party = require("./Routes/party");
 
-app.use([signup, vote, party, admin, ballot, campaign]); //using the routes
+app.use([signup, ballot, vote, party, admin, campaign]); //using the routes
 
 const serverNumber = 1970;
 

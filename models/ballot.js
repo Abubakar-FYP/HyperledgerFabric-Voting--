@@ -1,5 +1,6 @@
 const { Schema } = require("mongoose"); //Admin editable only
 const mongoose = require("mongoose");
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const ballotSchema = new mongoose.Schema({
   ballotname: {
@@ -17,12 +18,15 @@ const ballotSchema = new mongoose.Schema({
     ref: "Campaign",
   },
 
-  candidate: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Party.candidate",
-    },
-  ],
+  candidateList: {
+    candidate: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Party",
+      },
+    ],
+    default: [],
+  },
 });
 
 global.Ballot = global.Ballot || mongoose.model("Ballot", ballotSchema);

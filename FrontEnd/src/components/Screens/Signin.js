@@ -1,7 +1,6 @@
 import React from 'react';
-import { useHistory } from 'react-router';
 import {useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useHistory} from 'react-router-dom';
 import M from 'materialize-css';
 import { useContext } from 'react';
 import { UserContext } from '../../App';
@@ -16,7 +15,6 @@ const Signin =()=>{
 
 
 const PostData =() =>{
-    let history = useHistory
     fetch("/Signin",{
         method:"post",
         headers:{
@@ -43,10 +41,9 @@ const PostData =() =>{
         console.log(err)
     })
 }
+
 const router =()=>{
-    let path = '/home/abubakar/Desktop/Pakistan-Voting-System-using-HyperledgerFabric/FrontEnd/src/components/Screens/OTP.js';
-    let history = useHistory;
-    history.push(path);
+    history.push("/OTP");
 }
 <section className ="Signin">
 <div className= "container mt-5">
