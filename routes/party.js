@@ -7,14 +7,15 @@ const requireLogin = require("../middleware/requirelogin");
 //Registering Models
 require("../Models/party");
 require("../Models/criminal");
+require("../Models/candidate");
 
 //Models
 const Party = mongoose.model("Party");
+const Candidate = mongoose.model("Candidate");
 const Criminal = mongoose.model("Criminal");
 
-//use findparty before running this to find that if there is not any other party than this party
-//use the find candidate on front end before running this to make sure candidates are not duplicated
-//collect all the data from different forms then make this request
+//use the findparty or getparty dapi to check if its new or not
+//returns a list of candidates,chain this api to create candidate api
 router.post("/createparty", async (req, res) => {
   const {
     partyId,
@@ -46,7 +47,7 @@ router.post("/createparty", async (req, res) => {
     return res.status(408).json({ message: "one or more fields are empty" });
   }
 
-  let newParty = new Party({
+  const newParty = new Party({
     partyId,
     partyName,
     partyImg,
@@ -60,71 +61,50 @@ router.post("/createparty", async (req, res) => {
     candidate,
   });
 
-  const _id = newParty._id;
-  const updatedParty = newParty.candidate.map((item) => {
-    item.partyId = _id;
-    item.ballotid = null;
-    return item;
+  const candidateList = candidate.map((item) => {
+    return new Candidate({
+      name: item.name,
+      cnic: item.cnic,
+      partyId: newParty._id,
+      position: item.position,
+    });
+  }); // send these to candidate
+
+  const candidateIds = candidateList.map((item) => {
+    return item._id;
   });
 
-  newParty.candidate.splice(0, newParty.candidate.length, ...updatedParty);
+  newParty.candidate = candidateIds;
 
-  newParty
-    .save()
-    .then(res.status(200).json({ message: "a new party is created" }))
-    .catch((err) => res.status(200).json({ message: err }));
-});
-
-//use this api on the front-end using axios, for one by one check during insertion
-//front end check while inserting single candidate
-//returns a list of objects,A candidate if found, or null
-router.get("/findcandidate", async (req, res) => {
-  const { cnic } = req.body;
-  if (!cnic) {
-    return res.status(400).json({ message: "field is empty" });
-  }
-  const found = await Party.findOne({ "candidate.cnic": cnic }).lean();
-  if (found == null) {
-    return res.status(400).json({ message: null });
+  const resp = await newParty.save();
+  if (resp !== newParty) {
+    res.status(400).json({ message: "party did not save successfully" });
   } else {
-    const candidate = found.candidate
-      .map((item) => {
-        return item.cnic == cnic ? item : null;
-      })
-      .filter((item) => {
-        return item !== null;
-      });
-    console.log(candidate);
-    return res.status(200).json({ message: candidate });
+    res.status(200).json({ message: "party saved sucessfully" });
   }
+
+  return candidateList; //returns list of candidates
 });
 
-//returns string or null if not criminal
-router.get("/getcriminal", async (req, res) => {
-  const { cnic } = req.body;
+//chain use during candidate registration by party leader
+//null is a positive reply,that a person is not a criminal
+//true means that he/she is a criminal
+router.get("/getcriminal/:_id", async (req, res) => {
+  await Criminal.findOne({ _id: _id }).exec((err, doc) => {
+    if (!err) {
+      res.status(200).json({ message: null });
+    } else {
+      res.status(400).json({ message: true });
+    }
+  });
+});
 
-  if (!cnic) {
+//populate when db ready
+router.get("/findparty/:_id", async (req, res) => {
+  const { _id } = req.params._id;
+
+  if (!_id) {
     return res.status(400).json({ message: "field is empty" });
-  }
-
-  Criminal.findOne({ cnic })
-    .then((resp) => {
-      if (resp !== null) {
-        return res.status(200).json({ message: "candidate is a criminal" });
-      } else {
-        return res.status(200).json({ message: null });
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-});
-
-router.get("/findparty", async (req, res) => {
-  const { partyId } = req.body;
-
-  if (!partyId) {
-    return res.status(400).json({ message: "field empty" });
   }
 
   const found = await Party.find({}).lean();
@@ -138,114 +118,25 @@ router.get("/findparty", async (req, res) => {
   return res.status(200).json({ message: findParty });
 });
 
-router.delete("/deleteparty", async (req, res) => {
-  const { partyId } = req.body;
+//takes _id as parameters
+//deletes a party
+router.delete("/deleteparty/:id", async (req, res) => {
+  const { _id } = req.params._id;
 
-  if (!partyId) {
+  if (!_id) {
     return res.status(400).json({ message: "field is empty" });
   }
 
-  const found = await Party.findOne({ partyId });
-  if (found !== null) {
-    Party.findOneAndDelete({ partyId }, (resp) => {
-      return res
-        .status(200)
-        .json({ message: `party has been successfully deleted` });
-    }).catch((err) => {
-      return res.status(403).json({ message: err });
-    });
-  } else {
+  await Party.deleteOne({ _id: _id }, (resp) => {
+    if (resp) {
+      return res.status(200).json({ message: "party successfully deleted" });
+    }
+  }).catch((err) => {
+    console.log(err);
     return res
       .status(400)
-      .json({ message: "party with this party-id does not exist" });
-  }
-});
-
-{
-  /* 
-//a substitute has been made in the createparty,to solve this problem
-//dont use this
-//inserts party id into candidate info,after
-//for single and many candidates
-router.put("/updatepartyid", async (req, res) => {
-  const { partyId } = req.body;
-
-  if (!partyId) {
-    return res.status(400).json({ message: "field is empty" });
-  }
-
-  const found = await axios({
-    url: "http://localhost:1970/findparty",
-    method: "get",
-    data: {
-      partyId: partyId,
-    },
-  })
-    .then(async (resp) => {
-      if (resp.data["message"] == null) {
-        return res
-          .status(403)
-          .json({ message: "party not present with this id" });
-      } else {
-        const _id = resp.data.message._id;
-
-        const party = Party.findOne({ _id }).then((resp) => {
-          for (var i = 0; i < resp.candidate.length; i++) {
-            resp.candidate[i].partyId = _id;
-          }
-          resp.save();
-        });
-      }
-    })
-    .catch((err) => console.log(err));
-});
- */
-}
-
-//this route will execute when a user is selected for a ballot
-//a ballot id will be assigned to him
-router.put(
-  "/updatepartycandidateballot/:ballotid/:partyId",
-  async (req, res) => {
-    const { ballotid } = req.params.ballotid;
-    if (!ballotid) {
-      return res.status(400).json({ message: "field is empty" });
-    }
-    Party.findOne({ partyId })
-      .exec((err, doc) => {
-        doc.ballotid = ballotid;
-        doc.save().catch((err) => console.log(err));
-        res.status(200).json({ message: "candidate is given a ballotid" });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-);
-
-router.get("/getcandidateid/:candidateid", async (req, res) => {
-  const { candidateid } = req.params;
-  if (!candidateid) {
-    res.status(400).json({ message: "field is empty" });
-  }
-
-  Party.findOne({ "candidate.candidateId": candidateid })
-    .select("_id")
-    .exec((err, doc) => {
-      if (!err) {
-        res.status(200).json({ message: doc });
-      } else {
-        res.status(400).json({ message: err });
-      }
-    });
-});
-
-//returns mpa and mna
-//hard coded
-
-router.get("/getpositions", async (req, res) => {
-  const positions = { MPA: "MPA", MNA: "MNA" };
-  return res.status(200).json({positions});
+      .json({ message: "there's seems to be a problem deleting the Party" });
+  });
 });
 
 const removeNull = (array) => {
