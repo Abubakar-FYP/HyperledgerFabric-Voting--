@@ -99,23 +99,27 @@ router.get("/getcriminal/:_id", async (req, res) => {
   });
 });
 
-//populate when db ready
+//takes _id as input for party and returns party
+//and its ref data as well
 router.get("/findparty/:_id", async (req, res) => {
-  const { _id } = req.params._id;
-
-  if (!_id) {
+  if (!req.params._id) {
     return res.status(400).json({ message: "field is empty" });
   }
 
-  const found = await Party.find({}).lean();
-
-  if (!found) {
-    return res.status(400).json({ message: null });
-  }
-
-  const findParty = found.find((party) => party.partyId == partyId);
-
-  return res.status(200).json({ message: findParty });
+  const found = await Party.find({ _id: req.params._id })
+    .populate({
+      path: "candidate",
+      populate: {
+        path: "ballotId",
+      },
+    })
+    .exec((err, docs) => {
+      if (!err) {
+        return res.status(200).json({ message: docs });
+      } else {
+        return res.status(400).json({ message: err });
+      }
+    });
 });
 
 //takes _id as parameters

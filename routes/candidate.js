@@ -8,17 +8,36 @@ require("../Models/candidate");
 
 const Candidate = mongoose.model("Candidate");
 
+//use this route after the create party,
+//chain the createparty and this route, because
+//createparty returns an array of candidates
+//those candidates will now be added to Candidate Model
 router.post("/createcandidate", async (req, res) => {
-  const { candidate } = req.body;
+  const { candidate } = req.body; //traverse this array and insert one by one
   if (!candidate) {
     return res.status(400).json({ message: "field is empty" });
   }
-  candidate.map((item) => {
-    return;
+
+  const candidates = candidate.map(async (item) => {
+    const newCandidate = new Candidate({
+      _id: item._id,
+      name: item.name,
+      cnic: item.cnic,
+      position: item.position,
+      ballotId: item.ballotId,
+      partyId: item.partyId,
+    });
+
+    await newCandidate.save().catch((err) => {
+      console.log(err);
+    });
   });
+
+  res.status(200).json({ message: "Candidates have been registered" });
 });
 
 //delete's candidate with id in params
+//hold onto this one right now
 router.delete("/deletecandidate/:_id", async (req, res) => {
   const { _id } = req.body;
   if (!_id) {
@@ -75,7 +94,7 @@ router.put(
   async (req, res) => {
     //find that candidate and give him the ballot id
     await Candidate.findOne({ _id: req.params.candidateId }).exec(
-      (err, doc) => {
+      async (err, doc) => {
         if (!err) {
           doc.ballotid = req.params.ballotid;
           await doc
@@ -84,6 +103,7 @@ router.put(
               res
                 .status(200)
                 .json({ message: "ballot successfully assigned to candidate" });
+              return req.params.candidateId;
             })
             .catch((err) => {
               console.log(err);

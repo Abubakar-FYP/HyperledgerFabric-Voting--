@@ -19,7 +19,7 @@ router.get("/findallunapprovedparties", async (req, res) => {
     });
 });
 
-//populate when ready
+//dont need to populate because ot required
 //gets all the parties that are approved
 router.get("/findallapprovedparties", async (req, res) => {
   await Party.find({ is_valid: true })
@@ -33,14 +33,18 @@ router.get("/findallapprovedparties", async (req, res) => {
 
 //populate when ready
 router.get("/getallparties", async (req, res) => {
-  await Party.find({}).exec((err, docs) => {
-    if (!err) {
-      res.status(200).json({ message: docs });
-    } else {
-      console.log(err);
-      res.status(200).json({ message: err });
-    }
-  });
+  await Party.find({})
+    .populate({
+      path: "candidate",
+    })
+    .exec((err, docs) => {
+      if (!err) {
+        res.status(200).json({ message: docs });
+      } else {
+        console.log(err);
+        res.status(200).json({ message: err });
+      }
+    });
 });
 
 //approves the party

@@ -44,18 +44,18 @@ router.post("/createballot", async (req, res) => {
     });
 });
 
-router.get("/findballot", async (req, res) => {
-  //use this on every insertion of ballot,
-  //verifies if ballot is ok or not
-  const { ballotid } = req.body;
-
-  if (!ballotid) {
-    return res.status(400).json({ message: "one or mor fields are empty" });
+//use this on every insertion of ballot,
+//verifies if ballot is ok or not
+//good to go
+router.get("/findballot/:_id", async (req, res) => {
+  if (!req.params._id) {
+    return res.status(400).json({ message: "field is empty" });
   }
 
-  Ballot.findOne({ ballotid })
-    .populate("campaignId")
-    .populate("candidate")
+  Ballot.findOne({ _id: req.params._id })
+    .populate("campaignId", "_id campaignId campaignName")
+    .populate("candidate", "_id name position partyId")
+    .lean()
     .exec((err, docs) => {
       if (err) {
         return res.status(400).json({ message: err });
@@ -99,14 +99,26 @@ router.delete("/deleteballot", async (req, res) => {
 });
 
 //finds all ballots and their campaigns
-router.get("/findallballot", async (req, res) => {});
+router.get("/findallballot", async (req, res) => {
+  Ballot.find({})
+    .populate("campaignId", "_id campaignId campaignName")
+    .populate("candidate", "_id name position partyId")
+    .lean()
+    .exec((err, docs) => {
+      if (err) {
+        return res.status(400).json({ message: err });
+      } else {
+        return res.status(200).json({ message: docs });
+      }
+    });
+});
 
 //gets all the name of the ballots
 //tested
 //check again
 router.get("/getballotname", async (req, res) => {
   await Ballot.find({})
-    .select("ballotname")
+    .select("_id ballotname")
     .exec((err, docs) => {
       if (!err) {
         return res.status(200).json({ message: docs });
@@ -117,11 +129,10 @@ router.get("/getballotname", async (req, res) => {
     });
 });
 
-//first candidateid will be fetched from party.candidate after its creation
-//then found and inserted in ballot
-//!!!!TEST THIS ONE(REPORT THIS IF THERES A WARNING AHEAD,NOT RIGHT NOW))
+//!!! also chain this (after) candidate refers to ballot,
+//meaning when candidate is inserted
 router.put(
-  "/updatecandidatesinballot/:ballotid/:candidateid", //have to be _id
+  "/updatecandidatesinballot/:ballotid/:candidateid", //both have to be _id
   async (req, res) => {
     const { ballotid, candidate } = req.params;
 
