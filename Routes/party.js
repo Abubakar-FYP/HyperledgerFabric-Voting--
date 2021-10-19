@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
-const requireLogin = require("../middleware/requirelogin");
+const requireLogin = require("../Middleware/requirelogin");
 
 //Registering Models
 require("../Models/party");

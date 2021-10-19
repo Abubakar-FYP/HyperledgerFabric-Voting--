@@ -4,12 +4,12 @@ const mongoose = require("mongoose");
 const { restart } = require("nodemon");
 const path = require("path");
 
-const requireLogin = require("../middleware/requirelogin");
+const requireLogin = require("../Middleware/requirelogin");
 
-require("../models/voter");
-require("../models/vote");
-require("../models/ballot");
-require("../models/party");
+require("../Models/voter");
+require("../Models/vote");
+require("../Models/ballot");
+require("../Models/party");
 
 const Voter = mongoose.model("Voter");
 const Vote = mongoose.model("Vote");
