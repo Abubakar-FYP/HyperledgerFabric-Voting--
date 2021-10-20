@@ -10,28 +10,22 @@ require("../models/voter");
 require("../models/vote");
 require("../models/ballot");
 require("../models/party");
+require("../models/candidate");
 
 const Voter = mongoose.model("Voter");
 const Vote = mongoose.model("Vote");
 const Ballot = mongoose.model("Ballot");
-const Party = require("../Models/party");
+const Party = mongoose.model("Party");
+const Candidate = mongoose.model("Candidate");
 
-router.post("/vote/:v_cnic/:c_cnic", async (req, res) => {
-  if (req.params.v_cnic || req.params.c_cnic) {
-    return res.status(400).json({ message: "one of the fields are empty" });
-  }
-
+router.post("/vote/:voter/:candidate", async (req, res) => {
   const voter = await Voter.findOne({
-    cnic: req.params.v_cnic,
-  })
-    .lean()
-    .catch((err) => console.log(err));
+    cnic: req.params.voter,
+  }).catch((err) => console.log(err));
 
-  const candidate = await Party.findOne({
-    "candidate.cnic": req.params.c_cnic,
-  })
-    .lean()
-    .catch((err) => console.log(err));
+  const candidate = await Candidate.findOne({
+    cnic: req.params.candidate,
+  }).catch((err) => console.log(err));
 
   const newVote = new Vote({
     votername: voter.name,
@@ -58,6 +52,26 @@ router.post("/vote/:v_cnic/:c_cnic", async (req, res) => {
         return res
           .status(400)
           .json({ message: "there was an error in voting,try again" });
+      }
+    })
+    .catch((err) => console.log(err));
+});
+
+//returns if a voter has voted or not
+//good to go
+router.get("/votestatus/:_id", async (req, res) => {
+  if (!req.params._id) {
+    res.status(400).json({ message: "field is empty" });
+  }
+  await Voter.findOne({ _id: req.params._id })
+    .then((resp) => {
+      if (resp == null) {
+        return res.status(400).json({ message: "This id doest not exist" });
+      }
+      if (resp.voteflag == true) {
+        res.status(200).json({ message: "you have already voted" });
+      } else {
+        res.status(200).json({ message: "you have not voted yet" });
       }
     })
     .catch((err) => console.log(err));

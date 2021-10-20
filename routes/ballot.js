@@ -11,6 +11,7 @@ require("../Models/party");
 //Models
 const Ballot = mongoose.model("Ballot");
 const Party = require("../Models/party");
+const Vote = require("../models/vote");
 
 router.post("/createballot", async (req, res) => {
   const { ballotid, ballotname } = req.body; //send objectId of AreaId
@@ -72,23 +73,6 @@ router.delete("/deleteballot", async (req, res) => {
     return res.status(400).json({ message: "field is empty" });
   }
 
-  const found = await axios({
-    method: "get",
-    url: "http://localhost:1970/findballot",
-    data: {
-      ballotid: ballotid,
-    },
-  })
-    .then((resp) => {
-      console.log(resp.data);
-      if (resp.data["message"] == null) {
-        return res
-          .status(403)
-          .json({ message: "ballot not present with this id" });
-      }
-    })
-    .catch((err) => console.log(err));
-
   Ballot.findOneAndDelete({ ballotid })
     .then(() => {
       res.status(200).json({ message: "ballot successfully deleted" });
@@ -99,6 +83,7 @@ router.delete("/deleteballot", async (req, res) => {
 });
 
 //finds all ballots and their campaigns
+//good to go
 router.get("/findallballot", async (req, res) => {
   Ballot.find({})
     .populate("campaignId", "_id campaignId campaignName")
@@ -114,8 +99,7 @@ router.get("/findallballot", async (req, res) => {
 });
 
 //gets all the name of the ballots
-//tested
-//check again
+//good to go
 router.get("/getballotname", async (req, res) => {
   await Ballot.find({})
     .select("_id ballotname")
@@ -127,6 +111,52 @@ router.get("/getballotname", async (req, res) => {
         return res.status(400).json({ message: err });
       }
     });
+});
+
+//gets all ballot name by type(MPA or MNA)
+//good to go
+router.get("/getballotnamebytype/:type", async (req, res) => {
+  await Ballot.find({ type: req.params.type }).exec((err, docs) => {
+    if (!err) {
+      res.json(docs);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+//gets all ballot type
+//return ballot type
+//good to go
+router.get("/getallballotbytype", async (req, res) => {
+  await Ballot.find({})
+    .select("_id ballotname type")
+    .then((resp) => {
+      if (resp == null) {
+        return res.status(400).json({ message: "id does not exist" });
+      } else {
+        res.json({ message: resp });
+      }
+    })
+    .catch((err) => console.log(err));
+});
+
+//gets a single ballot type
+//returns mpa or mna
+//good to go
+router.get("/getballotbytype/:_id", async (req, res) => {
+  if (!req.params._id) {
+    return res.status(400).json({ message: "field is empty" });
+  }
+  await Ballot.findOne({ _id: req.params._id })
+    .then((resp) => {
+      if (resp == null) {
+        return res.status(400).json({ message: "id does not exist" });
+      } else {
+        res.json({ message: resp.type });
+      }
+    })
+    .catch((err) => console.log(err));
 });
 
 //!!! also chain this (after) candidate refers to ballot,
@@ -163,16 +193,34 @@ router.put(
 
 //it gets the candidate having the same ballotid
 //the candidats belonging to the same ballot
-router.get("/getcandidateswithballotid/:ballotid", async (req, res) => {});
+//good to go
+router.get("/getcandidateswithballotid/:ballotId", async (req, res) => {
+  Candidate.find({ ballotId: req.params.ballotId }).exec((err, docs) => {
+    if (!err) {
+      res.status(200).json({ message: docs });
+    } else {
+      res.status(400).json({ message: err });
+    }
+  });
+});
 
-//single ballot winner (candidate)
-router.get("/getballotwinner", async (req, res) => {});
+//all ballots winner
+//hit this one time when election time ends
+router.get("/getallballotwinner", async (req, res) => {
+  const ballots = await Ballot.find({}).select("_id candidate");
+
+  const candidateData = await Promise.all(
+    ballots.map(async (item) => {
+      for (const candidate of item.candidate) {
+        return await Candidate.findOne({ _id: candidate });
+      }
+    })
+  );
+  console.log(candidateData);
+  //find votes by all id,calculate it
+  //and then return the largest of them
+});
 //overall winner (party)
 //campaign winner (party)
-
-//returns unique values
-const unique = (value, index, self) => {
-  return self.indexOf(value) === index;
-};
 
 module.exports = router;

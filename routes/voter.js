@@ -3,16 +3,17 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 const requireLogin = require("../middleware/requirelogin");
-const { response } = require("express");
 
 //Registering Models
 require("../Models/voter");
 //Models
 const Voter = mongoose.model("Voter");
 
+//check all of these, if not working
+
 //this is for his dashboard,where when he/she signs up
-router.get("/getuserinfo/:cnic", async (req, res) => {
-  Voter.findOne({ cnic })
+router.get("/getuserinfo/:_id", async (req, res) => {
+  Voter.findOne({ _id: _id })
     .populate("ballotId")
     .exec((err, docs) => {
       if (!err) {
@@ -76,3 +77,5 @@ router.put("/assignballotuser/:cnic/:ballotid", async (req, res) => {
     }
   );
 });
+
+module.exports = router;

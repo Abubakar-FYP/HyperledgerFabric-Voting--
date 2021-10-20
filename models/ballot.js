@@ -13,6 +13,11 @@ const ballotSchema = new mongoose.Schema({
     required: true,
   },
 
+  type: {
+    type: String,
+    required: true,
+  },
+
   campaignId: {
     type: Schema.Types.ObjectId,
     ref: "Campaign",
