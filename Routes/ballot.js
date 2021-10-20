@@ -115,7 +115,7 @@ router.get("/getballotname", async (req, res) => {
 
 //gets all ballot name by type(MPA or MNA)
 //good to go
-router.get("/getballotnamebytype/:type", async (req, res) => {
+router.get("/getballotbytype/:type", async (req, res) => {
   await Ballot.find({ type: req.params.type }).exec((err, docs) => {
     if (!err) {
       res.json(docs);
