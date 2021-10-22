@@ -13,7 +13,7 @@ const Voter = mongoose.model("Voter");
 
 //this is for his dashboard,where when he/she signs up
 router.get("/getuserinfo/:_id", async (req, res) => {
-  Voter.findOne({ _id: _id })
+  Voter.findOne({ _id: req.params._id })
     .populate("ballotId")
     .exec((err, docs) => {
       if (!err) {
@@ -27,7 +27,6 @@ router.get("/getuserinfo/:_id", async (req, res) => {
 
 //returns the number of user who have voted
 //returns a number of users who have voted
-//
 router.get("/getcountvotedusers", async (req, res) => {
   Voter.countDocuments({ voteflag: true })
     .exec((err, count) => {
@@ -42,9 +41,8 @@ router.get("/getcountvotedusers", async (req, res) => {
 
 //check if voted already
 //check this when this user tries to signin
-router.get("/checkifvotedalready/:cnic", async (req, res) => {
-  const { cnic } = req.params.cnic;
-  const findVoter = await Voter.findOne({ cnic: cnic }).exec().lean();
+router.get("/checkifvotedalready/:_id", async (req, res) => {
+  const findVoter = await Voter.findOne({ _id: req.params._id }).exec().lean();
   if (findVoter.voteflag == true) {
     return res
       .status(200)
@@ -55,15 +53,10 @@ router.get("/checkifvotedalready/:cnic", async (req, res) => {
 //voter will be assigned ballot as per, ballot names will be shown to him
 //he selects one,the whole object of that ballot will be saved
 //now that ballotid from that object will be inserted the voter's ballot
-router.put("/assignballotuser/:cnic/:ballotid", async (req, res) => {
-  const { cnic, ballotid } = req.params;
-  if (!cnic || !ballotid) {
-    return res.status(400).json({ message: "field or fields are empty" });
-  }
-
-  Voter.findOneAndUpdate(
-    { cnic: cnic },
-    { ballotid: ballotid },
+router.put("/assignballotuser/:voterid/:ballotId", async (req, res) => {
+  await Voter.findOneAndUpdate(
+    { _id: req.params.voterid },
+    { ballotId: req.params.ballotId },
     (err, result) => {
       if (!err) {
         return res
@@ -72,7 +65,7 @@ router.put("/assignballotuser/:cnic/:ballotid", async (req, res) => {
       } else {
         return res
           .status(400)
-          .json({ message: "there was a problem inserting ballot" });
+          .json({ message: "there was a problem assigning ballot to user" });
       }
     }
   );

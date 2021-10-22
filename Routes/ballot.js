@@ -8,10 +8,12 @@ const ObjectId = mongoose.Types.ObjectId;
 //Register Models
 require("../Models/ballot");
 require("../Models/party");
+require("../Models/vote");
 //Models
 const Ballot = mongoose.model("Ballot");
-const Party = require("../Models/party");
-const Vote = require("../models/vote");
+const Party = mongoose.model("Party");
+const Vote = mongoose.model("Vote");
+const Campaign = mongoose.model("Campaign");
 
 router.post("/createballot", async (req, res) => {
   const { ballotid, ballotname } = req.body; //send objectId of AreaId
@@ -204,23 +206,72 @@ router.get("/getcandidateswithballotid/:ballotId", async (req, res) => {
   });
 });
 
-//all ballots winner
+//single ballots winner
+//use this for all ballots winner as well
+//!!!chain this for the all ballots winner
+//returns information about the candidate who won from the ballot
 //hit this one time when election time ends
-router.get("/getallballotwinner", async (req, res) => {
-  const ballots = await Ballot.find({}).select("_id candidate");
-
-  const candidateData = await Promise.all(
-    ballots.map(async (item) => {
-      for (const candidate of item.candidate) {
-        return await Candidate.findOne({ _id: candidate });
-      }
+router.get("/getballotwinner/:_id", async (req, res) => {
+  const ballots = await Ballot.findOne({ _id: req.params._id })
+    .select("_id candidate")
+    .populate({
+      path: "candidate _id cnic partyId",
+      populate: {
+        path: "partyId",
+        model: "Party",
+        select: "partyName partyImg",
+      },
     })
-  );
-  console.log(candidateData);
-  //find votes by all id,calculate it
-  //and then return the largest of them
+    .lean();
+
+  const cnicFiltered = ballots.candidate.map((item) => {
+    return item.cnic;
+  });
+
+  const mapping = new Map();
+
+  for (const cnic of cnicFiltered) {
+    mapping.set(cnic, await Vote.where({ cnic: cnic }).countDocuments());
+  }
+
+  let winner;
+  const max = ("max", Math.max(...mapping.values()));
+  for (const [key, value] of mapping.entries()) {
+    if (value == max) {
+      winner = key;
+    }
+  }
+
+  const winnerInfo = ballots.candidate.find((item) => {
+    if (item.cnic == winner) {
+      return item;
+    }
+  });
+  winnerInfo.votes = max;
+
+  res.status(200).json({ message: winnerInfo });
 });
-//overall winner (party)
+
 //campaign winner (party)
+//hold
+router.get("/getcampaignwinner/:_id", async (req, res) => {
+  const campaign = await Campaign.findOne({ _id: req.params._id })
+    .populate({
+      path: "ballotId",
+      populate: {
+        path: "_id name",
+        model: "Ballot",
+        populate: {
+          path: "candidate",
+        },
+      },
+    })
+    .exec((err, doc) => {
+      console.log(doc.ballotId);
+      res.json(doc);
+    });
+});
+
+//overall winner (party) //hold
 
 module.exports = router;
