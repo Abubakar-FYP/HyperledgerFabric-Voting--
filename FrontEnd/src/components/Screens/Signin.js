@@ -5,6 +5,7 @@ import M from 'materialize-css';
 import { useContext } from 'react';
 import { UserContext } from '../../App';
 import LoginPic from "../../assets/1.jpg";
+import NavBar from '../Navbar';
 // import {OTPredirect} from './OTP';
 
 const Signin =()=>{
@@ -54,7 +55,7 @@ const router =()=>{
 </section>
 
     return (
-
+        <div>
        <div className="mycard">
        <div className = "card auth-card">
            <h1>Sign in </h1>
@@ -73,7 +74,9 @@ const router =()=>{
             </h5>
         </div>
        </div>
+       </div>
     )
+
 }
 
 export default Signin 

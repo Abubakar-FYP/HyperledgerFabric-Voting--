@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { url } from "../../constants";
+import NavBar from "../Navbar";
 const PartyRegisteration = () => {
   // ===============================================================================
   //                               Local States
@@ -111,6 +112,10 @@ const PartyRegisteration = () => {
     setBallotId("")
   }
 
+  const handleOnSubmit = () => {
+    localStorage.removeItem("data")
+    setWholeData([])
+  }
   // ================================================================================
   //                  Console.logs
   // ================================================================================
@@ -184,6 +189,7 @@ const PartyRegisteration = () => {
   //                                  JSX
   // ===============================================================================
   return (
+    <div>
     <div className="conatiner">
       <div className="card" style={{ maxWidth: "1500px", margin: "20px auto" }}>
         <div className="card-header">Party Registeration</div>
@@ -431,7 +437,12 @@ const PartyRegisteration = () => {
     ))}
   </tbody>
 </table>
+{wholeData.length ? 
+  <button onClick={handleOnSubmit} className="btn btn-secondary" style={{marginLeft: "10rem"}}>Submit</button> 
+: null}
     </div>
+    </div>
+
   );
 };
 

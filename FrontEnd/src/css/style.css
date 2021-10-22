@@ -1,16 +1,3 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@1,300&display=swap');
 * {
     margin: 0;
@@ -59,11 +46,10 @@ li {
     display: flex;
     justify-content: space-between;
     position: -webkit-sticky;
-    padding: 0.1rem 1rem 5rem 1rem;
+    padding: 1rem;
     background-color: #333;
     color: #ddd;
     z-index: 1;
-
 }
 
 #home ul {
@@ -78,11 +64,11 @@ li {
     margin: 0 0.75;
 }
 
-/* #home ul li a:hover {
+#home ul li a:hover {
     background-color: #329932;
     color: #fff;
     border-radius: 10%;
-} */
+}
 
 @media (max-width: 600px) {
     #home {
@@ -102,7 +88,7 @@ li {
 /* Show Case Design */
 
 #showcase {
-    background: url('./img/pexelsphoto.jpg') no-repeat center center/cover;
+    background: url('../img/showcase.jpg') no-repeat center center/cover;
     height: 600px;
 }
 
@@ -134,7 +120,7 @@ li {
     color: #fff;
     font-size: 1.3rem;
     background-color: #329932;
-    padding: 0.8rem 1.2rem  2.5rem 0.8rem;
+    padding: 0.8rem 1.2rem;
     border-radius: 10%;
 }
 
@@ -169,8 +155,10 @@ li {
 }
 
 .whats .what .icon {
-    color: #329932;
+    background-color: #329932;
     padding: 10px;
+    border-radius: 50%;
+    color: #ddd;
 }
 
 
@@ -226,7 +214,7 @@ section#who .who {
 }
 
 section#who .left-img {
-    background: url('./img/who.jpg') no-repeat center center/cover;
+    background: url('../img/who.jpg') no-repeat center center/cover;
     width: 100%;
     height: 100%;
     padding: 5rem;
@@ -241,7 +229,7 @@ section#who .right-content {
 }
 
 section#who .right-content .who-info {
-    flex: 2;
+    flex: 1;
 }
 
 section#who .right-content h1 {
@@ -318,12 +306,11 @@ section#who .right-content ul li {
 }
 
 #clients .clients .client {
-    width: 15%;
-} 
+    width: 10%;
+}
 
 #clients .clients .client img {
     width: 100%;
-    border-radius: 50%;
 }
 
 @media (max-width: 600px) {
@@ -342,17 +329,16 @@ section#who .right-content ul li {
 /*  Contact */
 
 #contact {
-    display: block;
+    display: flex;
     margin-top: 5rem;
-    height: 550px;
-    /* padding-bottom: -5rem; */
+    height: 500px;
 }
 
-/* #contact .form,
+#contact .form,
 #contact .map {
     flex: 1;
     height: 100%;
-} */
+}
 
 #contact .form {
     background-color: #329932;
@@ -379,7 +365,6 @@ section#who .right-content ul li {
 #contact .form form .form-group label {
     font-size: 1.2rem;
     display: block;
-    color: #fff;
 }
 
 #contact .form form>input {

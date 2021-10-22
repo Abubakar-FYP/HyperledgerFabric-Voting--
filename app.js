@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const { MONGOURI } = require("./Keys/keys");
 const bodyparser = require("body-parser");
-
+require("dotenv").config()
 const requirelogin = require("./Middleware/requirelogin"); //middleware
 
 const app = express();
@@ -70,6 +70,7 @@ app.get("/", (req, res) => {
   res.send("home");
 });
 
+const serverDebugger = require("debug")("app:server")
 app.listen(serverNumber, () => {
-  console.log(`connected to ${serverNumber}`);
+  serverDebugger(`connected to ${serverNumber}`);
 });
