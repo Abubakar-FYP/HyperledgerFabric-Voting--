@@ -94,7 +94,6 @@ const PartyRegisteration = () => {
       partyName: party.partyName,
       leaderCnic: party.cnic,
       partySymbol: party.partySymbol,
-      partyLogo: partyLogo,
       candidateCnic: candidate.canCnic,
       candidateName: candidate.canName,
       area: selectedArea,
@@ -106,8 +105,6 @@ const PartyRegisteration = () => {
     console.table(newData)
     localStorage.removeItem("data")
     localStorage.setItem("data", JSON.stringify(newData))
-    setPartyLogo(null)
-    setParty(initialState)
     setCandidate(initialState2)
     setSelectedArea("")
     setSelectedCompaign("")
@@ -180,8 +177,8 @@ const PartyRegisteration = () => {
   ])
   useEffect(() => {
     const data = localStorage.getItem("data")
-    console.log("data from LS",JSON.parse(data))
-    if(data) {setWholeData(JSON.parse(data))}
+    console.log("data from LS",data && JSON.parse(data))
+    if(data) {setWholeData(data && JSON.parse(data))}
   }, [])
   // ===============================================================================
   //                                  JSX
@@ -416,7 +413,6 @@ const PartyRegisteration = () => {
       <th scope="col">Leader CNIC</th>
       <th scope="col">Party Name</th>
       <th scope="col">Party Symbol</th>
-      <th scope="col">Party Logo</th>
     </tr>
   </thead>
   <tbody>
@@ -431,10 +427,6 @@ const PartyRegisteration = () => {
    <td>{party.leaderCnic}</td>
    <td>{party.partyName}</td>
    <td>{party.partySymbol}</td>
-   <td>
-     <img style={{borderRadius: "50%"}} src={party.partyLogo} width="100px" height="100px"/>
-   </td>
-
  </tr>
     ))}
   </tbody>

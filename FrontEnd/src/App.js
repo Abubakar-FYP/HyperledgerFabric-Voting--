@@ -20,7 +20,8 @@ const Routing = ()=>{
   const history = useHistory()
   const {state,dispatch } = useContext(UserContext)
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"))
+    let user = localStorage.getItem("user");
+     user = JSON.parse(user && user)
     if (user) {
       dispatch({type:"USER",payload:user})
       history.push("/ElectionResultPortal")
