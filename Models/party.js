@@ -9,7 +9,7 @@ const partySchema = new Schema({
     type: String,
   },
 
-  partySlogan: {
+  partySymbol: {
     type: String,
   },
 
