@@ -6,11 +6,17 @@ import { url } from "../../constants"
 const AdminDashboard = () => {
     const [totalVotes, setTotalVotes] = useState("")
     useEffect(() => {
-        (async () => {
-            const {data} = await axios.get(url + "/getcountvotedusers")
-            console.log(data)
-            setTotalVotes(data.message)
-        })()
+        // (async () => {
+        //     const { data } = await axios.get(url + "/getcountvotedusers")
+        //     // console.log(data)
+        //     setTotalVotes(data.message)
+        // })();
+
+            (async () => {
+                const { data } = await axios.get(url + "/getcampaignwinner")
+                console.log(data)
+            })()
+
 
     }, [])
     return (
