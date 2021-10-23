@@ -11,11 +11,14 @@ const NavBar =() =>{
           </Link>
           </h1>
         <ul className="nav">
-          <li><Link to="/" style={{listStyle: "none", textDecoration: "none", color:"#fff"}}>Home</Link></li>
-          <li><Link to="/partyregisteration" style={{listStyle: "none", textDecoration: "none", color:"#fff"}}>Party Registeration</Link></li>
+          <li><Link to="/" style={{listStyle: "none", textDecoration: "none"}}
+          className="text-light">Home</Link></li>
+          <li><Link className="text-light" to="/partyregisteration" style={{listStyle: "none", textDecoration: "none", color:"#fff"}}>Party Registeration</Link></li>
 
-          <li><Link to="/signup" style={{listStyle: "none", textDecoration: "none", color:"#fff"}}>Voter Registeration</Link></li>
-
+          <li><Link className="text-light" to="/signup" style={{listStyle: "none", textDecoration: "none", color:"#fff"}}>Voter Registeration</Link></li>
+          <li><Link className="text-light" to="/votingballot" style={{listStyle: "none", textDecoration: "none", color:"#fff"}}>Voting Ballot</Link></li>
+          <li><Link className="text-light" to="/electioncreation" style={{listStyle: "none", textDecoration: "none", color:"#fff"}}>Election Creation</Link></li>
+          
         </ul>
       </nav>
     );

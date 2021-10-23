@@ -133,7 +133,7 @@ router.post("/signupinfo", async (req, res) => {
 
 router.post("/signin", async (req, res, next) => {
   const { cnic, phoneNumber } = req.body;
-
+console.log("cnic", cnic)
   if (!cnic) {
     return res.status(400).json({ message: "field is empty" });
   }

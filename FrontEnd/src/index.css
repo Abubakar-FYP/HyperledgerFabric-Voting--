@@ -73,7 +73,7 @@ li {
 }
 
 #home ul li a {
-    color: #ddd;
+    /* color: #ddd; */
     padding: 0.75rem;
     margin: 0 0.75;
 }

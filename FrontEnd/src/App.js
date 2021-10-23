@@ -15,6 +15,8 @@ import { reducer, intialState } from './reducers/userReducer';
 import PartyRegisteration from './components/Screens/PartyRegisteration';
 import LandingPage from './LandingPage';
 import NavBar from './components/Navbar';
+import VotingBallot from './components/Screens/VotingBallot';
+import ElectionCreation from './components/Screens/ElectionCreation';
 
 export const UserContext = createContext()
 
@@ -81,6 +83,8 @@ function App() {
           <Route exact path="/partyregisteration" component={PartyRegisteration} />
           <Route exact path="/signin" component={Signin} />
           <Route exact path="/signup" component={Signup} />
+          <Route exact path="/votingballot" component={VotingBallot} />
+          <Route exact path="/electioncreation" component={ElectionCreation} />
         </Switch>
       </BrowserRouter>
     </UserContext.Provider>
