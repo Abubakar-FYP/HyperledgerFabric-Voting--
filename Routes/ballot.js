@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 const requireLogin = require("../Middleware/requirelogin");
-const ObjectId = mongoose.Types.ObjectId;
+const response = require("debug")("app:response");
 
 //Register Models
 require("../Models/ballot");
@@ -223,7 +223,6 @@ router.get("/getballotwinner/:_id", async (req, res) => {
       },
     })
     .lean();
-
   const cnicFiltered = ballots.candidate.map((item) => {
     return item.cnic;
   });
@@ -242,34 +241,78 @@ router.get("/getballotwinner/:_id", async (req, res) => {
     }
   }
 
-  const winnerInfo = ballots.candidate.find((item) => {
+  let winnerInfo = ballots.candidate.find((item) => {
     if (item.cnic == winner) {
       return item;
     }
   });
-  winnerInfo.votes = max;
 
   res.status(200).json({ message: winnerInfo });
+  return winnerInfo;
 });
 
 //campaign winner (party)
-//hold
+//returns campaign winner, first counts the number of candidates won in ballots
+//then after that it counts the number of which party has the most ballots won
+//then gets the info of the party that won and with how many ballots in one campaign
 router.get("/getcampaignwinner/:_id", async (req, res) => {
-  const campaign = await Campaign.findOne({ _id: req.params._id })
-    .populate({
-      path: "ballotId",
-      populate: {
-        path: "_id name",
-        model: "Ballot",
-        populate: {
-          path: "candidate",
-        },
-      },
-    })
-    .exec((err, doc) => {
-      console.log(doc.ballotId);
-      res.json(doc);
-    });
+  const ballots = await Campaign.findOne({ _id: req.params._id }).select(
+    "ballotId"
+  );
+  var winners = new Array();
+  const winnerPartyVoteMapping = new Map();
+  for (const ballot of ballots.ballotId) {
+    winners.push(
+      await axios({
+        method: "get",
+        url: `http://localhost:1970/getballotwinner/${mongoose.Types.ObjectId(
+          ballot
+        )}`,
+      })
+        .then((resp) => {
+          return resp.data;
+        })
+        .catch((err) => console.log(err))
+    );
+  }
+
+  const winnerPartyNames = winners.map((item) => {
+    return item.message.partyId.partyName;
+  });
+
+  const partySet = new Set(winnerPartyNames); //unique values
+  const partySetToArray = Array.from(partySet);
+  const partyVoteMapping = new Map();
+
+  for (var i = 0; i < partySetToArray.length; i++) {
+    var counter = 0;
+    for (var j = 0; j < winnerPartyNames.length; j++) {
+      if (partySetToArray[i] === winnerPartyNames[j]) {
+        counter++;
+      }
+    }
+    partyVoteMapping.set(partySetToArray[i], counter);
+  }
+
+  var winner;
+  const max = ("max", Math.max(...partyVoteMapping.values()));
+  for (const [key, value] of partyVoteMapping.entries()) {
+    if (value == max) {
+      winner = key;
+    }
+  }
+
+  var winnerInfo;
+  for (const candidate of winners) {
+    if (candidate.message.partyId.partyName == winner) {
+      winnerInfo = candidate.message.partyId;
+      break;
+    }
+  }
+  winnerInfo.won = max;
+  console.log(winnerInfo);
+
+  return winnerInfo;
 });
 
 //overall winner (party) //hold

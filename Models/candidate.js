@@ -2,11 +2,6 @@ const { Schema } = require("mongoose"); //Admin editable only
 const mongoose = require("mongoose");
 
 const candidateSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    default: "",
-  },
-
   cnic: {
     type: Number,
     default: 0000,

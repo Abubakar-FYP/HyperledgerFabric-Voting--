@@ -12,6 +12,7 @@ const Candidate = mongoose.model("Candidate");
 //chain the createparty and this route, because
 //createparty returns an array of candidates
 //those candidates will now be added to Candidate Model
+//again
 router.post("/createcandidate", async (req, res) => {
   const { candidate } = req.body; //traverse this array and insert one by one
   if (!candidate) {

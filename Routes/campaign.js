@@ -41,7 +41,7 @@ router.post("/createcampaign", async (req, res) => {
     .save()
     .then((resp) => {
       if (resp) {
-        return res.status(200).json({ message: "campaign successfully saved" });
+        return res.status(200).json({ message: newCampaign._id });
       }
     })
     .catch((err) => {
@@ -106,14 +106,9 @@ router.get("/findallcampaigns", async (req, res) => {
 //first inserts in ballot then in campaign
 //make sure ballot ids are unique
 //it takes ballot array
-router.put("/updatecampaign", async (req, res) => {
-  const { ballot } = req.body; //list of ballots(object List)
-  var campaign_Id;
+//check this again,its wrong
+router.put("/updatecampaign/_id", async (req, res) => {
   var storeBallotIds = new Array();
-
-  if (!ballot) {
-    return res.status(400).json({ message: "field is empty" });
-  }
 
   const ballots = await Ballot.find().lean();
 

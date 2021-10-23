@@ -1,63 +1,60 @@
-const messagebird = require('messagebird')('Ap7JSDW0NMLxZMppeBGsG3Wn9');
-var checkStatus=1;
-var checkLength=0;
+const messagebird = require("messagebird")("ATxFxZ0RsvoxEyjAF0UBBx2M7");
+var checkStatus = 1;
+var checkLength = 0;
 
-const bird = (from,to,message)=>{
-  
+const bird = (from, to, message) => {
   console.log(to.length);
 
-  if(to.length!=11){
+  if (to.length != 11) {
     return "Entered Phone Number is not a 11 digit number";
   }
 
-  checkLength=1;
+  checkLength = 1;
 
   const code = "+92";
 
   to = to.slice(1);
-  const number = code+to;
-  
+  const number = code + to;
+
   var params = {
-    'originator':"PVS",
-    'recipients': [number],
-    'body': ` ${message} is your otp assigned by PVS,This is sent to you for verification `
+    originator: "PVS",
+    recipients: [number],
+    body: ` ${message} is your otp assigned by PVS,This is sent to you for verification `,
   };
 
   messagebird.messages.create(params, function (err, response) {
-    if (err) { 
-      checkStatus=0;
+    if (err) {
+      checkStatus = 0;
       return console.log(err);
     }
     return console.log(response);
   });
-}
+};
 
-const otpGenerator = ()=>{
-  const otp = Math.floor(Math.random() * 10000)
-  return otp
-}
+const otpGenerator = () => {
+  const otp = Math.floor(Math.random() * 10000);
+  return otp;
+};
 
-const otpSender = (to,next)=>{
-  
+const otpSender = (to, next) => {
   const otp4digit = otpGenerator();
-    
-  const response = bird("",to,otp4digit); 
 
-  if(checkLength==0){
+  const response = bird("", to, otp4digit);
+
+  if (checkLength == 0) {
     return response;
   }
-  
-  if(checkStatus==0){
+
+  if (checkStatus == 0) {
     console.log(checkStatus);
     return "Entered Number is Wrong or a server issue";
   }
-  
-  return otp4digit;
-}
 
+  return otp4digit;
+};
 
 module.exports = {
-  "bird":bird,
-  "otpGenerator":otpGenerator,
-  "otpSender":otpSender
-}
+  bird: bird,
+  otpGenerator: otpGenerator,
+  otpSender: otpSender,
+};

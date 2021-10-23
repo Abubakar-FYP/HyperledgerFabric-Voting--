@@ -99,7 +99,7 @@ router.post("/signupinfo", async (req, res) => {
     !street ||
     !house
   ) {
-    return res.status(400).json({ error: "One of the fields is empty" });
+    return res.status(400).json({ error: "One or more fields are empty" });
   }
 
   if (age < 18) {
@@ -124,7 +124,7 @@ router.post("/signupinfo", async (req, res) => {
   newVoter
     .save()
     .then((resp) => {
-      res.json({ message: "Voter successfully saved" });
+      return res.json({ message: newVoter._id });
     })
     .catch((err) => {
       return res.json({ message: `there was some error saving the voter` });
