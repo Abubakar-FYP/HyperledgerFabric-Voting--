@@ -5,8 +5,10 @@ const axios = require("axios");
 const requireLogin = require("../Middleware/requirelogin");
 
 require("../Models/candidate");
+require("../Models/nadra");
 
 const Candidate = mongoose.model("Candidate");
+const Nadra = mongoose.model("Nadra");
 
 //use this route after the create party,
 //chain the createparty and this route, because
@@ -124,5 +126,14 @@ router.get("/getpositions", async (req, res) => {
   const positions = { MPA: "MPA", MNA: "MNA" };
   return res.status(200).json({ positions });
 });
+
+router.get("/getmalevoters", async (req, res) => {
+  const voters = await Voter.find({});
+  const nadra = await Nadra.find({});
+
+  res.json(nadra);
+});
+
+router.get("/getfemalevoters", async (req, res) => {});
 
 module.exports = router;

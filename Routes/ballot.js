@@ -252,13 +252,6 @@ router.get("/getballotwinner/:_id", async (req, res) => {
 });
 
 router.get("/getallballotwinner", async (req, res) => {
-  var candidateCnic = new Array();
-
-  const ballots = new Set();
-  const candidates = new Set();
-  const cnic = new Set();
-  const voteCount = new Set();
-
   await Ballot.find({})
     .populate({
       path: "candidate",
@@ -266,24 +259,6 @@ router.get("/getallballotwinner", async (req, res) => {
     .lean()
     .exec(async (err, docs) => {
       if (!err) {
-        docs.map((item) => {
-          item.candidate.map((item) => {
-            ballots.add(item.partyId);
-            candidates.add(item._id);
-            cnic.add(item.cnic);
-          });
-        });
-        console.log(
-          "ballot IDS",
-          ballots,
-          "\n",
-          "CNIC'S",
-          cnic,
-          "\n",
-          "CANDIDATES",
-          candidates
-        );
-
         res.json(docs);
       } else {
         console.log(err);
@@ -302,6 +277,9 @@ router.get("/getcampaignwinner", async (req, res) => {
         path: "ballotId",
         populate: {
           path: "candidate",
+          populate: {
+            path: "partyId",
+          },
         },
       })
       .exec((err, docs) => {
