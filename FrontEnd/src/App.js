@@ -17,6 +17,8 @@ import LandingPage from './LandingPage';
 import NavBar from './components/Navbar';
 import VotingBallot from './components/Screens/VotingBallot';
 import ElectionCreation from './components/Screens/ElectionCreation';
+import AdminDashboard from './components/Screens/AdminDashboard';
+import Pulses from './Pulses';
 
 export const UserContext = createContext()
 
@@ -75,6 +77,7 @@ function App() {
       <BrowserRouter>
         {/* <Navbar/>
     <Routing/> */}
+
     <div>
       <NavBar />
     </div>
@@ -85,6 +88,7 @@ function App() {
           <Route exact path="/signup" component={Signup} />
           <Route exact path="/votingballot" component={VotingBallot} />
           <Route exact path="/electioncreation" component={ElectionCreation} />
+          <Route exact path="/admindashboard" component={AdminDashboard} />
         </Switch>
       </BrowserRouter>
     </UserContext.Provider>

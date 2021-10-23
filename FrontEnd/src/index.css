@@ -409,3 +409,59 @@ footer p {
     color: white;
     margin: 0 0;
 }
+
+#pakFlag{
+    position: relative;
+    width: 50%;
+    height: 100%;
+}
+
+#bolb1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    opacity: 1;
+  }
+  #bolb2 {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    opacity: 1;
+  }
+
+  #bolb3 {
+    position: absolute;
+    top: 55%;
+    left: 35%;
+    opacity: 1;
+  }
+
+/*  */
+
+#bolb4 {
+    position: absolute;
+    top: 80%;
+    left: 40%;
+    opacity: 1;
+}
+
+#bolb5 {
+    position: absolute;
+    top: 70%;
+    left: 20%;
+    opacity: 1;
+}
+
+#bolb6 {
+    position: absolute;
+    top: 15%;
+    left: 80%;
+    opacity: 1;
+}
+
+#bolb7 {
+    position: absolute;
+    top: 10%;
+    left: 65%;
+    opacity: 1;
+}
