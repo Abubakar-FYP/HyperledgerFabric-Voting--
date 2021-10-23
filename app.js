@@ -25,6 +25,7 @@ require("./Models/campaign");
 require("./Models/ballot");
 require("./Models/party");
 require("./Models/candidate");
+require("./Models/nadra");
 require("./Models/criminal");
 
 //Routes Registering
