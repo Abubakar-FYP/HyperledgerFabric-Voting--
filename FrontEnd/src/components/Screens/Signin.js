@@ -6,6 +6,9 @@ import { useContext } from 'react';
 import { UserContext } from '../../App';
 import LoginPic from "../../assets/1.jpg";
 import NavBar from '../Navbar';
+import axios from "axios"
+import { url } from "../../constants";
+
 // import {OTPredirect} from './OTP';
 
 const Signin =()=>{
@@ -15,36 +18,27 @@ const Signin =()=>{
     const  [MobileNumber , setMobilenumber] = useState ("")
 
 
-const PostData =() =>{
-    fetch("/Signin",{
-        method:"post",
-        headers:{
+const PostData =async () =>{
+    console.log("clicked")
+try {
+    if(CNIC){
+        const data = await axios.post(url + "/signin" , {  headers:{
             "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-            CNIC:"",
-            MobileNumber:""
-        })
-    })
-    .then(res=>res.json())
-    .then(data=>{
-        if (data.error){
-            M.toast({html: data.error,classes:"#c62828 red darken-3"})
-            }
-            else{
-                localStorage.setItem("jwt", data.token)
-                localStorage.setItem("user",JSON.stringify(data.user))
-                dispatch({type:"USER",payload:data.user})
-            M.toast({html: "Signed In Sucessfull ",classes:"#43a047 green darken-1"})
-            history.push('/')    
-        }
-    }).catch(err =>{
-        console.log(err)
-    })
+        }}, {cnic: CNIC})
+        console.log("data from api =============" ,data)
+    }
+} catch (error) {
+    console.log("error==================", error)
+    
+}
+    //     localStorage.setItem("jwt", data.token)
+    //     localStorage.setItem("user",JSON.stringify(data.user))
+    //     dispatch({type:"USER",payload:data.user})
+    // M.toast({html: "Signed In Sucessfull ",classes:"#43a047 green darken-1"})
 }
 
 const router =()=>{
-    history.push("/OTP");
+    // history.push("/OTP");
 }
 <section className ="Signin">
 <div className= "container mt-5">
@@ -63,11 +57,11 @@ const router =()=>{
             value={CNIC}
             onChange={(e)=> setCNIC (e.target.value)}
             />
-            <input type="tel" id="phone" name="phone" placeholder="MobileNumber" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" 
+            {/* <input type="tel" id="phone" name="phone" placeholder="MobileNumber" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" 
              value={MobileNumber} 
             onChange={(e)=>setMobilenumber(e.target.value)} 
-           />
-           <button className ="btn waves-effect waves-light" onClick={router}> 
+           /> */}
+           <button className ="btn waves-effect waves-light" onClick={PostData}> 
            Next</button>
             <h5>
             Don't have an Account? <Link to = '/Signup'>Click here</Link>

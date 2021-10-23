@@ -105,14 +105,20 @@ const PartyRegisteration = () => {
   }
 
   const saveDataInLS = () => {
-    const data = {
+    const partyLeader = {
       leaderName: party.leaderName,
       partyName: party.partyName,
       leaderCnic: party.cnic,
       partySymbol: party.partySymbol,
+      partyLogo: partyLogo,
+      type: selectedType
+    }
+    localStorage.setItem("party", JSON.stringify(partyLeader))
+    const data = {
       candidateCnic: candidate.canCnic,
       candidateName: candidate.canName,
       area: selectedArea,
+      type: selectedType,
       compaign: selectedCompaign,
       ballotId: ballotId
     }
@@ -125,11 +131,14 @@ const PartyRegisteration = () => {
     setSelectedArea("")
     setSelectedCompaign("")
     setBallotId("")
+    setSelectedType("")
   }
 
   const handleOnSubmit = () => {
     localStorage.removeItem("data")
+    localStorage.removeItem("party")
     setWholeData([])
+    setParty(initialState)
   }
   // ================================================================================
   //                  Console.logs
@@ -139,6 +148,7 @@ const PartyRegisteration = () => {
   // console.table(wholeData)
   // console.log(wholeData)
   console.log("type==========", type)
+  // console.log("party logooooo==========", partyLogo)
   // =================================================================================
   //                                      UseEffects
   // =================================================================================
@@ -151,6 +161,8 @@ const PartyRegisteration = () => {
       !partyLogo
     ) {
       showCandidate[1](false);
+    }else{
+      // showCandidate[1](true);
     }
   }, [
     party.leaderName,
@@ -198,8 +210,18 @@ const PartyRegisteration = () => {
   ])
   useEffect(() => {
     const data = localStorage.getItem("data")
-    console.log("data from LS", data && JSON.parse(data))
+    // console.log("data from LS", data && JSON.parse(data))
     if (data) { setWholeData(data && JSON.parse(data)) }
+    const partyLS = JSON.parse(localStorage.getItem("party"))
+    if (partyLS){
+      const newParty = {...party}
+      newParty.cnic = partyLS.leaderCnic
+      newParty.leaderName = partyLS.leaderName
+      newParty.partyName = partyLS.partyName
+      newParty.partySymbol = partyLS.partySymbol
+      setParty(newParty)
+      setPartyLogo(partyLS.partyLogo)
+    }
   }, [])
   // ===============================================================================
   //                                  JSX
@@ -211,7 +233,7 @@ const PartyRegisteration = () => {
           <div className="card-header">Party Registeration</div>
           <div className="card-body">
             <div className="row">
-              <div className="col-md-6">
+              <div className="col-md-6 col-12">
                 <div className="form-group">
                   <label htmlFor="leader_name">Leader Name</label>
                   <input
@@ -224,7 +246,7 @@ const PartyRegisteration = () => {
                   />
                 </div>
               </div>
-              <div className="col-md-6">
+              <div className="col-md-6 col-12">
                 <div className="form-group">
                   <label htmlFor="cnic">CNIC</label>
                   <input
@@ -239,7 +261,7 @@ const PartyRegisteration = () => {
               </div>
             </div>
             <div className="row">
-              <div className="col-md-6">
+              <div className="col-md-6 col-12">
                 <div className="form-group">
                   <label htmlFor="party_name">Party Name </label>
                   <input
@@ -252,7 +274,7 @@ const PartyRegisteration = () => {
                   />
                 </div>
               </div>
-              <div className="col-md-6">
+              <div className="col-md-6 col-12">
                 <div className="form-group">
                   <label htmlFor="party_symbol">Party Symbol</label>
                   <input
@@ -267,7 +289,7 @@ const PartyRegisteration = () => {
               </div>
             </div>
             <div className="row">
-              <div className="col-md-6">
+              <div className="col-md-6 col-12">
                 <div className="form-group">
                   <input
                     //   value={partyLogo}
@@ -308,7 +330,7 @@ const PartyRegisteration = () => {
           <div className="card-header">Add Candidate</div>
           <div className="card-body">
             <div className="row">
-              <div className="col-md-6">
+              <div className="col-md-6 col-12">
                 <div className="form-group">
                   <label htmlFor="name">Name</label>
                   <input
@@ -321,7 +343,7 @@ const PartyRegisteration = () => {
                   />
                 </div>
               </div>
-              <div className="col-md-6">
+              <div className="col-md-6 col-12">
                 <div className="form-group">
                   <label htmlFor="canCnic">CNIC</label>
                   <input
@@ -461,25 +483,31 @@ const PartyRegisteration = () => {
               <th scope="col">Candidate CNIC</th>
               <th scope="col">Compaign </th>
               <th scope="col">Area </th>
+              <th scope="col">Type </th>
               <th scope="col">Ballod ID</th>
               <th scope="col">Leader Name</th>
               <th scope="col">Leader CNIC</th>
               <th scope="col">Party Name</th>
               <th scope="col">Party Symbol</th>
+              <th scope="col">Party Logo</th>
             </tr>
           </thead>
           <tbody>
-            {wholeData?.map(party => (
+            {wholeData?.map(p => (
               <tr key={Math.random() * 2342342342342}>
-                <td>{party.candidateName}</td>
-                <td>{party.candidateCnic}</td>
-                <td>{party.compaign}</td>
-                <td>{party.area}</td>
-                <td>{party.ballotId}</td>
+                <td>{p.candidateName}</td>
+                <td>{p.candidateCnic}</td>
+                <td>{p.compaign}</td>
+                <td>{p.area}</td>
+                <td>{p.type}</td>
+                <td>{p.ballotId}</td>
                 <td>{party.leaderName}</td>
-                <td>{party.leaderCnic}</td>
+                <td>{party.cnic}</td>
                 <td>{party.partyName}</td>
                 <td>{party.partySymbol}</td>
+                <td>
+                <img style={{borderRadius: "50%"}} src={partyLogo} width="100px" height="100px"/>
+                </td>    
               </tr>
             ))}
           </tbody>
