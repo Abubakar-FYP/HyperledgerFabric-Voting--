@@ -26,6 +26,13 @@ const candidateSchema = new mongoose.Schema({
     default: null,
   },
 
+  voters: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Voter",
+    },
+  ],
+
   is_criminal: {
     type: Boolean,
     default: false,

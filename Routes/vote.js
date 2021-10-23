@@ -20,39 +20,25 @@ const Candidate = mongoose.model("Candidate");
 
 router.post("/vote/:voter/:candidate", async (req, res) => {
   const voter = await Voter.findOne({
-    cnic: req.params.voter,
+    _id: req.params.voter,
   }).catch((err) => console.log(err));
+
+  console.log(voter);
 
   const candidate = await Candidate.findOne({
-    cnic: req.params.candidate,
+    _id: req.params.candidate,
   }).catch((err) => console.log(err));
 
-  const newVote = new Vote({
-    voterCnic: voter.cnic,
-    candidateCnic: candidate.cnic,
-    ballotid: candidate.ballotid,
-  });
+  console.log(candidate);
 
-  newVote
-    .save()
-    .then((resp) => console.log(resp))
-    .catch((err) => {
-      console.log(err);
-    });
+  voter.voted = req.params.candidate;
+  voter.voteflag = true;
+  candidate.voters.push(req.params.voter);
 
-  Voter.findOneAndUpdate({ cnic: req.params.v_cnic }, { voteflag: true })
-    .exec((err, doc) => {
-      if (!err) {
-        return res
-          .status(200)
-          .json({ message: "now you are logged out,Because you have voted" });
-      } else {
-        return res
-          .status(400)
-          .json({ message: "there was an error in voting,try again" });
-      }
-    })
-    .catch((err) => console.log(err));
+  await voter.save();
+  await candidate.save();
+
+  res.send({ message: "vote has been casted" });
 });
 
 //returns if a voter has voted or not

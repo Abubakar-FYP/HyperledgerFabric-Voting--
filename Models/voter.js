@@ -15,6 +15,11 @@ const voterSchema = new mongoose.Schema({
     ref: "Ballot",
     default: null,
   }, //this will be assigned based on the area of the voter
+
+  voted: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Candidate",
+  },
 }); //all the data's hash will be created to login next time*
 
 global.Voter = global.Voter || mongoose.model("Voter", voterSchema);

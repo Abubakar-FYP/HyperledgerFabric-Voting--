@@ -10,10 +10,12 @@ const campaign = new Schema({
     type: String,
   },
 
-  ballotId: {
-    type: [Schema.Types.ObjectId],
-    ref: "Ballot",
-  },
+  ballotId: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "Ballot",
+    },
+  ],
 });
 
 global.Campaign = global.Campaign || mongoose.model("Campaign", campaign);
