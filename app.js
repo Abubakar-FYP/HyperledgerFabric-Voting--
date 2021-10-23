@@ -29,6 +29,7 @@ require("./Models/criminal");
 
 //Routes Registering
 var vote = require("./Routes/vote");
+var voter = require("./Routes/voter");
 var signup = require("./Routes/signup");
 var admin = require("./Routes/admin");
 var ballot = require("./Routes/ballot");
@@ -36,7 +37,7 @@ var campaign = require("./Routes/campaign");
 var party = require("./Routes/party");
 var candidate = require("./Routes/candidate");
 
-app.use([signup, ballot, vote, candidate, party, admin, campaign]); //using the routes
+app.use([signup, ballot, vote, candidate, party, admin, campaign, voter]); //using the routes
 
 const serverNumber = 1970;
 
