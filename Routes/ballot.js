@@ -277,6 +277,9 @@ router.get("/getcampaignwinner", async (req, res) => {
         path: "ballotId",
         populate: {
           path: "candidate",
+          populate: {
+            path: "partyId",
+          },
         },
       })
       .exec((err, docs) => {
