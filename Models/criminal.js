@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const criminalSchema = new mongoose.Schema({
   cnic: {
     type: Number,
-    required: true,
   },
 });
 

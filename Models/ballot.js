@@ -5,17 +5,14 @@ const ObjectId = mongoose.Schema.Types.ObjectId;
 const ballotSchema = new mongoose.Schema({
   ballotname: {
     type: String,
-    required: true,
   },
 
   ballotid: {
     type: Number,
-    required: true,
   },
 
   type: {
     type: String,
-    required: true,
   },
 
   campaignId: {

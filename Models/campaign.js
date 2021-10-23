@@ -1,24 +1,20 @@
-const {Schema} = require('mongoose');
-const mongoose = require('mongoose');
+const { Schema } = require("mongoose");
+const mongoose = require("mongoose");
 
 const campaign = new Schema({
+  campaignId: {
+    type: Number,
+  },
 
-    campaignId:{
-        type: Number,
-        required: true
-    },
+  campaignName: {
+    type: String,
+  },
 
-    campaignName:{
-        type: String,
-        required: true
-    },
-
-    ballotId:{
-        type:[Schema.Types.ObjectId],
-        ref:"Ballot"
-    }
-
+  ballotId: {
+    type: [Schema.Types.ObjectId],
+    ref: "Ballot",
+  },
 });
 
-global.Campaign = global.Campaign || mongoose.model("Campaign",campaign); 
+global.Campaign = global.Campaign || mongoose.model("Campaign", campaign);
 module.exports = global.Campaign;

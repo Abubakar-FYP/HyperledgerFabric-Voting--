@@ -7,23 +7,19 @@ const Ballot = mongoose.model("Ballot");
 const partySchema = new Schema({
   partyName: {
     type: String,
-    required: true,
   },
 
   partySlogan: {
     type: String,
-    required: true,
   },
 
   partyImg: {
     type: String,
     default: "...",
-    required: true,
   },
 
   partyLeaderCnic: {
     type: Number,
-    required: true,
   },
 
   candidate: [

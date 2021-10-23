@@ -3,7 +3,6 @@ const mongoose = require("mongoose"); //mongoose imported
 const voterSchema = new mongoose.Schema({
   cnic: {
     type: Number,
-    required: true,
   },
 
   voteflag: {
