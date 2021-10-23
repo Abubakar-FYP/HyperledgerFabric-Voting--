@@ -125,4 +125,8 @@ router.get("/getpositions", async (req, res) => {
   return res.status(200).json({ positions });
 });
 
+router.get("/getmalevoters", async (req, res) => {});
+
+router.get("/getfemalevoters", async (req, res) => {});
+
 module.exports = router;
