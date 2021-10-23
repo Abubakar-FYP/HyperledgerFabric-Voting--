@@ -251,6 +251,58 @@ router.get("/getballotwinner/:_id", async (req, res) => {
   return winnerInfo;
 });
 
+router.get("/getallballotwinner", async (req, res) => {
+  var candidateCnic = new Array();
+  await Ballot.find({})
+    .populate({
+      path: "candidate",
+    })
+    .lean()
+    .exec(async (err, docs) => {
+      if (!err) {
+        for (const ballot of docs) {
+          ballot.candidate.map((item) => {
+            candidateCnic.push(item.cnic);
+          });
+        }
+
+        const mapping = new Map();
+
+        for (const cnic of candidateCnic) {
+          mapping.set(
+            cnic,
+            await Vote.where({ candidateCnic: cnic }).countDocuments()
+          );
+        }
+
+        let winner;
+        const max = ("max", Math.max(...mapping.values()));
+        for (const [key, value] of mapping.entries()) {
+          if (value == max) {
+            winner = key;
+          }
+        }
+        var winnerInfo;
+        for (const candidate of docs) {
+          for (var i = 0; i < candidate.candidate.length; i++) {
+            if (candidate.candidate[i].cnic == winner) {
+              winnerInfo = candidate.candidate[i];
+              break;
+            }
+          }
+        }
+
+        winnerInfo.votes = max;
+        console.log(winnerInfo);
+
+        res.status(200).json({ message: winnerInfo });
+        return winnerInfo;
+      } else {
+        console.log(err);
+      }
+    });
+});
+
 //campaign winner (party)
 //returns campaign winner, first counts the number of candidates won in ballots
 //then after that it counts the number of which party has the most ballots won
@@ -259,9 +311,11 @@ router.get("/getcampaignwinner/:_id", async (req, res) => {
   const ballots = await Campaign.findOne({ _id: req.params._id }).select(
     "ballotId"
   );
+  var counter = 0;
   var winners = new Array();
   const winnerPartyVoteMapping = new Map();
   for (const ballot of ballots.ballotId) {
+    counter++;
     winners.push(
       await axios({
         method: "get",
@@ -277,6 +331,7 @@ router.get("/getcampaignwinner/:_id", async (req, res) => {
   }
 
   const winnerPartyNames = winners.map((item) => {
+    console.log(item);
     return item.message.partyId.partyName;
   });
 
@@ -285,7 +340,7 @@ router.get("/getcampaignwinner/:_id", async (req, res) => {
   const partyVoteMapping = new Map();
 
   for (var i = 0; i < partySetToArray.length; i++) {
-    var counter = 0;
+    let counter = 0;
     for (var j = 0; j < winnerPartyNames.length; j++) {
       if (partySetToArray[i] === winnerPartyNames[j]) {
         counter++;
@@ -310,6 +365,7 @@ router.get("/getcampaignwinner/:_id", async (req, res) => {
     }
   }
   winnerInfo.won = max;
+  winnerInfo.ballotOutOf = counter;
   console.log(winnerInfo);
 
   return winnerInfo;

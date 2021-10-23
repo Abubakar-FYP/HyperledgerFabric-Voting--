@@ -1,4 +1,4 @@
-const messagebird = require("messagebird")("ATxFxZ0RsvoxEyjAF0UBBx2M7");
+const messagebird = require("messagebird")("ghnhj9IMDIisXOffqvsreoR48");
 var checkStatus = 1;
 var checkLength = 0;
 
@@ -36,7 +36,7 @@ const otpGenerator = () => {
   return otp;
 };
 
-const otpSender = (to, next) => {
+const otpSender = (to) => {
   const otp4digit = otpGenerator();
 
   const response = bird("", to, otp4digit);

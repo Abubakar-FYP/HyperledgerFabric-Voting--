@@ -17,56 +17,24 @@ const Criminal = mongoose.model("Criminal");
 //use the findparty or getparty dapi to check if its new or not
 //returns a list of candidates,chain this api to create candidate api
 router.post("/createparty", async (req, res) => {
-  const {
-    partyId,
-    partyName,
-    partyImg,
-    partyLeaderName,
-    partyLeaderCnic,
-    partyLeaderPhoneNumber,
-    partyLeaderGender,
-    partyLeaderAge,
-    partyLeaderReligion,
-    partyLeaderAddress,
-    candidate,
-  } = req.body;
+  const { partyName, partyImg, partyLeaderCnic, candidate } = req.body;
 
-  if (
-    !partyId ||
-    !partyName ||
-    !partyImg ||
-    !partyLeaderName ||
-    !partyLeaderCnic ||
-    !partyLeaderPhoneNumber ||
-    !partyLeaderGender ||
-    !partyLeaderAge ||
-    !partyLeaderReligion ||
-    !partyLeaderAddress ||
-    !candidate
-  ) {
+  if (!partyName || !partyImg || !partyLeaderCnic || !candidate) {
     return res.status(408).json({ message: "one or more fields are empty" });
   }
 
   const newParty = new Party({
-    partyId,
     partyName,
     partyImg,
-    partyLeaderName,
     partyLeaderCnic,
-    partyLeaderPhoneNumber,
-    partyLeaderGender,
-    partyLeaderAge,
-    partyLeaderReligion,
-    partyLeaderAddress,
     candidate,
   });
 
   const candidateList = candidate.map((item) => {
     return new Candidate({
-      name: item.name,
       cnic: item.cnic,
-      partyId: newParty._id,
       position: item.position,
+      partyId: newParty._id,
     });
   }); // send these to candidate
 
@@ -83,7 +51,7 @@ router.post("/createparty", async (req, res) => {
     res.status(200).json({ message: "party saved sucessfully" });
   }
 
-  return candidateList; //returns list of candidates
+  return candidateList;
 });
 
 //chain use during candidate registration by party leader

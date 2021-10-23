@@ -28,8 +28,6 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
   }).catch((err) => console.log(err));
 
   const newVote = new Vote({
-    votername: voter.name,
-    candidatename: candidate.name,
     voterCnic: voter.cnic,
     candidateCnic: candidate.cnic,
     ballotid: candidate.ballotid,

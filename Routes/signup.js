@@ -131,35 +131,33 @@ router.post("/signupinfo", async (req, res) => {
     });
 });
 
-router.post("/signin", async (req, res, next) => {
-  const { cnic, phoneNumber } = req.body;
+router.post("/signin", async (req, res) => {
+  const { cnic } = req.body;
 
   if (!cnic) {
     return res.status(400).json({ message: "field is empty" });
   }
 
-  Voter.findOne({ cnic })
+  Nadra.findOne({ cnic })
     .then((resp) => {
-      console.log(resp);
       const token = jwt.sign({ _id: resp._id }, JWTKEY);
-      res.status(200).json({ token });
+      console.log(resp.phoneNumber);
+      const genOtp = otp.otpSender(resp.phoneNumber);
+
+      localStorage.setItem("sOtp", genOtp);
     })
     .catch((err) => {
       if (err) {
         return res.status(403).json({ message: err });
       }
     });
-
-  const genOtp = otp.otpSender(phoneNumber);
-
-  localStorage.setItem("sOtp", genOtp);
 });
 
 router.post("/signinotp", async (req, res) => {
   const genOtp = localStorage.getItem("sOtp");
 
-  if (genOtp != (await req.body.otpNumber)) {
-    return await res.status(400).json({
+  if (genOtp != req.body.otpNumber) {
+    return res.status(400).json({
       message: "otp entered in the field does not match otp generated",
     });
   }
