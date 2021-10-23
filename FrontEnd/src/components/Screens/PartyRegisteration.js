@@ -26,6 +26,8 @@ const PartyRegisteration = () => {
   const [selectedArea, setSelectedArea] = useState("");
   const [areas, setAreas] = useState(null);
   const [ballotId, setBallotId] = useState("")
+  const [type, setType] = useState("")
+  const [selectedType, setSelectedType] = useState("")
   const [wholeData, setWholeData] = useState([])
   const [disableBtn, setDisableBtn] = useState(true)
   // ===============================================================================
@@ -46,18 +48,18 @@ const PartyRegisteration = () => {
     const files = Array.from(e.target.files)
     setPartyLogo(null)
     files.forEach(file => {
-        if (file) {
-            if (file.type.includes("png") || file.type.includes("jpeg") || file.type.includes("jpg")) {
+      if (file) {
+        if (file.type.includes("png") || file.type.includes("jpeg") || file.type.includes("jpg")) {
 
-                const reader = new FileReader()
-                reader.onload = () => {
-                    if (reader.readyState === 2) {
-                        setPartyLogo(reader.result)
-                    }
-                }
-                reader.readAsDataURL(file)
+          const reader = new FileReader()
+          reader.onload = () => {
+            if (reader.readyState === 2) {
+              setPartyLogo(reader.result)
             }
+          }
+          reader.readAsDataURL(file)
         }
+      }
     })
   };
   const addCandidate = () => {
@@ -73,11 +75,24 @@ const PartyRegisteration = () => {
     // get this specific compaign from state compaigns
     const compaign = compaigns.find((comp) => comp._id.toString() === id);
     console.log(compaign);
-    setAreas(compaign.ballotId);
+    setType(compaign.ballotId);
+    setSelectedType("")
     setSelectedArea("")
     setBallotId("")
   };
 
+  const selectType = (e,id)=> {
+    console.log(e.target.innerText);
+    setSelectedType(e.target.innerText);
+    console.log(id);
+
+    // get this specific compaign from state compaigns
+    const areas = type.filter(val => val.type === e.target.innerText);
+    console.log(areas);
+    setAreas(areas);
+    setSelectedArea("")
+    setBallotId("")
+  }
   const selectArea = (e, id) => {
     console.log(e.target.innerText)
     setSelectedArea(e.target.innerText)
@@ -101,7 +116,7 @@ const PartyRegisteration = () => {
       compaign: selectedCompaign,
       ballotId: ballotId
     }
-    const newData = [...wholeData , data]
+    const newData = [...wholeData, data]
     setWholeData(newData)
     console.table(newData)
     localStorage.removeItem("data")
@@ -119,10 +134,11 @@ const PartyRegisteration = () => {
   // ================================================================================
   //                  Console.logs
   // ================================================================================
-//   console.log("Compaigns", compaigns);
-//   console.log("Areas", areas);
-// console.table(wholeData)
-// console.log(wholeData)
+  //   console.log("Compaigns", compaigns);
+  //   console.log("Areas", areas);
+  // console.table(wholeData)
+  // console.log(wholeData)
+  console.log("type==========", type)
   // =================================================================================
   //                                      UseEffects
   // =================================================================================
@@ -153,7 +169,7 @@ const PartyRegisteration = () => {
 
   // disable Add Candidate Button
   useEffect(() => {
-    if(
+    if (
       !party.leaderName ||
       !party.partyName ||
       !party.cnic ||
@@ -163,11 +179,11 @@ const PartyRegisteration = () => {
       !candidate.canName ||
       !selectedArea ||
       !selectedCompaign ||
-      !ballotId){
-        setDisableBtn(true)
-      }else{
-        setDisableBtn(false)
-      }
+      !ballotId) {
+      setDisableBtn(true)
+    } else {
+      setDisableBtn(false)
+    }
   }, [
     party.leaderName,
     party.partyName,
@@ -182,265 +198,296 @@ const PartyRegisteration = () => {
   ])
   useEffect(() => {
     const data = localStorage.getItem("data")
-    console.log("data from LS",data && JSON.parse(data))
-    if(data) {setWholeData(data && JSON.parse(data))}
+    console.log("data from LS", data && JSON.parse(data))
+    if (data) { setWholeData(data && JSON.parse(data)) }
   }, [])
   // ===============================================================================
   //                                  JSX
   // ===============================================================================
   return (
     <div>
-    <div className="conatiner">
-      <div className="card" style={{ maxWidth: "1500px", margin: "20px auto" }}>
-        <div className="card-header">Party Registeration</div>
-        <div className="card-body">
-          <div className="row">
-            <div className="col-md-6">
-              <div className="form-group">
-                <label htmlFor="leader_name">Leader Name</label>
-                <input
-                  value={party.leaderName}
-                  onChange={handlePartyRegisteration}
-                  id="leader_name"
-                  className="form-control"
-                  type="text"
-                  name="leaderName"
-                />
+      <div className="conatiner">
+        <div className="card" style={{ maxWidth: "1500px", margin: "20px auto" }}>
+          <div className="card-header">Party Registeration</div>
+          <div className="card-body">
+            <div className="row">
+              <div className="col-md-6">
+                <div className="form-group">
+                  <label htmlFor="leader_name">Leader Name</label>
+                  <input
+                    value={party.leaderName}
+                    onChange={handlePartyRegisteration}
+                    id="leader_name"
+                    className="form-control"
+                    type="text"
+                    name="leaderName"
+                  />
+                </div>
+              </div>
+              <div className="col-md-6">
+                <div className="form-group">
+                  <label htmlFor="cnic">CNIC</label>
+                  <input
+                    value={party.cnic}
+                    onChange={handlePartyRegisteration}
+                    id="cnic"
+                    className="form-control"
+                    type="number"
+                    name="cnic"
+                  />
+                </div>
               </div>
             </div>
-            <div className="col-md-6">
-              <div className="form-group">
-                <label htmlFor="cnic">CNIC</label>
-                <input
-                  value={party.cnic}
-                  onChange={handlePartyRegisteration}
-                  id="cnic"
-                  className="form-control"
-                  type="number"
-                  name="cnic"
-                />
+            <div className="row">
+              <div className="col-md-6">
+                <div className="form-group">
+                  <label htmlFor="party_name">Party Name </label>
+                  <input
+                    value={party.partyName}
+                    onChange={handlePartyRegisteration}
+                    id="party_name"
+                    className="form-control"
+                    type="text"
+                    name="partyName"
+                  />
+                </div>
+              </div>
+              <div className="col-md-6">
+                <div className="form-group">
+                  <label htmlFor="party_symbol">Party Symbol</label>
+                  <input
+                    value={party.partySymbol}
+                    onChange={handlePartyRegisteration}
+                    id="party_symbol"
+                    className="form-control"
+                    type="text"
+                    name="partySymbol"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-          <div className="row">
-            <div className="col-md-6">
-              <div className="form-group">
-                <label htmlFor="party_name">Party Name </label>
-                <input
-                  value={party.partyName}
-                  onChange={handlePartyRegisteration}
-                  id="party_name"
-                  className="form-control"
-                  type="text"
-                  name="partyName"
-                />
+            <div className="row">
+              <div className="col-md-6">
+                <div className="form-group">
+                  <input
+                    //   value={partyLogo}
+                    onChange={handlePartyLogo}
+                    className="form-control form-control-sm"
+                    id="formFileSm"
+                    type="file"
+                    placeholder="Party Logo"
+                  />
+                </div>
               </div>
-            </div>
-            <div className="col-md-6">
-              <div className="form-group">
-                <label htmlFor="party_symbol">Party Symbol</label>
-                <input
-                  value={party.partySymbol}
-                  onChange={handlePartyRegisteration}
-                  id="party_symbol"
-                  className="form-control"
-                  type="text"
-                  name="partySymbol"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-md-6">
-              <div className="form-group">
-                <input
-                  //   value={partyLogo}
-                  onChange={handlePartyLogo}
-                  className="form-control form-control-sm"
-                  id="formFileSm"
-                  type="file"
-                  placeholder="Party Logo"
-                />
-              </div>
-            </div>
-            <div className=" offset-md-4 col-md-2 ">
-              <div className="form-group">
-                <input
-                  id="add_candidate"
-                  className={`btn btn-secondary  ${
-                    party.leaderName &&
-                    party.partyName &&
-                    party.cnic &&
-                    party.partySymbol &&
-                    partyLogo
-                      ? ""
-                      : "disabled"
-                  }`}
-                  type="submit"
-                  value="Add Candidate"
-                  onClick={addCandidate}
-                />
+              <div className=" offset-md-4 col-md-2 ">
+                <div className="form-group">
+                  <input
+                    id="add_candidate"
+                    className={`btn btn-secondary  ${party.leaderName &&
+                        party.partyName &&
+                        party.cnic &&
+                        party.partySymbol &&
+                        partyLogo
+                        ? ""
+                        : "disabled"
+                      }`}
+                    type="submit"
+                    value="Add Candidate"
+                    onClick={addCandidate}
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div
-        className={`card ${!showCandidate[0] && "d-none"}`}
-        style={{ maxWidth: "1500px", margin: "20px auto" }}
-      >
-        <div className="card-header">Add Candidate</div>
-        <div className="card-body">
-          <div className="row">
-            <div className="col-md-6">
-              <div className="form-group">
-                <label htmlFor="name">Name</label>
-                <input
-                  value={candidate.canName}
-                  onChange={handleCandidateRegisteration}
-                  id="name"
-                  className="form-control"
-                  type="text"
-                  name="canName"
-                />
+        <div
+          className={`card ${!showCandidate[0] && "d-none"}`}
+          style={{ maxWidth: "1500px", margin: "20px auto" }}
+        >
+          <div className="card-header">Add Candidate</div>
+          <div className="card-body">
+            <div className="row">
+              <div className="col-md-6">
+                <div className="form-group">
+                  <label htmlFor="name">Name</label>
+                  <input
+                    value={candidate.canName}
+                    onChange={handleCandidateRegisteration}
+                    id="name"
+                    className="form-control"
+                    type="text"
+                    name="canName"
+                  />
+                </div>
+              </div>
+              <div className="col-md-6">
+                <div className="form-group">
+                  <label htmlFor="canCnic">CNIC</label>
+                  <input
+                    value={candidate.canCnic}
+                    onChange={handleCandidateRegisteration}
+                    id="canCnic"
+                    className="form-control"
+                    type="number"
+                    name="canCnic"
+                  />
+                </div>
               </div>
             </div>
-            <div className="col-md-6">
-              <div className="form-group">
-                <label htmlFor="canCnic">CNIC</label>
-                <input
-                  value={candidate.canCnic}
-                  onChange={handleCandidateRegisteration}
-                  id="canCnic"
-                  className="form-control"
-                  type="number"
-                  name="canCnic"
-                />
+            <div className="row">
+              <div className="col-md-2">
+                <div className="dropdown">
+                  <button
+                    className="btn btn-secondary dropdown-toggle"
+                    type="button"
+                    id="dropdownMenuButton"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    {selectedCompaign ? selectedCompaign : "compaign"}
+                  </button>
+                  <div
+                    className="dropdown-menu"
+                    aria-labelledby="dropdownMenuButton"
+                  >
+                    {compaigns &&
+                      compaigns.map((compaign) => (
+                        <p
+                          className="dropdown-item"
+                          key={compaign._id}
+                          onClick={(e) => selectCompaign(e, compaign._id)}
+                        >
+                          {compaign.campaignName}
+                        </p>
+                      ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-md-3">
-              <div className="dropdown">
-                <button
-                  className="btn btn-secondary dropdown-toggle"
-                  type="button"
-                  id="dropdownMenuButton"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  {selectedCompaign ? selectedCompaign : "compaign"}
-                </button>
-                <div
-                  className="dropdown-menu"
-                  aria-labelledby="dropdownMenuButton"
-                >
-                  {compaigns &&
-                    compaigns.map((compaign) => (
+
+              <div className="col-md-2">
+                <div className="dropdown">
+                  <button
+                    className="btn btn-secondary dropdown-toggle"
+                    type="button"
+                    id="dropdownMenuButton"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    {selectedType ? selectedType : "Type"}
+                  </button>
+                  <div
+                    className="dropdown-menu"
+                    aria-labelledby="dropdownMenuButton"
+                  >
+                    {type &&
+                      type.map((value) => (
+                        <p
+                          className="dropdown-item"
+                          key={value._id}
+                          onClick={(e) => selectType(e, value._id)}
+                        >
+                          {value.type}
+                        </p>
+                      ))}
+                  </div>
+                </div>
+              </div>
+              
+
+              <div className="col-md-2">
+                <div className="dropdown">
+                  <button
+                    className="btn btn-secondary dropdown-toggle"
+                    type="button"
+                    id="dropdownMenuButton"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    {selectedArea ? selectedArea : "Area"}
+                  </button>
+                  <div
+                    className="dropdown-menu"
+                    aria-labelledby="dropdownMenuButton"
+                  >
+                    {areas?.length ?
+                      areas.map((area) => (
+                        <p
+                          key={area?._id}
+                          onClick={e => selectArea(e, area?._id)}
+                          className="dropdown-item">{area?.ballotname}</p>
+                      )) :
                       <p
-                        className="dropdown-item"
-                        key={compaign._id}
-                        onClick={(e) => selectCompaign(e, compaign._id)}
-                      >
-                        {compaign.campaignName}
-                      </p>
-                    ))}
-                </div>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="dropdown">
-                <button
-                  className="btn btn-secondary dropdown-toggle"
-                  type="button"
-                  id="dropdownMenuButton"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  {selectedArea ? selectedArea : "Area"}
-                </button>
-                <div
-                  className="dropdown-menu"
-                  aria-labelledby="dropdownMenuButton"
-                >
-                  {areas?.length ?
-                    areas.map((area) => (
-                      <p 
-                      key={area?._id}
-                      onClick={e => selectArea(e, area?._id)}
-                      className="dropdown-item">{area?.ballotname }</p>
-                    )):
-                      <p 
-                      className="dropdown-item">No Area Is Present</p>
+                        className="dropdown-item">No Area Is Present</p>
                     }
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="col-md-3">
+              <div className="col-md-3">
                 <button
                   className="btn btn-secondary disabled"
                   type="button"
-              >
+                >
                   {ballotId ? ballotId : "Ballot ID"}
                 </button>
-            
-            </div>
 
-            <div className="col-md-3">
+              </div>
+
+              <div className="col-md-3">
                 <button
                   className="btn btn-secondary"
                   type="button"
                   disabled={disableBtn}
                   onClick={saveDataInLS}
-              >
-                Add Candidate
+                >
+                  Add Candidate
                 </button>
-            
-            </div>
 
+              </div>
+
+            </div>
           </div>
+
         </div>
-        
+        <table className="table table-striped"
+          style={{ maxWidth: "1500px", margin: "10px auto", display: wholeData?.length ? "block" : "none" }}>
+          <thead>
+            <tr>
+              <th scope="col">Candidate Name</th>
+              <th scope="col">Candidate CNIC</th>
+              <th scope="col">Compaign </th>
+              <th scope="col">Area </th>
+              <th scope="col">Ballod ID</th>
+              <th scope="col">Leader Name</th>
+              <th scope="col">Leader CNIC</th>
+              <th scope="col">Party Name</th>
+              <th scope="col">Party Symbol</th>
+            </tr>
+          </thead>
+          <tbody>
+            {wholeData?.map(party => (
+              <tr key={Math.random() * 2342342342342}>
+                <td>{party.candidateName}</td>
+                <td>{party.candidateCnic}</td>
+                <td>{party.compaign}</td>
+                <td>{party.area}</td>
+                <td>{party.ballotId}</td>
+                <td>{party.leaderName}</td>
+                <td>{party.leaderCnic}</td>
+                <td>{party.partyName}</td>
+                <td>{party.partySymbol}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {wholeData.length ?
+          <button onClick={handleOnSubmit} className="btn btn-secondary" style={{ marginLeft: "10rem" }}>Submit</button>
+          : null}
       </div>
-      <table className="table table-striped" 
-      style={{maxWidth: "1500px", margin: "10px auto", display: wholeData?.length ? "block": "none"}}>
-  <thead>
-    <tr>
-      <th scope="col">Candidate Name</th>
-      <th scope="col">Candidate CNIC</th>
-      <th scope="col">Compaign </th>
-      <th scope="col">Area </th>
-      <th scope="col">Ballod ID</th>
-      <th scope="col">Leader Name</th>
-      <th scope="col">Leader CNIC</th>
-      <th scope="col">Party Name</th>
-      <th scope="col">Party Symbol</th>
-    </tr>
-  </thead>
-  <tbody>
-    {wholeData?.map(party => (
-   <tr key={Math.random()*2342342342342}>
-   <td>{party.candidateName}</td>
-   <td>{party.candidateCnic}</td>
-   <td>{party.compaign}</td>
-   <td>{party.area}</td>
-   <td>{party.ballotId}</td>
-   <td>{party.leaderName}</td>
-   <td>{party.leaderCnic}</td>
-   <td>{party.partyName}</td>
-   <td>{party.partySymbol}</td>
- </tr>
-    ))}
-  </tbody>
-</table>
-{wholeData.length ? 
-  <button onClick={handleOnSubmit} className="btn btn-secondary" style={{marginLeft: "10rem"}}>Submit</button> 
-: null}
-    </div>
     </div>
 
   );
