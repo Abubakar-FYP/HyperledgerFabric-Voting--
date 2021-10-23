@@ -2,23 +2,21 @@ const express = require("express");
 const mongoose = require("mongoose");
 const { MONGOURI } = require("./Keys/keys");
 const bodyparser = require("body-parser");
-require("dotenv").config()
+require("dotenv").config();
 const requirelogin = require("./Middleware/requirelogin"); //middleware
 
 const app = express();
 
-const cors=require("cors")
-app.use(cors())
+const cors = require("cors");
+app.use(cors());
 app.use(express.json()); //to parse outgoing json in the post req
 app.use(express.urlencoded({ extended: true })); //parse html forms, like post methods etc
 
 app.use((req, res, next) => {
-
   res.header("Access-Control-Allow-Origin", "*");
-  
-  next()
-  
-  })
+
+  next();
+});
 //Models registering
 require("./Models/admin");
 require("./Models/voter");
@@ -69,8 +67,7 @@ mongoose.connection.on("exit", (err) => {
 app.get("/", (req, res) => {
   res.send("home");
 });
-
-const serverDebugger = require("debug")("app:server")
+const serverDebuger = require("debug")("app:server");
 app.listen(serverNumber, () => {
-  serverDebugger(`connected to ${serverNumber}`);
+  serverDebuger(`connected to ${serverNumber}`);
 });
