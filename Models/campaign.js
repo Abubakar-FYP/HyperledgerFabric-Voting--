@@ -16,6 +16,20 @@ const campaign = new Schema({
       ref: "Ballot",
     },
   ],
+
+  voteCounts: {
+    type: [
+      {
+        partyName: {
+          type: String,
+        },
+        voteCount: {
+          type: Number,
+          defualt: 0,
+        },
+      },
+    ],
+  },
 });
 
 global.Campaign = global.Campaign || mongoose.model("Campaign", campaign);

@@ -27,19 +27,39 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
     res.send({ message: "you cannot vote again" });
   } */
 
-  console.log("Voter=====>", voter);
+  /* 
+  console.log("Voter=====>", voter); */
 
   const candidate = await Candidate.findOne({
     _id: req.params.candidate,
   }).catch((err) => console.log(err));
 
-  console.log("Candidate=====>", candidate);
-
   const party = await Party.findOne({
     _id: candidate.partyId,
   });
+  console.log("party========", party);
+  console.log("Candidate=====>", candidate, candidate.partyId);
+  const ballot = await Ballot.findOne({ _id: candidate.ballotId });
 
-  console.log("Party=====>", party);
+  console.log("Ballot=====>", ballot);
+
+  const campaign = await Campaign.findOne({ _id: ballot.campaignId });
+
+  console.log("Campaign=====>", campaign);
+
+  const newCount = campaign.voteCounts?.find(
+    (part) => part?.partyName === party.partyName
+  );
+  console.log("new count===========", newCount);
+  if (newCount) {
+    newCount.voteCount = newCount?.voteCount + 1;
+  } else {
+    let obj = {};
+    obj.partyName = party.partyName;
+    obj.voteCount = 1;
+
+    campaign.voteCounts.push(obj);
+  }
 
   party.voters.push(req.params.voter);
   party.voteCount = party.voteCount + 1;
@@ -50,6 +70,7 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
   candidate.voters.push(req.params.voter);
 
   await voter.save();
+  await campaign.save();
   await candidate.save();
   await party.save();
 

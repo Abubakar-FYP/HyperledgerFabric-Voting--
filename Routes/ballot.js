@@ -384,6 +384,11 @@ router.get("/getoverallpartywinner", async (req, res) => {
     });
 });
 
+router.get("/electionresultdata", async (req, res) => {
+  await Party.find({}).exec((err, docs) => {
+    res.send(docs);
+  });
+});
 //overall winner (party) //hold
 
 module.exports = router;
