@@ -33,16 +33,23 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
     _id: req.params.candidate,
   }).catch((err) => console.log(err));
 
+  console.log(candidate);
+
   const party = await Party.findOne({
-    _id: candidate.party,
+    _id: candidate.partyId,
   });
+
+  party.voters.push(voter._id);
+  party.voteCount = party.voteCount + 1;
 
   voter.voted = req.params.candidate;
   voter.voteflag = true;
+  candidate.voteCount = candidate.voteCount + 1;
   candidate.voters.push(req.params.voter);
 
   await voter.save();
   await candidate.save();
+  await party.save();
 
   res.send({ message: "vote has been casted" });
 });

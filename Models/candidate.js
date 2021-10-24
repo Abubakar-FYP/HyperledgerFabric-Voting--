@@ -33,6 +33,10 @@ const candidateSchema = new mongoose.Schema({
     },
   ],
 
+  voteCount: {
+    type: Number,
+  },
+
   is_criminal: {
     type: Boolean,
     default: false,
