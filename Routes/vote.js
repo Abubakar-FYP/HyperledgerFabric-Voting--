@@ -23,23 +23,25 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
     _id: req.params.voter,
   }).catch((err) => console.log(err));
 
-  if (voter.voteflag === true) {
+  /*  if (voter.voteflag === true) {
     res.send({ message: "you cannot vote again" });
-  }
+  } */
 
-  console.log(voter);
+  console.log("Voter=====>", voter);
 
   const candidate = await Candidate.findOne({
     _id: req.params.candidate,
   }).catch((err) => console.log(err));
 
-  console.log(candidate);
+  console.log("Candidate=====>", candidate);
 
   const party = await Party.findOne({
     _id: candidate.partyId,
   });
 
-  party.voters.push(voter._id);
+  console.log("Party=====>", party);
+
+  party.voters.push(req.params.voter);
   party.voteCount = party.voteCount + 1;
 
   voter.voted = req.params.candidate;
