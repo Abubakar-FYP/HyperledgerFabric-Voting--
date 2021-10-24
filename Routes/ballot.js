@@ -274,82 +274,22 @@ router.get("/getallballotwinner", async (req, res) => {
 //then after that it counts the number of which party has the most ballots won
 //then gets the info of the party that won and with how many ballots in one campaign
 router.get("/getcampaignwinner", async (req, res) => {
-  console.log(
-    await Campaign.find({})
-      .populate({
-        path: "ballotId",
+  await Campaign.find({})
+    .populate({
+      path: "ballotId",
+      populate: {
+        path: "candidate",
         populate: {
-          path: "candidate",
-          populate: {
-            path: "partyId",
-          },
+          path: "partyId",
         },
-      })
-      .exec((err, docs) => {
-        res.json(docs);
-      })
-  );
-
-  /*  var counter = 0;
-  var winners = new Array();
-  const winnerPartyVoteMapping = new Map();
-
-   for (const ballot of ballots.ballotId) {
-    counter++;
-    winners.push(
-      await axios({
-        method: "get",
-        url: `http://localhost:1970/getballotwinner/${mongoose.Types.ObjectId(
-          ballot
-        )}`,
-      })
-        .then((resp) => {
-          return resp.data;
-        })
-        .catch((err) => console.log(err))
-    );
-  }
- 
-  const winnerPartyNames = winners.map((item) => {
-    console.log(item);
-    return item.message.partyId.partyName;
-  });
-
-  const partySet = new Set(winnerPartyNames); //unique values
-  const partySetToArray = Array.from(partySet);
-  const partyVoteMapping = new Map();
-
-  for (var i = 0; i < partySetToArray.length; i++) {
-    let counter = 0;
-    for (var j = 0; j < winnerPartyNames.length; j++) {
-      if (partySetToArray[i] === winnerPartyNames[j]) {
-        counter++;
-      }
-    }
-    partyVoteMapping.set(partySetToArray[i], counter);
-  }
-
-  var winner;
-  const max = ("max", Math.max(...partyVoteMapping.values()));
-  for (const [key, value] of partyVoteMapping.entries()) {
-    if (value == max) {
-      winner = key;
-    }
-  }
-
-  var winnerInfo;
-  for (const candidate of winners) {
-    if (candidate.message.partyId.partyName == winner) {
-      winnerInfo = candidate.message.partyId;
-      break;
-    }
-  }
-  winnerInfo.won = max;
-  winnerInfo.ballotOutOf = counter;
-  console.log(winnerInfo);
-
-  return winnerInfo; */
+      },
+    })
+    .exec((err, docs) => {
+      res.json(docs);
+    });
 });
+
+router.get("/electionwinner", async (req, res) => {});
 
 //overall winner (party) //hold
 
