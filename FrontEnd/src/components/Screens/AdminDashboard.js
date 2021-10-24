@@ -68,6 +68,7 @@ const AdminDashboard = () => {
                 <div className="row">
                     <div className="col-12 col-md-3">
                         <div className="card text-white bg-success">
+                        <div className="card-header">Total Votes</div>
                             <div className="card-body">
                                 <CountUp
                                     start={0}
@@ -85,7 +86,6 @@ const AdminDashboard = () => {
             <div className="row">
                 <div className="col-12 col-md-3">
                     <div className="card text-white bg-success">
-                        <div className="card-header">Male Voters</div>
                         <div className="card-body">
                             <CountUp
                                 start={0}
@@ -98,8 +98,8 @@ const AdminDashboard = () => {
                 </div>
                 <div className="col-12 col-md-3">
                     <div className="card text-white bg-warning">
-                        <div className="card-header">Female Voters</div>
                         <div className="card-body">
+                        <i className="fas fa-female"></i>
                             <CountUp
                                 start={0}
                                 end={feMaleVoters}
@@ -114,36 +114,28 @@ const AdminDashboard = () => {
             <h1 className="h3 text-start">Single Ballot Winners</h1>
             <div className="row">
                 <div className="col-12">
+                    <div className="table-responsive" style={{maxHeight: "300px"}}>
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">First</th>
-                                <th scope="col">Last</th>
-                                <th scope="col">Handle</th>
+                                <th scope="col">ballot Id</th>
+                                <th scope="col">Party</th>
+                                <th scope="col">Candidate</th>
+                                <th scope="col">Votes</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <th scope="row">1</th>
-                                <td>Mark</td>
-                                <td>Otto</td>
-                                <td>@mdo</td>
+                            {ballotWinners.length && ballotWinners.map(ballot => (
+                            <tr key={ballot._id}>
+                                <th scope="row">{ballot.ballotid}</th>
+                                <td>{ballot.candidate[0]?.partyId.partyName || "Unknown"}</td>
+                                <td>{ballot.candidate[0]?.name || "Unknown"}</td>
+                                <td>{ballot.candidate[0]?.voteCount || "0"}</td>
                             </tr>
-                            <tr>
-                                <th scope="row">2</th>
-                                <td>Jacob</td>
-                                <td>Thornton</td>
-                                <td>@fat</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">3</th>
-                                <td>Larry</td>
-                                <td>the Bird</td>
-                                <td>@twitter</td>
-                            </tr>
+                            ))}
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
         </div>

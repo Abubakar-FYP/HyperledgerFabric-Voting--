@@ -255,6 +255,11 @@ router.get("/getallballotwinner", async (req, res) => {
     .lean()
     .exec(async (err, docs) => {
       if (!err) {
+        docs.map(doc => (
+          doc.candidate = doc.candidate.sort((a,b) => b?.voteCount - a?.voteCount )
+        ))
+          // console.log("saperate docs=======", docs[i])
+        console.log("docs ==============", docs)
         res.json(docs);
       } else {
         console.log(err);
