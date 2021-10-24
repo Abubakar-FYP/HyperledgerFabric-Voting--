@@ -212,43 +212,46 @@ router.get("/getcandidateswithballotid/:ballotId", async (req, res) => {
 //returns information about the candidate who won from the ballot
 //hit this one time when election time ends
 router.get("/getballotwinner/:_id", async (req, res) => {
+  const partyNames = new Set();
+  const candidateNames = new Set();
+  const voteCount = new Set();
+  const tempArray = new Array();
+
   const ballots = await Ballot.findOne({ _id: req.params._id })
-    .select("_id candidate")
+    .select("_id ballotname ballotid")
+    .lean()
     .populate({
-      path: "candidate _id cnic partyId",
+      path: "candidate",
+      select: " _id voters name cnic",
       populate: {
         path: "partyId",
         model: "Party",
-        select: "partyName partyImg",
+        select: "partyName partyid",
       },
     })
-    .lean();
-  const cnicFiltered = ballots.candidate.map((item) => {
-    return item.cnic;
-  });
+    .exec((err, docs) => {
+      if (!err) {
+        var ballotId;
+        const response = docs.candidate.map((item) => {
+          tempArray.push(item);
+          if (item.voters === undefined) {
+            item.voteCount = null;
+          }
 
-  const mapping = new Map();
-
-  for (const cnic of cnicFiltered) {
-    mapping.set(cnic, await Vote.where({ cnic: cnic }).countDocuments());
-  }
-
-  let winner;
-  const max = ("max", Math.max(...mapping.values()));
-  for (const [key, value] of mapping.entries()) {
-    if (value == max) {
-      winner = key;
-    }
-  }
-
-  let winnerInfo = ballots.candidate.find((item) => {
-    if (item.cnic == winner) {
-      return item;
-    }
-  });
-
-  res.status(200).json({ message: winnerInfo });
-  return winnerInfo;
+          if (item.voteCount === null) {
+            item.voteCount = 0;
+          } else {
+            item.voteCount = item.voters.length;
+          }
+          return item;
+        });
+        response.ballotId = docs.ballotid;
+        console.log(response);
+        res.json(response);
+      } else {
+        console.log(err);
+      }
+    });
 });
 
 router.get("/getallballotwinner", async (req, res) => {

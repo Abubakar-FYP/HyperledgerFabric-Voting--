@@ -23,6 +23,10 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
     _id: req.params.voter,
   }).catch((err) => console.log(err));
 
+  if (voter.voteflag === true) {
+    res.send({ message: "you cannot vote again" });
+  }
+
   console.log(voter);
 
   const candidate = await Candidate.findOne({
