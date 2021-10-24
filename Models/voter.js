@@ -5,6 +5,10 @@ const voterSchema = new mongoose.Schema({
     type: Number,
   },
 
+  password: {
+    type: String,
+  },
+
   voteflag: {
     type: Boolean,
     default: false,
@@ -24,6 +28,11 @@ const voterSchema = new mongoose.Schema({
   voted: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Candidate",
+  },
+
+  role: {
+    type: String,
+    default: "Voter",
   },
 }); //all the data's hash will be created to login next time*
 
