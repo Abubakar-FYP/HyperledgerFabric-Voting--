@@ -128,12 +128,19 @@ router.get("/getpositions", async (req, res) => {
 });
 
 router.get("/getmalevoters", async (req, res) => {
-  const voters = await Voter.find({});
-  const nadra = await Nadra.find({});
-
-  res.json(nadra);
+  const voters = await Voter.find({ gender: "M", voteflag: true });
+  if (voters == null) {
+    res.json({ message: "no vote has been casted by males" });
+  }
+  res.json(voters);
 });
 
-router.get("/getfemalevoters", async (req, res) => {});
+router.get("/getfemalevoters", async (req, res) => {
+  const voters = await Voter.find({ gender: "F", voteflag: true });
+  if (voters == null) {
+    res.json({ message: "no vote has been casted by females" });
+  }
+  res.json(voters);
+});
 
 module.exports = router;
