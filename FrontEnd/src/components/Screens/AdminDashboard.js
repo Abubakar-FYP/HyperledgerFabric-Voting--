@@ -5,8 +5,9 @@ import axios from "axios"
 import { url } from "../../constants"
 const AdminDashboard = () => {
     const [totalVotes, setTotalVotes] = useState("")
-    const [compaigns, setCompaigns] = useState([])
-    const [filteredCompaigns , setFilteredCompaigns] = useState(null)
+    const [ballotWinners, setBallotWinners] = useState([])
+    const [maleVoters, setMaleVoters] = useState("")
+    const [feMaleVoters, setfeMaleVoters] = useState("")
     useEffect(() => {
         (async () => {
             const { data } = await axios.get(url + "/getcountvotedusers")
@@ -14,28 +15,24 @@ const AdminDashboard = () => {
             setTotalVotes(data.message)
         })();
         (async () => {
-            const { data } = await axios.get(url + "/getcampaignwinner")
+            let { data } = await axios.get(url + "/getallballotwinner")
+            console.log("get all ballot winners" , data)
+            setBallotWinners(data)
+        })();
+        (async () => {
+            const { data } = await axios.get(url + "/getmalevoters")
             // console.log(data)
-            setCompaigns(data)
-        })()
+            setMaleVoters(data.length)
+        })();
+        (async () => {
+            const { data } = await axios.get(url + "/getfemalevoters")
+            // console.log(data)
+            setfeMaleVoters(data.length)
+        })();
     }, [])
-    useEffect(() => {
-        const arr = [];
-        if(compaigns.length){
-            for(let a = 0; a<compaigns.length ; a++){
-                const obj = {};
-                obj.compaignName = compaigns[a].campaignName
-                obj.candidates= compaigns[a].ballotId.map(can => can.candidate)
-                obj.ballots= compaigns[a].ballotId.map(ballot => ballot)
-                obj.ballotsLength = compaigns[a].ballotId.length
-                arr.push(obj)
-            }
-        }
-        console.log("arr", arr)
-        setFilteredCompaigns(arr)
-    }, [compaigns])
-    console.log("compaigns===============", compaigns)
-    console.log("filtered compaigns===============", filteredCompaigns)
+    console.log("male voters===============", maleVoters)
+    console.log("female voters===============", feMaleVoters)
+    console.log("Ballot Winners===============", ballotWinners)
     return (
         <div className="container">
             <div className="row">
@@ -84,21 +81,70 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             </div>
+            <h1 className="h3 text-start">Gender Vise Votes</h1>
             <div className="row">
-            {compaigns?.length && compaigns?.map(compaign => (
-            <div key={compaign._id} className="col-12 col-md-3">
-                <div className="card">
-                    <div className="card-header">
-                        {compaign.campaignName}
-                    </div>
-                    <div className="card-body">
-                        Winner 
-                        {/* {console.log("compaign.ballotId=========" , compaign.ballotId)}
-                        {console.log("compaign.ballotId.candidate=========" , compaign.ballotId.map(can => can.candidate))} */}
+                <div className="col-12 col-md-3">
+                    <div className="card text-white bg-success">
+                        <div className="card-header">Male Voters</div>
+                        <div className="card-body">
+                            <CountUp
+                                start={0}
+                                end={maleVoters}
+                                duration={1}
+                                separator=','
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>            
-            ))}
+                <div className="col-12 col-md-3">
+                    <div className="card text-white bg-warning">
+                        <div className="card-header">Female Voters</div>
+                        <div className="card-body">
+                            <CountUp
+                                start={0}
+                                end={feMaleVoters}
+                                duration={1}
+                                separator=','
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h1 className="h3 text-start">Single Ballot Winners</h1>
+            <div className="row">
+                <div className="col-12">
+                    <table className="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">First</th>
+                                <th scope="col">Last</th>
+                                <th scope="col">Handle</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>Mark</td>
+                                <td>Otto</td>
+                                <td>@mdo</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td>Jacob</td>
+                                <td>Thornton</td>
+                                <td>@fat</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">3</th>
+                                <td>Larry</td>
+                                <td>the Bird</td>
+                                <td>@twitter</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     )
