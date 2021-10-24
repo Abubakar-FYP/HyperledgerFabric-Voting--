@@ -17,6 +17,8 @@ require("../Models/voter");
 const Admin = mongoose.model("Admin");
 const Voter = mongoose.model("Voter");
 
+//HERE OTP WORK WAS DONE
+
 router.post("/signinadmin", requireLogin, (req, res) => {
   const { email, password } = req.body;
 
@@ -41,9 +43,9 @@ router.post("/signinadmin", requireLogin, (req, res) => {
 });
 
 router.post("/signup", async (req, res, next) => {
-  const { cnic, phoneNumber } = req.body;
+  const { cnic, password } = req.body;
 
-  if (!cnic || !phoneNumber) {
+  if (!cnic || !password) {
     return res
       .status(422)
       .json({ message: "one or more of the fields are empty" });
@@ -55,13 +57,13 @@ router.post("/signup", async (req, res, next) => {
     }
   });
 
-  const genOtp = otp.otpSender(phoneNumber); //middleware,for sending otp, and saves the otp in variable
+  /*  const genOtp = otp.otpSender(phoneNumber); //middleware,for sending otp, and saves the otp in variable
   console.log(genOtp);
 
   if (typeof genOtp == "string") {
     res.json({ message: genOtp.toString() });
   }
-
+ */
   res.status(200).json({ message: "successufully otp sent" });
 });
 
