@@ -364,10 +364,8 @@ router.get("/getallcampaignwinner", async (req, res) => {
     });
 });
 
-router.get("/electionwinner", async (req, res) => {
-  const mapping = new Map();
-  let campaigns = new Array();
-  await Campaign.find({})
+router.get("/getoverallpartywinner", async (req, res) => {
+  await Party.find({})
     .lean()
     .populate({
       path: "ballotId",
@@ -381,36 +379,8 @@ router.get("/electionwinner", async (req, res) => {
       },
     })
     .exec((err, docs) => {
-      for (let i = 0; i < docs.length; i++) {
-        const campaignName = docs[i].campaignName;
-
-        let mapping = {};
-
-        const candidates = docs[i].ballotId.map((item) => {
-          //returns object of candidates for a ballot
-          return item.candidate
-            .map((item) => {
-              if (item.voters === undefined) {
-                item.voteCount = null;
-              }
-
-              if (item.voteCount === null) {
-                item.voteCount = 0;
-              } else {
-                item.voteCount = item.voters.length;
-              }
-              return item;
-            })
-            .map((item) => {
-              console.log("i am here ===>", item);
-              mapping[item.partyId.partyName] = item.voteCount;
-            }); //returns from candidate array
-        });
-        campaigns.push(mapping);
-      }
-      campaigns[1]["PPP"] = 5;
-      const party1 = campaigns.map((party) => party["PPP"]);
-      res.send({ campaigns, party1 });
+      docs.sort((a, b) => a?.voteCount - b?.voteCount);
+      res.json(docs);
     });
 });
 
