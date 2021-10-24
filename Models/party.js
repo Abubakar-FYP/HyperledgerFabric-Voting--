@@ -35,6 +35,11 @@ const partySchema = new Schema({
       ref: "Voter",
     },
   ],
+
+  voteCount: {
+    type: Number,
+  },
+
   //ballot reference ? reverse...
   is_valid: {
     type: Boolean,
