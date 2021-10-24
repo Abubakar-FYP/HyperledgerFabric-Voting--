@@ -38,6 +38,7 @@ const partySchema = new Schema({
 
   voteCount: {
     type: Number,
+    default: 0,
   },
 
   //ballot reference ? reverse...
