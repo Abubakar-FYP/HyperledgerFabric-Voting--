@@ -111,6 +111,18 @@ router.delete("/deleteparty/:id", async (req, res) => {
   });
 });
 
+router.get("/getallpartyname", async (req, res) => {
+  await Party.find({})
+    .select("partyName")
+    .exec((err, docs) => {
+      if (!err) {
+        res.json(docs);
+      } else {
+        console.log(err);
+      }
+    });
+});
+
 const removeNull = (array) => {
   return array.filter((item) => {
     item !== null;
