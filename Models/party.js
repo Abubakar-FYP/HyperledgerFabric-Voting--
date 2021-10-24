@@ -28,6 +28,13 @@ const partySchema = new Schema({
       ref: "Candidate",
     },
   ],
+
+  voters: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "Voter",
+    },
+  ],
   //ballot reference ? reverse...
   is_valid: {
     type: Boolean,
