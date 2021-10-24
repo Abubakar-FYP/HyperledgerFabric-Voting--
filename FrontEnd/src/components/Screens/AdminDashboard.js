@@ -5,14 +5,37 @@ import axios from "axios"
 import { url } from "../../constants"
 const AdminDashboard = () => {
     const [totalVotes, setTotalVotes] = useState("")
+    const [compaigns, setCompaigns] = useState([])
+    const [filteredCompaigns , setFilteredCompaigns] = useState(null)
     useEffect(() => {
         (async () => {
-            const {data} = await axios.get(url + "/getcountvotedusers")
-            console.log(data)
+            const { data } = await axios.get(url + "/getcountvotedusers")
+            // console.log(data)
             setTotalVotes(data.message)
+        })();
+        (async () => {
+            const { data } = await axios.get(url + "/getcampaignwinner")
+            // console.log(data)
+            setCompaigns(data)
         })()
-
     }, [])
+    useEffect(() => {
+        const arr = [];
+        if(compaigns.length){
+            for(let a = 0; a<compaigns.length ; a++){
+                const obj = {};
+                obj.compaignName = compaigns[a].campaignName
+                obj.candidates= compaigns[a].ballotId.map(can => can.candidate)
+                obj.ballots= compaigns[a].ballotId.map(ballot => ballot)
+                obj.ballotsLength = compaigns[a].ballotId.length
+                arr.push(obj)
+            }
+        }
+        console.log("arr", arr)
+        setFilteredCompaigns(arr)
+    }, [compaigns])
+    console.log("compaigns===============", compaigns)
+    console.log("filtered compaigns===============", filteredCompaigns)
     return (
         <div className="container">
             <div className="row">
@@ -60,6 +83,22 @@ const AdminDashboard = () => {
 
                     </div>
                 </div>
+            </div>
+            <div className="row">
+            {compaigns?.length && compaigns?.map(compaign => (
+            <div key={compaign._id} className="col-12 col-md-3">
+                <div className="card">
+                    <div className="card-header">
+                        {compaign.campaignName}
+                    </div>
+                    <div className="card-body">
+                        Winner 
+                        {/* {console.log("compaign.ballotId=========" , compaign.ballotId)}
+                        {console.log("compaign.ballotId.candidate=========" , compaign.ballotId.map(can => can.candidate))} */}
+                    </div>
+                </div>
+            </div>            
+            ))}
             </div>
         </div>
     )
