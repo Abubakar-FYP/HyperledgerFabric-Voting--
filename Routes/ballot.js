@@ -248,6 +248,9 @@ router.get("/getallballotwinner", async (req, res) => {
   await Ballot.find({})
     .populate({
       path: "candidate",
+      populate: {
+        path: "partyId",
+      },
     })
     .lean()
     .exec(async (err, docs) => {
@@ -387,7 +390,7 @@ router.get("/getallcampaignwinner", async (req, res) => {
 
 router.get("/electionwinner", async (req, res) => {
   const mapping = new Map();
-  const campaigns = new Array();
+  let campaigns = new Array();
   await Campaign.find({})
     .lean()
     .populate({
@@ -405,7 +408,7 @@ router.get("/electionwinner", async (req, res) => {
       for (let i = 0; i < docs.length; i++) {
         const campaignName = docs[i].campaignName;
 
-        const mapping = new Map();
+        let mapping = {};
 
         const candidates = docs[i].ballotId.map((item) => {
           //returns object of candidates for a ballot
@@ -423,20 +426,15 @@ router.get("/electionwinner", async (req, res) => {
               return item;
             })
             .map((item) => {
-              if (!mapping.has(item.partyId.partyName)) {
-                mapping.set(item.partyId.partyName, item.voteCount);
-              } else {
-                for (const [key, value] of mapping) {
-                  if (key === item.partyId.partyName) {
-                    mapping.set(key, value + item.voteCount);
-                  }
-                }
-              }
+              console.log("i am here ===>", item);
+              mapping[item.partyId.partyName] = item.voteCount;
             }); //returns from candidate array
         });
         campaigns.push(mapping);
       }
-      res.json(campaigns);
+      campaigns[1]["PPP"] = 5;
+      const party1 = campaigns.map((party) => party["PPP"]);
+      res.send({ campaigns, party1 });
     });
 });
 
