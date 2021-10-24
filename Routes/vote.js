@@ -33,7 +33,9 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
     _id: req.params.candidate,
   }).catch((err) => console.log(err));
 
-  console.log(candidate);
+  const party = await Party.findOne({
+    _id: candidate.party,
+  });
 
   voter.voted = req.params.candidate;
   voter.voteflag = true;
