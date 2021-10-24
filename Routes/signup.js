@@ -48,7 +48,7 @@ router.post("/signinadmin", requireLogin, (req, res) => {
 router.post("/signup", async (req, res, next) => {
   const { cnic, gender, password } = req.body;
 
-  if (!cnic || !password) {
+  if (!cnic || !password || !gender) {
     return res
       .status(422)
       .json({ message: "one or more of the fields are empty" });

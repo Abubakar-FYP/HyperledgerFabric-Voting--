@@ -17,7 +17,7 @@ router.post("/createcampaign", async (req, res) => {
     return res.status(403).json({ error: "one or more fields are empty" });
   }
 
-  const found = await Campaign.findOne({ campaignId })
+  await Campaign.findOne({ campaignId })
     .then((resp) => {
       if (resp) {
         return res.status(200).json({ message: "campaign is already present" });
@@ -26,10 +26,6 @@ router.post("/createcampaign", async (req, res) => {
     .catch((err) => {
       return res.status(400).json({ message: err });
     });
-
-  if (found) {
-    return res.status(200).json({ message: "campaign is already present" });
-  }
 
   const newCampaign = new Campaign({
     campaignId,

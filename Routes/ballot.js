@@ -24,15 +24,11 @@ router.post("/createballot", async (req, res) => {
     return res.status(400).json({ message: "one or more fields are empty" });
   }
 
-  const found = await Ballot.findOne({ ballotid }).then((resp) => {
+  await Ballot.findOne({ ballotid }).then((resp) => {
     if (resp) {
       return res.json({ message: "ballot already present with this id" });
     }
   });
-
-  if (found) {
-    return res.json({ message: "ballot already present with this id" });
-  }
 
   const newBallot = new Ballot({
     ballotid,
@@ -71,15 +67,19 @@ router.get("/findballot/:_id", async (req, res) => {
 });
 
 router.delete("/deleteballot", async (req, res) => {
-  const { ballotid } = req.body;
-
   if (!ballotid) {
     return res.status(400).json({ message: "field is empty" });
   }
 
-  Ballot.findOneAndDelete({ ballotid })
-    .then(() => {
-      res.status(200).json({ message: "ballot successfully deleted" });
+  Ballot.findOneAndDelete({ ballotid: req.params._id })
+    .then((resp) => {
+      if (resp) {
+        return res.status(200).json({ message: "ballot successfully deleted" });
+      } else {
+        return res
+          .status(400)
+          .json({ message: "there was an error deleting Ballot" });
+      }
     })
     .catch((err) => {
       res.status(400).json({ message: err });

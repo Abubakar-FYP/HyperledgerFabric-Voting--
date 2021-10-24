@@ -13,7 +13,7 @@ const Voter = mongoose.model("Voter");
 
 //this is for his dashboard,where when he/she signs up
 router.get("/getuserinfo/:_id", async (req, res) => {
-  Voter.findOne({ _id: req.params._id })
+  await Voter.findOne({ _id: req.params._id })
     .populate("ballotId")
     .exec((err, docs) => {
       if (!err) {
@@ -28,7 +28,7 @@ router.get("/getuserinfo/:_id", async (req, res) => {
 //returns the number of user who have voted
 //returns a number of users who have voted
 router.get("/getcountvotedusers", async (req, res) => {
-  Voter.countDocuments({ voteflag: true })
+  await Voter.countDocuments({ voteflag: true })
     .exec((err, count) => {
       if (!err) {
         return res.status(200).json({ message: count });
