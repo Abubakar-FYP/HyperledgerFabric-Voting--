@@ -44,13 +44,15 @@ router.post("/createparty", async (req, res) => {
 
   newParty.candidate = candidateIds;
 
-  const resp = await newParty.save();
-  if (resp !== newParty) {
-    res.status(400).json({ message: "party did not save successfully" });
-  } else {
-    res.status(200).json({ message: "party saved sucessfully" });
-  }
-
+  const resp = await newParty.save().then((resp) => {
+    if (resp) {
+      res.status(200).json({ message: "party sucessfully registered" });
+    } else {
+      res
+        .status(400)
+        .json({ message: "there was a problem registering party" });
+    }
+  });
   return candidateList;
 });
 
