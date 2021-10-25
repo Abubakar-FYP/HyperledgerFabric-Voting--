@@ -412,10 +412,9 @@ router.get("/electionresultdata", async (req, res) => {
           candidate.ballotId.ballotid
         ); */
         result.candidateName.push(candidate.name);
+        //name is coming up empty
         result.ballotId.push(candidate.ballotId.ballotid);
       }
-      /* console.log("Result===============>", result);
-       */
       /* 
       console.log(
         //candidate[0].name is returning undefined
