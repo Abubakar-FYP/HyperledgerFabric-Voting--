@@ -22,6 +22,49 @@ const ElectionCreation = () => {
     }
     return (
         <div className="container ">
+            <div className="row">
+                <div className="card">
+                    <div className="card-header">
+                        Pending Parties
+                    </div>
+                    <div className="card-body">
+                        <ul>
+                            {[1,2,3,4,5].map(party => (
+                                <li key={party} className="list-group-item">
+                                <div className="d-flex justify-content-between">
+                                    <h6>Party Name</h6>
+                                    <button className="btn btn-primary">
+                                        Approve
+                                    </button>
+                                    <button className="btn btn-danger">
+                                        Reject
+                                    </button>
+                                </div>
+                            </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div className="row">
+                <div className="card">
+                    <div className="card-header">
+                        Approved Parties
+                    </div>
+                    <div className="card-body">
+                        <ul>
+                            {[1,2,3,4,5].map(party => (
+                                <li key={party} className="list-group-item">
+                                <div className="d-flex justify-content-between">
+                                    <h6>Party Name</h6>
+                                    <button className="btn btn-success" disabled={true}>Approved </button>
+                                </div>
+                            </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            </div>
             <div className="d-flex justify-content-end">
                 <button className={`btn ${!createElection ? "btn-secondary" : "btn-danger"}`}
                     onClick={() => setCreateElection(!createElection)}
@@ -35,7 +78,7 @@ const ElectionCreation = () => {
                 <div className="card-body">
                     <div className="card mt-5">
                         <div className="card-header">
-                            Election 2020
+                            Active Elections
                         </div>
                         <div className="card-body">
 
@@ -43,7 +86,7 @@ const ElectionCreation = () => {
                     </div>
                     <div className="card mt-5">
                         <div className="card-header">
-                            Election 2019
+                            Previos Elections
                         </div>
                         <div className="card-body">
 
