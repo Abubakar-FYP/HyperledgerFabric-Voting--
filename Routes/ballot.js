@@ -385,9 +385,48 @@ router.get("/getoverallpartywinner", async (req, res) => {
 });
 
 router.get("/electionresultdata", async (req, res) => {
-  await Party.find({}).exec((err, docs) => {
-    res.send(docs);
-  });
+  await Party.find({})
+    .populate({
+      path: "candidate",
+      select: "-cnic ",
+      populate: {
+        path: "ballotId",
+        select: "-voters -is_criminal",
+      },
+    })
+    .exec((err, docs) => {
+      let result = {};
+      let checkArray = new Array();
+      let filteredResult;
+      docs.sort((b, a) => b?.voteCount - a?.voteCount);
+      filteredResult = docs[docs.length - 1];
+      result.partyName = filteredResult.partyName;
+      result.voteCount = filteredResult.voteCount;
+      result.ballotId = new Array();
+      result.candidateName = new Array();
+
+      for (const candidate of filteredResult.candidate) {
+        /*  console.log("Candidate===================>", candidate);
+        console.log(
+          "BallotId===================>",
+          candidate.ballotId.ballotid
+        ); */
+        result.candidateName.push(candidate.name);
+        result.ballotId.push(candidate.ballotId.ballotid);
+      }
+      /* console.log("Result===============>", result);
+       */
+      /* 
+      console.log(
+        //candidate[0].name is returning undefined
+        "CandidateName===================>",
+        filteredResult.candidate[0].name
+      );
+ */
+
+      console.log("Result======================>", result);
+      res.json({ message: result });
+    });
 });
 //overall winner (party) //hold
 
