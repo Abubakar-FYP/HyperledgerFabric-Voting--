@@ -436,46 +436,42 @@ router.get("/getallpartyvotes", async (req, res) => {
 
 
   router.get("/electionresultdata", async (req, res) => {
-    await Party.find({})
-    .populate({
-      path: "candidate",
-      select: "-cnic ",
-      populate: {
-        path: "ballotId",
-        select: "-voters -is_criminal",
-      },
-    })
+    await Campaign.find({})
+    // .select("campaignName voteCounts")
     .exec((err, docs) => {
-      let result = {};
-      let checkArray = new Array();
-      let filteredResult;
-      docs.sort((b, a) => b?.voteCount - a?.voteCount);
-      filteredResult = docs[docs.length - 1];
-      result.partyName = filteredResult.partyName;
-      result.voteCount = filteredResult.voteCount;
-      result.ballotId = new Array();
-      result.candidateName = new Array();
+      let result = docs.map(cam => {
+        return{
+          campaignName: cam.campaignName,
+          voteCounts: cam.voteCounts    
+        }
+        })
+      // docs.sort((a,b) => b?.voteCount - a?.voteCount);
+//       filteredResult = docs[docs.length - 1];
+//       result.partyName = filteredResult.partyName;
+//       result.voteCount = filteredResult.voteCount;
+//       result.ballotId = new Array();
+//       result.candidateName = new Array();
 
-      for (const candidate of filteredResult.candidate) {
-        /*  console.log("Candidate===================>", candidate);
-        console.log(
-          "BallotId===================>",
-          candidate.ballotId.ballotid
-        ); */
-        result.candidateName.push(candidate.name);
-        //name is coming up empty
-        result.ballotId.push(candidate.ballotId.ballotid);
-      }
-      /* 
-      console.log(
-        //candidate[0].name is returning undefined
-        "CandidateName===================>",
-        filteredResult.candidate[0].name
-      );
- */
+//       for (const candidate of filteredResult.candidate) {
+//         /*  console.log("Candidate===================>", candidate);
+//         console.log(
+//           "BallotId===================>",
+//           candidate.ballotId.ballotid
+//         ); */
+//         result.candidateName.push(candidate.name);
+//         //name is coming up empty
+//         result.ballotId.push(candidate.ballotId.ballotid);
+//       }
+//       /* 
+//       console.log(
+//         //candidate[0].name is returning undefined
+//         "CandidateName===================>",
+//         filteredResult.candidate[0].name
+//       );
+//  */
 
-      console.log("Result======================>", result);
-      res.json({ message: result });
+//       console.log("Result======================>", result);
+      res.json({ result });
     });
   })
  

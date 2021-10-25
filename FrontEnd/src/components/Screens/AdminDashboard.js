@@ -14,6 +14,7 @@ const AdminDashboard = () => {
         voteCount: 0,
         partyName: ""
     })
+    const [campaignWiseWinners, setCampaignWiseWinners] = useState([])
     useEffect(() => {
         (async () => {
             const { data } = await axios.get(url + "/getcountvotedusers")
@@ -46,11 +47,17 @@ const AdminDashboard = () => {
             console.log("overall party winner", data)
             setAllPartyOverAllVotes(data.docs)
         })();
+        (async () => {
+            const { data } = await axios.get(url + "/electionresultdata")
+            console.log("campaign wise winner", data)
+            setCampaignWiseWinners(data.result)
+        })();
     }, [])
     // console.log("male voters===============", maleVoters)
     // console.log("female voters===============", feMaleVoters)
     // console.log("Ballot Winners===============", ballotWinners)
-    console.log("All party overall votes===============", allPartyOverallVotes)
+    // console.log("All party overall votes===============", allPartyOverallVotes)
+    console.log("campaignWiseWinners ===============", campaignWiseWinners)
     return (
         <div className="container">
             <div className="row">
@@ -162,23 +169,78 @@ const AdminDashboard = () => {
 
             <h3 className="text-start">List Of Total Votes Of All Parties</h3>
             <div className="row">
-               {allPartyOverallVotes.map((party , i )=> (
-                   
+                {allPartyOverallVotes.map((party, i) => (
+
                     <div className="col-12 col-md-3">
-                    <div className={`card text-white bg-${i%2 !== 0 ? "warning" : "dark"}`}>
-                        <div className="card-header">Total Votes of {party.partyName}</div>
-                        <div className="card-body">
-                            <CountUp
-                                start={0}
-                                end={party.voteCount}
-                                duration={1}
-                                separator=','
-                            />
+                        <div className={`card text-white bg-${i % 2 !== 0 ? "warning" : "dark"}`}>
+                            <div className="card-header">Total Votes of {party.partyName}</div>
+                            <div className="card-body">
+                                <CountUp
+                                    start={0}
+                                    end={party.voteCount}
+                                    duration={1}
+                                    separator=','
+                                />
+                            </div>
                         </div>
+
                     </div>
+                ))}
+            </div>
+            <div className="row">
+                <div className="col-md-6 d-flex flex-column">
+                    <h3 className="text-start">Campaign Wise Winner Party</h3>
+                    {campaignWiseWinners.map((party, i) => (
+                        <div className="">
+                            <div className={`card text-white bg-${i % 2 !== 0 ? "warning" : "dark"}`}>
+                                <div className="card-header">Total Votes {party.campaignName}</div>
+                                <div className="card-body">
+                                    <span className=" mx-3">
+                                        {party.voteCounts[0]?.partyName}
+                                    </span>
+                                    <CountUp
+                                        start={0}
+                                        end={party.voteCounts[0]?.voteCount || 0}
+                                        duration={1}
+                                        separator=','
+                                    />
+                                </div>
+                            </div>
+
+                        </div>
+                    ))}
 
                 </div>
-               ))}
+                <div className="col-md-6 d-flex flex-column">
+                    <h3 className="text-start">Campaign Wise Votes Status</h3>
+
+                    {campaignWiseWinners.map((party, i) => (
+                        <div className="">
+                            <div className={`card text-white bg-${i % 2 !== 0 ? "warning" : "dark"}`}>
+                                <div className="card-header">Total Votes {party.campaignName}</div>
+                                <div className="card-body">
+                                    {party.voteCounts.map((cam, i) => {
+                                        return (
+                                            <div key={i}>
+                                                <span className=" mx-3">
+                                                    {cam?.partyName}
+                                                </span>
+                                                <CountUp
+                                                    start={0}
+                                                    end={cam?.voteCount || 0}
+                                                    duration={1}
+                                                    separator=','
+                                                />
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+
+                        </div>
+                    ))}
+
+                </div>
             </div>
             <h1 className="h3 text-start">Single Ballot Winners</h1>
             <div className="row">
@@ -207,11 +269,17 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             </div>
-            <BarChart 
-            mVotes={maleVoters}
-            fVotes={feMaleVoters}
-            allPartyOverallVotes={allPartyOverallVotes}
+            {maleVoters && feMaleVoters && allPartyOverallVotes.length && ballotWinners?.length && 
+             (
+                <BarChart
+                mVotes={maleVoters}
+                fVotes={feMaleVoters}
+                allPartyOverallVotes={allPartyOverallVotes}
+                ballotWinners={ballotWinners}
             />
+             )
+            }
+        
         </div>
     )
 }
