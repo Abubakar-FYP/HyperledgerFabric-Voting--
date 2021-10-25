@@ -3,6 +3,7 @@ import Pulses from '../../Pulses'
 import CountUp from 'react-countup';
 import axios from "axios"
 import { url } from "../../constants"
+import BarChart from './charts/BarChart';
 const AdminDashboard = () => {
     const [totalVotes, setTotalVotes] = useState("")
     const [ballotWinners, setBallotWinners] = useState([])
@@ -164,7 +165,6 @@ const AdminDashboard = () => {
                {allPartyOverallVotes.map((party , i )=> (
                    
                     <div className="col-12 col-md-3">
-                   {console.log("iiiiiiiiiiiii============", i)}
                     <div className={`card text-white bg-${i%2 !== 0 ? "warning" : "dark"}`}>
                         <div className="card-header">Total Votes of {party.partyName}</div>
                         <div className="card-body">
@@ -207,6 +207,11 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             </div>
+            <BarChart 
+            mVotes={maleVoters}
+            fVotes={feMaleVoters}
+            allPartyOverallVotes={allPartyOverallVotes}
+            />
         </div>
     )
 }
