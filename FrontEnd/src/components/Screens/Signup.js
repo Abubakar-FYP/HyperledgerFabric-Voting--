@@ -5,41 +5,28 @@ import {Link} from 'react-router-dom';
 import M from 'materialize-css';
 import { useHistory } from 'react-router';
 import NavBar from '../Navbar';
-
+import axios from "axios"
+import {url} from "../../constants"
 const Signup =()=>{
-    const [Name ,setName ] = useState ("")
+    const [password ,setPassword ] = useState ("")
     const [CNIC ,setCNIC ] = useState ("")
-    const [HouseNo , setHouseNo] = useState("")
-    const [StreetNo, setStreetNo] = useState("")
-    const [Age , setAge] = useState("")
-    const [Gender , setGender] = useState("")
-    const [Area, setArea] = useState("")
-    const [Province,setprovince] = useState ("")
-    const [Country , setCountry] = useState("")
 
-    const PostData =()=>{
-        let history = useHistory
-        fetch("/Signup",{
-        method:"post", 
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-            CNIC:""
-        })
-        })
-        .then(res=>res.json())
-        .then(data=>{
-            if (data.error){
-            M.toast({html: data.error,classes:"#c62828 red darken-3"})
-            }
-            else{
-            M.toast({html: data.message,classes:"#43a047 green darken-1"})
-            history.push('/Signin')    
+    const handleSignup = async()=>{
+        if(!password, !CNIC){
+            alert("enter password and cnic")
+            return
         }
-        }).catch(err =>{
-            console.log(err)
+        // post data 
+        const res = await fetch({
+            url: "http://localhost:1970/signup",
+            method: "post",
+            data: {
+                password: password , cnic: CNIC
+            }
         })
+        console.log("res" , res)
+        // const res = await axios.post("/signup"  , {password: password , cnic: CNIC})
+        // console.log("signup user", res)
     }
 
     return (
@@ -51,9 +38,12 @@ const Signup =()=>{
             value={CNIC}
             onChange={(e)=>setCNIC(e.target.value)}
            />
+            <input type="password" id="cnic" name="cnic" placeholder="Password" 
+            value={password}
+            onChange={(e)=>setPassword(e.target.value)}
+           />
 
-            
-           <button className ="btn waves-effect waves-light" onClick={()=>PostData()}> 
+           <button className ="btn waves-effect waves-light" onClick={handleSignup}> 
            Signup</button>
             <h5>
             Already have an Account? <Link to = '/Signin'>Click here</Link>

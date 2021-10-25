@@ -6,17 +6,21 @@ require("dotenv").config();
 const requirelogin = require("./Middleware/requirelogin"); //middleware
 
 const app = express();
+app.use(express.json()); //to parse outgoing json in the post req
 
 const cors = require("cors");
+
 app.use(cors());
-app.use(express.json()); //to parse outgoing json in the post req
-app.use(express.urlencoded({ extended: true })); //parse html forms, like post methods etc
 
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
+  // res.header("Access-Control-Allow-Origin", "*");
+  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
 
   next();
 });
+
+app.use(express.urlencoded({ extended: true })); //parse html forms, like post methods etc
+
 //Models registering
 require("./Models/admin");
 require("./Models/voter");

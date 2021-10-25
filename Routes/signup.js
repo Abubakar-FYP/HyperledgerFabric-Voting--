@@ -46,9 +46,10 @@ router.post("/signinadmin", requireLogin, (req, res) => {
 });
 
 router.post("/signup", async (req, res, next) => {
-  const { cnic, gender, password } = req.body;
+  // console.log("signup api=============", req.body)
+  const { cnic, password } = req.body;
 
-  if (!cnic || !password || !gender) {
+  if (!cnic || !password ) {
     return res
       .status(422)
       .json({ message: "one or more of the fields are empty" });
@@ -62,7 +63,6 @@ router.post("/signup", async (req, res, next) => {
 
   const newVoter = new Voter({
     cnic: cnic,
-    gender: gender,
     password: password,
   });
 
