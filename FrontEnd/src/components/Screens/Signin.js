@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useState} from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import M from 'materialize-css';
@@ -8,33 +8,42 @@ import LoginPic from "../../assets/1.jpg";
 import NavBar from '../Navbar';
 import axios from "axios"
 import { url } from "../../constants";
-
+import {toast} from "react-toastify"
 // import {OTPredirect} from './OTP';
 
-const Signin =()=>{
-    const {state,dispatch} = useContext(UserContext)
+const Signin =(props)=>{
     const history = useHistory()
     const  [CNIC, setCNIC] = useState ("")
-    const  [MobileNumber , setMobilenumber] = useState ("")
+    const  [password , setPassword] = useState ("")
+    useEffect(() => {
+        const user = localStorage.getItem("userData")
+        if(user){
+            history.push("/")
+        }
+    }, [])
 
-
-const PostData =async () =>{
-    console.log("clicked")
-try {
-    if(CNIC){
-        const data = await axios.post(url + "/signin" , {  headers:{
-            "Content-Type":"application/json"
-        }}, {cnic: CNIC})
-        console.log("data from api =============" ,data)
+const handleSignin =async () =>{
+    if(!CNIC || !password){
+        toast.error("Fill All Fields")
+        return
     }
-} catch (error) {
-    console.log("error==================", error)
-    
-}
-    //     localStorage.setItem("jwt", data.token)
-    //     localStorage.setItem("user",JSON.stringify(data.user))
-    //     dispatch({type:"USER",payload:data.user})
-    // M.toast({html: "Signed In Sucessfull ",classes:"#43a047 green darken-1"})
+    try {
+    const {data} = await axios.post(url + "/signin" , {cnic: CNIC , password: password})
+    console.log("data==========", data)
+    if(data){
+        localStorage.setItem("userData" , JSON.stringify(data))
+        toast.success("You have signin Successfully")
+        history.push("/votingballot")
+        setTimeout(() => {
+        window.location.reload()
+
+        }, 2000)
+
+    }
+    } catch (error) {
+        toast.error("Invalid CNIC or Password")
+    }
+
 }
 
 const router =()=>{
@@ -57,11 +66,13 @@ const router =()=>{
             value={CNIC}
             onChange={(e)=> setCNIC (e.target.value)}
             />
-            {/* <input type="tel" id="phone" name="phone" placeholder="MobileNumber" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" 
-             value={MobileNumber} 
-            onChange={(e)=>setMobilenumber(e.target.value)} 
-           /> */}
-           <button className ="btn waves-effect waves-light" onClick={PostData}> 
+
+            <input type="password" id="cnic" placeholder="Password"
+            value={password}
+            onChange={(e)=> setPassword (e.target.value)}
+            />
+
+           <button className ="btn waves-effect waves-light" onClick={handleSignin}> 
            Next</button>
             <h5>
             Don't have an Account? <Link to = '/Signup'>Click here</Link>

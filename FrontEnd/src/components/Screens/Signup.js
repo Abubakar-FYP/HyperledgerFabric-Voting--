@@ -1,39 +1,48 @@
 // import { method } from 'bluebird';
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useState } from 'react';
 import {Link} from 'react-router-dom';
-import M from 'materialize-css';
-import { useHistory } from 'react-router';
-import NavBar from '../Navbar';
 import axios from "axios"
 import {url} from "../../constants"
+import { toast } from 'react-toastify';
+import {useHistory} from "react-router-dom"
 const Signup =()=>{
+
     const [password ,setPassword ] = useState ("")
     const [CNIC ,setCNIC ] = useState ("")
-
+    const history = useHistory()
+    useEffect(() => {
+        const user = localStorage.getItem("userData")
+        if(user){
+            history.push("/")
+        }
+    }, [])
     const handleSignup = async()=>{
         if(!password, !CNIC){
             alert("enter password and cnic")
             return
         }
-        // post data 
-        const res = await fetch({
-            url: "http://localhost:1970/signup",
-            method: "post",
-            data: {
-                password: password , cnic: CNIC
-            }
-        })
-        console.log("res" , res)
-        // const res = await axios.post("/signup"  , {password: password , cnic: CNIC})
-        // console.log("signup user", res)
+        try {
+            const res = await axios.post(url + "/signup"  , {password: password , cnic: CNIC})
+            console.log("signup user", res.data)
+            if(res){
+                toast.success("You Have Successfully Signup")
+            history.push("/signin")
+
+            }    
+        } catch (error) {
+            console.log(error)
+            toast.error("You are already registered")
+        }
+        
     }
+
 
     return (
         <div className="mycard">
              <div className= "card Signup-card">
            <h1>Sign Up </h1>
-            
+
             <input type="number" id="cnic" name="cnic" placeholder="CNIC" 
             value={CNIC}
             onChange={(e)=>setCNIC(e.target.value)}
