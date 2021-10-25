@@ -8,6 +8,11 @@ const AdminDashboard = () => {
     const [ballotWinners, setBallotWinners] = useState([])
     const [maleVoters, setMaleVoters] = useState("")
     const [feMaleVoters, setfeMaleVoters] = useState("")
+    const [allPartyOverallVotes, setAllPartyOverAllVotes] = useState([])
+    const [overallPartyWinner, setOverAllPartyWinner] = useState({
+        voteCount: 0,
+        partyName: ""
+    })
     useEffect(() => {
         (async () => {
             const { data } = await axios.get(url + "/getcountvotedusers")
@@ -16,7 +21,7 @@ const AdminDashboard = () => {
         })();
         (async () => {
             let { data } = await axios.get(url + "/getallballotwinner")
-            console.log("get all ballot winners" , data)
+            console.log("get all ballot winners", data)
             setBallotWinners(data)
         })();
         (async () => {
@@ -29,10 +34,22 @@ const AdminDashboard = () => {
             // console.log(data)
             setfeMaleVoters(data.length)
         })();
+
+        (async () => {
+            const { data } = await axios.get(url + "/getoverallpartywinner")
+            console.log("overall party winner", data)
+            setOverAllPartyWinner(data)
+        })();
+        (async () => {
+            const { data } = await axios.get(url + "/getallpartyvotes")
+            console.log("overall party winner", data)
+            setAllPartyOverAllVotes(data.docs)
+        })();
     }, [])
-    console.log("male voters===============", maleVoters)
-    console.log("female voters===============", feMaleVoters)
-    console.log("Ballot Winners===============", ballotWinners)
+    // console.log("male voters===============", maleVoters)
+    // console.log("female voters===============", feMaleVoters)
+    // console.log("Ballot Winners===============", ballotWinners)
+    console.log("All party overall votes===============", allPartyOverallVotes)
     return (
         <div className="container">
             <div className="row">
@@ -62,13 +79,10 @@ const AdminDashboard = () => {
                 </div>
             </div>
             <div className="row">
-                <h1 className="text-start">
-                    Total Number of Vote Counted
-                </h1>
                 <div className="row">
                     <div className="col-12 col-md-3">
                         <div className="card text-white bg-success">
-                        <div className="card-header">Total Votes</div>
+                            <div className="card-header">Total Votes</div>
                             <div className="card-body">
                                 <CountUp
                                     start={0}
@@ -80,61 +94,116 @@ const AdminDashboard = () => {
                         </div>
 
                     </div>
+                    <div className="col-12 col-md-3">
+                        <div className="card text-white bg-danger">
+                            <div className="card-header">Overall Winner Party is {overallPartyWinner?.partyName} </div>
+                            <div className="card-body">
+                                <CountUp
+                                    start={0}
+                                    end={overallPartyWinner?.voteCount}
+                                    duration={1}
+                                    separator=','
+                                />
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
-            <h1 className="h3 text-start">Gender Vise Votes</h1>
             <div className="row">
                 <div className="col-12 col-md-3">
                     <div className="card text-white bg-success">
+                        <div className="card-header">Male Votes</div>
                         <div className="card-body">
-                            <CountUp
-                                start={0}
-                                end={maleVoters}
-                                duration={1}
-                                separator=','
-                            />
+                            <div className="row">
+                                <div className="col-4">
+                                    <i className="fas fa-male fa-2x text-start"></i>
+                                </div>
+                                <div className="col-8">
+
+                                    <CountUp
+                                        start={0}
+                                        end={maleVoters}
+                                        duration={1}
+                                        separator=','
+                                    />
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
                 </div>
                 <div className="col-12 col-md-3">
                     <div className="card text-white bg-warning">
+                        <div className="card-header">female Votes</div>
                         <div className="card-body">
-                        <i className="fas fa-female"></i>
-                            <CountUp
-                                start={0}
-                                end={feMaleVoters}
-                                duration={1}
-                                separator=','
-                            />
+                            <div className="row">
+                                <div className="col-4">
+                                    <i className="fas fa-male fa-2x text-start"></i>
+                                </div>
+                                <div className="col-8">
+
+                                    <CountUp
+                                        start={0}
+                                        end={feMaleVoters}
+                                        duration={1}
+                                        separator=','
+                                    />
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
                 </div>
             </div>
 
+            <h3 className="text-start">List Of Total Votes Of All Parties</h3>
+            <div className="row">
+               {allPartyOverallVotes.map((party , i )=> (
+                   
+                    <div className="col-12 col-md-3">
+                   {console.log("iiiiiiiiiiiii============", i)}
+                    <div className={`card text-white bg-${i%2 !== 0 ? "warning" : "dark"}`}>
+                        <div className="card-header">Total Votes of {party.partyName}</div>
+                        <div className="card-body">
+                            <CountUp
+                                start={0}
+                                end={party.voteCount}
+                                duration={1}
+                                separator=','
+                            />
+                        </div>
+                    </div>
+
+                </div>
+               ))}
+            </div>
             <h1 className="h3 text-start">Single Ballot Winners</h1>
             <div className="row">
                 <div className="col-12">
-                    <div className="table-responsive" style={{maxHeight: "300px"}}>
-                    <table className="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col">ballot Id</th>
-                                <th scope="col">Party</th>
-                                <th scope="col">Candidate</th>
-                                <th scope="col">Votes</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {ballotWinners.length && ballotWinners.map(ballot => (
-                            <tr key={ballot._id}>
-                                <th scope="row">{ballot.ballotid}</th>
-                                <td>{ballot.candidate[0]?.partyId.partyName || "Unknown"}</td>
-                                <td>{ballot.candidate[0]?.name || "Unknown"}</td>
-                                <td>{ballot.candidate[0]?.voteCount || "0"}</td>
-                            </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    <div className="table-responsive" style={{ maxHeight: "300px" }}>
+                        <table className="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ballot Id</th>
+                                    <th scope="col">Party</th>
+                                    <th scope="col">Candidate</th>
+                                    <th scope="col">Votes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {ballotWinners.length && ballotWinners.map(ballot => (
+                                    <tr key={ballot._id}>
+                                        <th scope="row">{ballot?.ballotid}</th>
+                                        <td>{ballot.candidate[0]?.partyId?.partyName || "Unknown"}</td>
+                                        <td>{ballot.candidate[0]?.name || "Unknown"}</td>
+                                        <td>{ballot.candidate[0]?.voteCount || "0"}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

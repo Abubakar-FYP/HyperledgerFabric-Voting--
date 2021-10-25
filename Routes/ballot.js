@@ -338,6 +338,7 @@ router.get("/getcampaignwinner/:_id", async (req, res) => {
 
 //good to go
 router.get("/getallcampaignwinner", async (req, res) => {
+  const party = await Party.find().select("partyName");
   await Campaign.find({})
     .lean()
     .populate({
@@ -353,7 +354,6 @@ router.get("/getallcampaignwinner", async (req, res) => {
     })
     .exec((err, docs) => {
       const sorted = new Array();
-
       docs.map((doc) =>
         // console.log("docs=====================", doc.ballotId[1].candidate)
         doc.ballotId.map(
@@ -365,7 +365,20 @@ router.get("/getallcampaignwinner", async (req, res) => {
             ))
         )
       );
-      res.send(docs);
+      const allWinnerCandidatesFromABallot = docs.map(compaign => (
+        compaign.ballotId.map(ballot => ballot.candidate)
+      ))
+
+      // get same parties from each compaign
+      // const data = 
+
+      // get all the winners
+      console.log("winners" , allWinnerCandidatesFromABallot)
+      res.send({
+        candidates: allWinnerCandidatesFromABallot,
+        // winners: firsWinningCandidates,
+        // party
+      });
     });
 });
 
@@ -384,11 +397,42 @@ router.get("/getoverallpartywinner", async (req, res) => {
       },
     })
     .exec((err, docs) => {
-      docs.sort((a, b) => a?.voteCount - b?.voteCount);
-      res.json(docs);
+      docs.sort((a, b) => b?.voteCount - a?.voteCount);
+      res.json({
+        voteCount : docs[0].voteCount,
+        partyName:  docs[0].partyName
+      });
     });
 });
 
+router.get("/getallpartyvotes", async (req, res) => {
+  await Party.find({})
+    .lean()
+    .populate({
+      path: "ballotId",
+      select: "ballotname",
+      populate: {
+        path: "candidate",
+        populate: {
+          path: "partyId",
+          select: "partyName",
+        },
+      },
+    })
+    .exec((err, docs) => {
+      docs.sort((a, b) => b?.voteCount - a?.voteCount);
+      docs = docs.map(party => {
+        return {
+          voteCount: party.voteCount,
+          partyName: party.partyName
+        }
+      })
+      console.log("docssss===========", docs)
+      res.send({
+        docs
+      });
+    });
+});
 //overall winner (party) //hold
 
 module.exports = router;
