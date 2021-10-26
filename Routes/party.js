@@ -14,11 +14,24 @@ const Party = mongoose.model("Party");
 const Candidate = mongoose.model("Candidate");
 const Criminal = mongoose.model("Criminal");
 
+router.get("/solo", async (req, res) => {
+  const candidates = await Party.find({}).select("partyLeaderCnic");
+
+  for (const candidate1 of idlist) {
+    for (const candidate2 of candidates) {
+      console.log("candidate1===>", candidate1 == candidate2, "candidate2===>");
+    }
+  }
+  res.json({ candidates });
+});
+
 //use the findparty or getparty dapi to check if its new or not
 //returns a list of candidates,chain this api to create candidate api
 router.post("/createparty", async (req, res) => {
   const { partyName, partyImg, partySymbol, partyLeaderCnic, candidate } =
     req.body;
+  const criminals = await Criminal.find({});
+  const candidates = await Party.find({}).select("partyLeaderCnic");
 
   if (
     !partyName ||
@@ -43,9 +56,19 @@ router.post("/createparty", async (req, res) => {
     return item._id;
   });
 
+  const idlist = candidates.map((candidate) => {
+    return candidate.partyLeaderCnic;
+  });
+
+  idlist.map((id)=>{
+    candidateIds.map((obj)=>{
+    if(id==obj){
+      return res.status("cannot register party")
+    }
+  })
+
   newParty.candidate = candidateIds;
 
-  const resp = await newParty.save();
 
   const candidates = candidate.map(async (item) => {
     const newCandidate = new Candidate({
