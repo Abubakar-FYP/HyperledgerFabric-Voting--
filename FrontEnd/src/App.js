@@ -21,6 +21,7 @@ import AdminDashboard from './components/Screens/AdminDashboard';
 import Pulses from './Pulses';
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import PartiesStatus from './components/Screens/PartiesStatus';
 
 export const UserContext = createContext()
 
@@ -91,6 +92,7 @@ function App() {
           <Route exact path="/votingballot" component={VotingBallot} />
           <Route exact path="/electioncreation" component={ElectionCreation} />
           <Route exact path="/admindashboard" component={AdminDashboard} />
+          <Route exact path="/partiesstatus" component={PartiesStatus} />
         </Switch>
       </BrowserRouter>
     </UserContext.Provider>

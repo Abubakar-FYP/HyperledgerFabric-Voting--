@@ -6,7 +6,7 @@ require("dotenv").config();
 const requirelogin = require("./Middleware/requirelogin"); //middleware
 
 const app = express();
-app.use(express.json()); //to parse outgoing json in the post req
+app.use(express.json({limit: '50mb'})); //to parse outgoing json in the post req
 
 const cors = require("cors");
 

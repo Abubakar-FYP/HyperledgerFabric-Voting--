@@ -32,7 +32,7 @@ const Signup =()=>{
             }    
         } catch (error) {
             console.log(error)
-            toast.error("You are already registered")
+            toast.error(error.message)
         }
         
     }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { url } from "../../constants";
 import NavBar from "../Navbar";
+import {toast} from "react-toastify"
 const PartyRegisteration = () => {
   // ===============================================================================
   //                               Local States
@@ -134,11 +135,41 @@ const PartyRegisteration = () => {
     setSelectedType("")
   }
 
-  const handleOnSubmit = () => {
-    localStorage.removeItem("data")
+  const handleOnSubmit = async () => {
+    const data = JSON.parse(localStorage.getItem("data"))
+    const party = JSON.parse(localStorage.getItem("party"))
+  
+    const dataToSend = {
+      partyName: party.partyName,
+      partyImg: party.partyLogo,
+      partySymbol : party.partySymbol,
+      partyLeaderCnic: party.leaderCnic,
+      candidate: data.map(p => {
+        return {
+          cnic: p.candidateCnic,
+          position: p.type,
+          ballotid: p.ballotId
+        }
+      })
+    }
+    console.log("data to send===========", dataToSend)
+    const formData =  new FormData()
+    formData.set("partyImg", party.partyLogo)
+    try {
+      const {data: res} = await axios.post(url + "/createparty" , dataToSend)
+      console.log("response from the server" , res)
+      if(res.message){
+        toast.success(res.message)
+            localStorage.removeItem("data")
     localStorage.removeItem("party")
     setWholeData([])
     setParty(initialState)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+ 
+
   }
   // ================================================================================
   //                  Console.logs

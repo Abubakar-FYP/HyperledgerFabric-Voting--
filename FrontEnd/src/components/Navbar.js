@@ -28,6 +28,10 @@ const NavBar = () => {
       <ul className="nav">
         <li><Link to="/" style={{ listStyle: "none", textDecoration: "none" }}
           className="text-light">Home</Link></li>
+
+
+        <li><Link to="/partiesstatus" style={{ listStyle: "none", textDecoration: "none" }}
+          className="text-light">Parties Status</Link></li>
         {user && user?.doc.role === "admin" ? (
           <>
             <li><Link className="text-light" to="/partyregisteration" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Party Registeration</Link></li>
