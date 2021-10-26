@@ -22,6 +22,16 @@ const VotingBallot = () => {
 
     }, [user])
     console.log("user in local state", user)
+
+    const castAVote = async (id) => {
+        try {
+        console.log("clicked=", url + `/vote/${user?.doc?._id}/${id}`)
+        const {data} = await axios.post(url + `/vote/${user?.doc?._id}/${id}`)
+        console.log("casting vote response ==============", data)   
+        } catch (error) {
+            console.log("errror===========", error.message)
+        }
+    }
     return (
         <div className="container text-start">
             <div className="row">
@@ -60,11 +70,11 @@ const VotingBallot = () => {
                         </div>
                     </div>
                 </div>
-                <div className="col-md-6">
+                {/* <div className="col-md-6">
                     <div className="card">
                         <div className="card-body">
                             <div className="">
-                                {ballots?.map(ballot => (
+                                {ballots && ballots?.length && ballots?.map(ballot => (
                                     <div>
                                         <div className="mt-4">
                                             <strong>Candidate Name :  </strong>
@@ -75,7 +85,9 @@ const VotingBallot = () => {
                                             {ballot.position}
                                         </div>
                                         <div className="mt-4">
-                                            <button className="btn btn-success">Vote</button>
+                                            <button 
+                                            onClick={() => castAVote(ballot._id)}
+                                            className="btn btn-success">Vote</button>
                                         </div>
                                         <hr />
                                     </div>
@@ -83,7 +95,7 @@ const VotingBallot = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
             </div>
         </div>
     )
