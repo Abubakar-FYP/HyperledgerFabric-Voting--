@@ -8,12 +8,12 @@ const PartiesStatus = () => {
     const [approvedParties, setApprovedParties] = useState([])
     const getPendingParties = async () => {
         const { data } = await axios.get(url + "/getpendingparties")
-        //    console.log("getpendingpartiesgetpendingpartiesgetpendingparties", data)
+           console.log("getpendingpartiesgetpendingpartiesgetpendingparties", data)
         setPendingParties(data.message)
     }
     const getApprovedParties = async () => {
         const { data } = await axios.get(url + "/getapprovedparties")
-        // console.log("getapprovedpartiesgetapprovedpartiesgetapprovedparties", data)
+        console.log("getapprovedpartiesgetapprovedpartiesgetapprovedparties", data)
         setApprovedParties(data.message)
     }
     const callForApis = () => {
