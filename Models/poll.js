@@ -1,7 +1,7 @@
 const { Schema } = require("mongoose"); //Admin editable only
 const mongoose = require("mongoose");
 
-const pollSchema = new mongoose.Schema({
+const pollVoteSchema = new mongoose.Schema({
   pollname: {
     type: String,
   },
@@ -15,11 +15,6 @@ const pollSchema = new mongoose.Schema({
     type: Date,
   }, //enter this runtime
 
-  valid: {
-    type: Boolean,
-    default: true,
-  },
-
   voter: {
     type: mongoose.Types.ObjectId,
     ref: "Voter",
@@ -31,5 +26,5 @@ const pollSchema = new mongoose.Schema({
   },
 });
 
-global.Poll = global.Poll || mongoose.model("Poll", pollSchema);
-module.exports = global.Poll;
+global.PollVote = global.PollVote || mongoose.model("PollVote", pollVoteSchema);
+module.exports = global.PollVote;

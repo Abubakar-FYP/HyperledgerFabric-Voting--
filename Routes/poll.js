@@ -9,7 +9,8 @@ require("../Models/poll");
 require("../Models/polls");
 
 const Polls = mongoose.model("Polls");
-const Poll = mongoose.model("Poll");
+const PollVote = mongoose.model("PollVote");
+const Candidate = mongoose.model("Candidate");
 
 /*
 created two DBs, 
@@ -38,12 +39,19 @@ router.post("/createpoll", async (req, res) => {
     }
   });
 
+  const startTime = new Date();
+  const endTime = new Date();
+
+  endTime.setHours(startTime.getHours() + 1);
+
   const newPoll = new Polls({
     pollId: pollId,
     pollname: pollname,
     type: type,
     description: description,
     candidate: candidate,
+    endTime: endTime,
+    startTime: startTime,
   });
 
   newPoll
@@ -110,22 +118,70 @@ router.get("/getallpolls", async (req, res) => {
   }
 });
 
+//casts vote for polls, in pollVotes
 router.post("/vote/:pollid/:voterid/:candidateid", async (req, res) => {
+  const polls = await Polls.findOne({ _id: req.params.pollid });
+  if (polls == null) {
+    return res.json({ message: "poll does not exist with this id" });
+  }
+
+  const voter = await Voter.findOne({ _id: req.params.voterid });
+  if (voter == null) {
+    return res.json({ message: "voter does not exist" });
+  }
+
+  const candidate = await Candidate.findOne({ _id: req.params.candidateid });
+  if (candidate == null) {
+    return res.json({ message: "candidate does not exist in this poll" });
+  }
+
+  const newVote = new PollVote({
+    pollName: polls.pollName,
+    startTime: polls.startTime,
+    endTime: polls.endTime,
+    voter: req.params.voterid,
+    candidate: req.params.candidateid,
+  });
+
+  newVote.save().then((resp) => {
+    if (resp == undefined) {
+      console.log("there was a problem saving the vote");
+      return;
+    } else {
+      return res.json({ message: "you have sucessfully voted in the poll" });
+    }
+  });
   //get poll info
   //insert voterinfo and candidateinfo
   //insertpoll info
 });
 
-router.post("/getresultofallpolls", async (req, res) => {
-  //count number of times candidate came
-  //or remodel for count
-});
+router.get("/getresultofallpolls", async (req, res) => {
+  const polls = await Polls.find({});
+  const candidates = await Candidate.find({});
 
-router.put("/insertendtime", async (req, res) => {
-  //insert end time or just add 1 hour to model
+  for (const candidate in candidates) {
+    console.log("candidate========>", candidate);
+  }
 });
-router.get("/stoppoll/pollId", async (req, res) => {});
+// find all polls
+// find all candidates
+//find check each candidate in polls and count him/her
+//count number of times candidate came
+//or remodel for count
 
-router.get("/gettimeremaining", async (req, res) => {});
+router.put("/stoppoll", async (req, res) => {
+  const polls = await Polls.find({});
+
+  polls.map((poll) => {
+    console.log(poll.startTime, poll.endTime);
+    console.log(poll.startTime.getHours() == poll.endTime.getHours());
+  });
+
+  //find all polls
+  //check their start and end time
+  //compare and if same or exceeded
+  //change its validity
+});
 
 module.exports = router;

@@ -14,13 +14,18 @@ const pollsSchema = new mongoose.Schema({
     type: String,
   },
 
+  valid: {
+    type: Boolean,
+    default: true,
+  },
+
   description: {
     type: String,
   },
 
   startTime: {
     type: Date,
-    default: Date.now(),
+    default: new Date(Date.now().toString()),
   }, //default
 
   endTime: {
