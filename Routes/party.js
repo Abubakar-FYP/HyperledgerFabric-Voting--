@@ -17,27 +17,21 @@ const Criminal = mongoose.model("Criminal");
 //use the findparty or getparty dapi to check if its new or not
 //returns a list of candidates,chain this api to create candidate api
 router.post("/createparty", async (req, res) => {
-  const {
-    partyName,
-    partyImg,
-    partySymbol,
-    partyLeaderCnic,
-    candidate,
-    ballotId,
-  } = req.body;
+  const { partyName, partyImg, partySymbol, partyLeaderCnic, candidate } =
+    req.body;
 
   if (
     !partyName ||
     !partyImg ||
     !partyLeaderCnic ||
     !partySymbol ||
-    !candidate ||
-    !ballotId
+    !candidate
   ) {
     return res.status(408).json({ message: "one or more fields are empty" });
   }
-  const party = await Party.findOne({partyName: partyName})
-  if(party) return res.status(400).send("Party with same name is Already Exists")
+  const party = await Party.findOne({ partyName: partyName });
+  if (party)
+    return res.status(400).send("Party with same name is Already Exists");
   const newParty = new Party({
     partyName,
     partyImg,
@@ -45,7 +39,7 @@ router.post("/createparty", async (req, res) => {
     partyLeaderCnic,
   });
 
-  const candidateIds = candidateList.map((item) => {
+  const candidateIds = candidate.map((item) => {
     return item._id;
   });
 
