@@ -1,7 +1,9 @@
-import React from 'react'
+import React , {useEffect, useState} from 'react'
 import DatePicker from "react-datepicker"
 import DateTimePicker from 'react-datetime-picker';
-
+import axios from "axios"
+import {url} from "../../constants"
+import {toast} from "react-toastify"
 const ElectionCreation = () => {
     const [startDate, setStartDate] = React.useState(new Date());
     const [endDate, setEndtDate] = React.useState(new Date());
@@ -12,6 +14,8 @@ const ElectionCreation = () => {
     console.log(poolNameList)
     const [electionName, setElectionName] = React.useState("")
 
+    const [pendingParties, setPendingParties] = useState([])
+    const [approvedParties, setApprovedParties] = useState([])
     const handleOnSubmit = () => {
         setCreateElection(false)
         setBoolean(true)
@@ -20,6 +24,42 @@ const ElectionCreation = () => {
         console.log("done")
         setElectionName("")
     }
+    const getPendingParties = async () => {
+        const {data} = await axios.get(url + "/getpendingparties")
+        //    console.log("getpendingpartiesgetpendingpartiesgetpendingparties", data)
+           setPendingParties(data.message)
+    }
+    const getApprovedParties = async () => {
+        const {data} = await axios.get(url + "/getapprovedparties")
+        // console.log("getapprovedpartiesgetapprovedpartiesgetapprovedparties", data)
+        setApprovedParties(data.message)
+    }
+    const callForApis = () => {
+        getPendingParties()
+        getApprovedParties()
+    }
+    useEffect(() => {
+        callForApis()
+    }, [])
+
+    const approveParty = async (id) => {
+        const {data} = await axios.put(url + "/approveparty" + "/" + id)
+        if(data.message) {
+            toast.success(data.message)
+            callForApis()
+
+        }
+    }
+    const rejectParty = async (id) => {
+        const {data} = await axios.delete(url + "/rejectparty" + "/" + id)
+        if(data.message) {
+            toast.success(data.message)
+        callForApis()
+
+        }
+    }
+    console.log("pendingPartiespendingParties",pendingParties)
+    console.log("approvedPartiesapprovedParties",approvedParties)
     return (
         <div className="container ">
             <div className="row">
@@ -29,14 +69,18 @@ const ElectionCreation = () => {
                     </div>
                     <div className="card-body">
                         <ul>
-                            {[1,2,3,4,5].map(party => (
-                                <li key={party} className="list-group-item">
+                            {pendingParties?.map(party => (
+                                <li key={party._id} className="list-group-item">
                                 <div className="d-flex justify-content-between">
-                                    <h6>Party Name</h6>
-                                    <button className="btn btn-primary">
+                                    <h6>Party Name : {party.partyName}</h6>
+                                    <button 
+                                    onClick={() => approveParty(party._id)}
+                                    className="btn btn-primary">
                                         Approve
                                     </button>
-                                    <button className="btn btn-danger">
+                                    <button 
+                                    onClick={() => rejectParty(party._id)}
+                                    className="btn btn-danger">
                                         Reject
                                     </button>
                                 </div>
@@ -53,10 +97,10 @@ const ElectionCreation = () => {
                     </div>
                     <div className="card-body">
                         <ul>
-                            {[1,2,3,4,5].map(party => (
-                                <li key={party} className="list-group-item">
+                            {approvedParties.map(party => (
+                                <li key={party._id} className="list-group-item">
                                 <div className="d-flex justify-content-between">
-                                    <h6>Party Name</h6>
+                                    <h6>Party Name: {party.partyName}</h6>
                                     <button className="btn btn-success" disabled={true}>Approved </button>
                                 </div>
                             </li>

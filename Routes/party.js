@@ -22,7 +22,8 @@ router.post("/createparty", async (req, res) => {
   if (!partyName || !partyImg || !partyLeaderCnic || !candidate) {
     return res.status(408).json({ message: "one or more fields are empty" });
   }
-
+  const party = await Party.findOne({partyName: partyName})
+  if(party) return res.status(400).send("Party with same name is Already Exists")
   const newParty = new Party({
     partyName,
     partyImg,
