@@ -28,7 +28,7 @@ router.get("/solo", async (req, res) => {
 //use the findparty or getparty dapi to check if its new or not
 //returns a list of candidates,chain this api to create candidate api
 router.post("/createparty", async (req, res) => {
-  console.log("req body ==========" , req.body)
+  console.log("req body ==========", req.body);
 
   const { partyName, partyImg, partySymbol, partyLeaderCnic, candidate } =
     req.body;
@@ -62,17 +62,17 @@ router.post("/createparty", async (req, res) => {
     return candidate.partyLeaderCnic;
   });
 
-  idlist.map((id)=>{
-    candidateIds.map((obj)=>{
-    if(id==obj){
-      return res.status("cannot register party")
-    }
-  })
+  idlist.map((id) => {
+    candidateIds.map((obj) => {
+      if (id == obj) {
+        return res.status("cannot register party");
+      }
+    });
+  });
 
   newParty.candidate = candidateIds;
 
-
-  const candidates = candidate.map(async (item) => {
+  const candidatel = candidate.map(async (item) => {
     const newCandidate = new Candidate({
       cnic: item.cnic,
       position: item.position,
@@ -135,11 +135,5 @@ router.get("/getallpartyname", async (req, res) => {
       }
     });
 });
-
-const removeNull = (array) => {
-  return array.filter((item) => {
-    item !== null;
-  });
-};
 
 module.exports = router;
