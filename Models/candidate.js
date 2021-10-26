@@ -16,7 +16,6 @@ const candidateSchema = new mongoose.Schema({
     //assigned by party leader to candidate
     type: mongoose.Schema.Types.ObjectId,
     ref: "Ballot",
-    default: null,
   },
 
   partyId: {
