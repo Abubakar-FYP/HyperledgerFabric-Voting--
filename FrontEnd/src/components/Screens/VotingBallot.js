@@ -1,6 +1,13 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 
 const VotingBallot = () => {
+    const [user, setUser] = useState(null)
+    useEffect(() => {
+        const userData = JSON.parse(localStorage.getItem("userDate"))
+        if(userData){
+            setUser(userData)
+        }
+    }, [])
     return (
         <div className="container text-start">
             <div className="row">
@@ -31,8 +38,8 @@ const VotingBallot = () => {
                                 </div>
                                 <div className="mt-4">
                                     <strong>Status : </strong>
-                                    <span className="text-danger">
-                                        Not Voted
+                                    <span className={`text-${user?.doc?.voteflag ? "success" : "danger"}`}>
+                                        {user?.doc?.voteflag ? "Voted" : "Not Voted"}
                                     </span>
                                 </div>
                             </div>
