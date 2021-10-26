@@ -17,7 +17,6 @@ const voterSchema = new mongoose.Schema({
   ballotId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Ballot",
-    default: null,
   }, //this will be assigned based on the area of the voter
 
   voted: {

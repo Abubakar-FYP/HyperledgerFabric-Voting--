@@ -28,8 +28,6 @@ router.get("/solo", async (req, res) => {
 //use the findparty or getparty dapi to check if its new or not
 //returns a list of candidates,chain this api to create candidate api
 router.post("/createparty", async (req, res) => {
-  console.log("req body ==========", req.body);
-
   const { partyName, partyImg, partySymbol, partyLeaderCnic, candidate } =
     req.body;
   const criminals = await Criminal.find({});
@@ -54,23 +52,28 @@ router.post("/createparty", async (req, res) => {
     partyLeaderCnic,
   });
 
-  const candidateIds = candidate.map((item) => {
-    return item._id;
+  const candidateCnic = candidate.map((item) => {
+    console.log("sentList========", item);
+    return item; //returns cnic
   });
 
   const idlist = candidates.map((candidate) => {
+    console.log("idlist-=======", candidate);
     return candidate.partyLeaderCnic;
   });
 
-  idlist.map((id) => {
-    candidateIds.map((obj) => {
-      if (id === obj) {
-        return res.status("cannot register party");
+  let check = false;
+  for (let i = 0; i < candidateCnic.length; i++) {
+    for (let j = 0; j < idlist.length; j++) {
+      if (candidateCnic[i] == idlist[j]) {
+        check = true;
       }
-    });
-  });
+    }
+  }
 
-  newParty.candidate = candidateIds;
+  if (check) {
+    return res.json({ message: "Party cannot be registered due to candidate" });
+  }
 
   const candidatel = candidate.map(async (item) => {
     const newCandidate = new Candidate({
@@ -80,10 +83,14 @@ router.post("/createparty", async (req, res) => {
       ballotId: item.ballotId,
     });
 
+    newParty.candidate = newCandidate._id;
+
     await newCandidate.save().catch((err) => {
       return console.log(err);
     });
   });
+
+  await newParty.save();
 
   res.status(200).json({ message: "Party has been registered" });
 });

@@ -9,6 +9,7 @@ require("../Models/nadra");
 
 const Candidate = mongoose.model("Candidate");
 const Nadra = mongoose.model("Nadra");
+const Ballot = mongoose.model("Ballot");
 
 //delete's candidate with id in params
 //hold onto this one right now
@@ -119,19 +120,23 @@ router.get("/getfemalevoters", async (req, res) => {
 router.get("/getcandidatebyballotid/:ballotid", async (req, res) => {
   await Candidate.find({
     ballotId: req.params.ballotid,
-  }).exec((err, doc) => {
-    if (!err) {
-      if (doc.length == 0)
-        return res.json({
-          message: "candidates does not exist with this ballot id",
-        });
-      else {
-        return res.json({ message: doc });
+  })
+    .populate({
+      path: "ballotId",
+    })
+    .exec((err, doc) => {
+      if (!err) {
+        if (doc.length == 0)
+          return res.json({
+            message: "candidates does not exist with this ballot id",
+          });
+        else {
+          return res.json({ message: doc });
+        }
+      } else {
+        console.log(err);
       }
-    } else {
-      console.log(err);
-    }
-  });
+    });
 });
 
 module.exports = router;
