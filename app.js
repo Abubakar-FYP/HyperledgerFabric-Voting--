@@ -28,6 +28,8 @@ require("./Models/vote");
 require("./Models/campaign");
 require("./Models/ballot");
 require("./Models/party");
+require("./Models/poll");
+require("./Models/polls");
 require("./Models/candidate");
 require("./Models/nadra");
 require("./Models/criminal");
@@ -41,8 +43,9 @@ var ballot = require("./Routes/ballot");
 var campaign = require("./Routes/campaign");
 var party = require("./Routes/party");
 var candidate = require("./Routes/candidate");
+var poll = require("./Routes/poll");
 
-app.use([signup, ballot, vote, candidate, party, admin, campaign, voter]); //using the routes
+app.use([signup, ballot, vote, candidate, party, admin, campaign, voter, poll]); //using the routes
 
 const serverNumber = 1970;
 
