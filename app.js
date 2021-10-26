@@ -33,6 +33,7 @@ require("./Models/polls");
 require("./Models/candidate");
 require("./Models/nadra");
 require("./Models/criminal");
+require("./Models/election");
 
 //Routes Registering
 var vote = require("./Routes/vote");
@@ -44,6 +45,20 @@ var campaign = require("./Routes/campaign");
 var party = require("./Routes/party");
 var candidate = require("./Routes/candidate");
 var poll = require("./Routes/poll");
+var election = require("./Routes/election");
+
+app.use([
+  signup,
+  ballot,
+  vote,
+  candidate,
+  party,
+  admin,
+  campaign,
+  voter,
+  poll,
+  election,
+]); //using the routes
 
 const serverNumber = 1970;
 
