@@ -55,7 +55,7 @@ router.post("/signup", async (req, res, next) => {
       .send({ message: "one or more of the fields are empty" });
   }
 
-  const resp = await Nadra.findOne({ cnic });
+  const resp = await Nadra.findOne({ cnic: cnic });
   if (!resp) return res.status(400).json({ message: "User does not exist" });
 
   if (resp?.nationality !== "Pakistan") {
