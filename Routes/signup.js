@@ -55,13 +55,10 @@ router.post("/signup", async (req, res, next) => {
       .send({ message: "one or more of the fields are empty" });
   }
 
-  const resp = await Nadra.findOne({ cnic }).then((found) => {
-    if (found == null) {
-      return res.status(400).json({ message: "User does not exist" });
-    }
-  });
+  const resp = await Nadra.findOne({ cnic })
+  if(!resp) return res.status(400).json({ message: "User does not exist" });
 
-  if (resp?.nationality != "Pakistan") {
+  if (resp?.nationality !== "Pakistan") {
     return res.status(400).json({ message: "user is not a pakistani citizen" });
   }
 
@@ -79,7 +76,7 @@ router.post("/signup", async (req, res, next) => {
     gender: gender % 2 === 0 ? "F" : "M",
   });
 
-  newVoter.save();
+  await newVoter.save();
   /*  const genOtp = otp.otpSender(phoneNumber); //middleware,for sending otp, and saves the otp in variable
   console.log(genOtp);
 
