@@ -107,17 +107,16 @@ router.post("/signin", async (req, res) => {
   if (!cnic || !password) {
     return res.status(400).json({ message: "field is empty" });
   }
-  await Voter.findOne({ cnic: cnic, password: password })
+  const doc = await Voter.findOne({ cnic: cnic, password: password })
     .select("-password")
-    .exec((err, doc) => {
-      if (doc) {
-        console.log("Result=========", doc);
-        const token = jwt.sign({ _id: doc._id }, JWTKEY);
-        res.json({ token, doc });
-      } else {
-        console.log(err);
-      }
-    });
+  if(!doc) return res.status(400).send("You Are Not A Registered Voter")
+
+  const user = await Nadra.findOne({ cnic: cnic })
+
+  console.log("Result=========", user);
+    const token = jwt.sign({ _id: doc._id }, JWTKEY);
+    res.send({ token, doc, user });
+  
 });
 /* 
 router.post("/signinotp", async (req, res) => {

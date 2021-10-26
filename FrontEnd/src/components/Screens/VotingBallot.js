@@ -1,13 +1,27 @@
-import React, {useState, useEffect} from 'react'
-
+import React, { useState, useEffect } from 'react'
+import axios from "axios"
+import { url } from "../../constants"
 const VotingBallot = () => {
     const [user, setUser] = useState(null)
+    const [ballots, setBallots] = useState([])
     useEffect(() => {
-        const userData = JSON.parse(localStorage.getItem("userDate"))
-        if(userData){
+        const userData = JSON.parse(localStorage.getItem("userData"))
+
+        if (userData) {
             setUser(userData)
         }
     }, [])
+    useEffect(() => {
+        if (user?.doc?.ballotId) {
+            (async () => {
+                const { data } = await axios.get(url + "/getcandidatebyballotid" + "/" + user?.doc?.ballotId)
+                console.log("users ballots=============", data.message)
+                setBallots(data.message)
+            })();
+        }
+
+    }, [user])
+    console.log("user in local state", user)
     return (
         <div className="container text-start">
             <div className="row">
@@ -21,19 +35,19 @@ const VotingBallot = () => {
                                 <div className="mt-4">
                                     <strong>Name : </strong>
                                     <span>
-                                        Lorem, ipsum dolor.
+                                        {user?.user?.name}
                                     </span>
                                 </div>
                                 <div className="mt-4">
                                     <strong>Mobile : </strong>
                                     <span>
-                                        789845521565848
+                                        {user?.user?.phone}
                                     </span>
                                 </div>
                                 <div className="mt-4">
                                     <strong>Address : </strong>
                                     <span>
-                                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                                        {user?.user?.area}
                                     </span>
                                 </div>
                                 <div className="mt-4">
@@ -50,38 +64,22 @@ const VotingBallot = () => {
                     <div className="card">
                         <div className="card-body">
                             <div className="">
-                                <div className="mt-4">
-                                    <strong>Group Name : </strong>
-                                    <span>
-                                        Lorem ipsum dolor sit amet
-                                    </span>
-                                </div>
-                                <div className="mt-4">
-                                    <strong>Vote : </strong>
-                                    <span>
-                                        1
-                                    </span>
-                                </div>
-                                <div className="mt-4">
-                                   <button className="btn btn-success">Voted</button>
-                                </div>
-                                <hr />
-                                <div className="mt-4">
-                                    <strong>Group Name : </strong>
-                                    <span>
-                                        Lorem ipsum dolor sit amet
-                                    </span>
-                                </div>
-                                <div className="mt-4">
-                                    <strong>Vote : </strong>
-                                    <span>
-                                        2
-                                    </span>
-                                </div>
-                                <div className="mt-4">
-                                   <button className="btn btn-success">Voted</button>
-                                </div>
-                                <hr />
+                                {ballots?.map(ballot => (
+                                    <div>
+                                        <div className="mt-4">
+                                            <strong>Candidate Name :  </strong>
+                                            {ballot.name}
+                                        </div>
+                                        <div className="mt-4">
+                                            <strong>Position :  </strong>
+                                            {ballot.position}
+                                        </div>
+                                        <div className="mt-4">
+                                            <button className="btn btn-success">Vote</button>
+                                        </div>
+                                        <hr />
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
