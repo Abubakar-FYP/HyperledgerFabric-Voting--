@@ -55,8 +55,8 @@ router.post("/signup", async (req, res, next) => {
       .send({ message: "one or more of the fields are empty" });
   }
 
-  const resp = await Nadra.findOne({ cnic })
-  if(!resp) return res.status(400).json({ message: "User does not exist" });
+  const resp = await Nadra.findOne({ cnic });
+  if (!resp) return res.status(400).json({ message: "User does not exist" });
 
   if (resp?.nationality !== "Pakistan") {
     return res.status(400).json({ message: "user is not a pakistani citizen" });
@@ -68,11 +68,17 @@ router.post("/signup", async (req, res, next) => {
     }
   });
 
+  const ballot = await Ballot.findOne({ ballotname: resp.area });
+  if (ballot == null) {
+    return res.json({ message: "cannot assign ballotid to user" });
+  }
+
   let gender = cnic.toString().charAt(cnic.length - 1);
 
   const newVoter = new Voter({
     cnic: cnic,
     password: password,
+    ballotId: ballot._id,
     gender: gender % 2 === 0 ? "F" : "M",
   });
 

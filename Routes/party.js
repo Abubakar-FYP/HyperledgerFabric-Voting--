@@ -64,7 +64,7 @@ router.post("/createparty", async (req, res) => {
 
   idlist.map((id) => {
     candidateIds.map((obj) => {
-      if (id == obj) {
+      if (id === obj) {
         return res.status("cannot register party");
       }
     });
