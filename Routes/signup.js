@@ -46,24 +46,27 @@ router.post("/signinadmin", requireLogin, (req, res) => {
 });
 
 router.post("/signup", async (req, res, next) => {
-  const { cnic, gender, password } = req.body;
+  // console.log("signup api=============", req.body)
+  const { cnic, password } = req.body;
 
-  if (!cnic || !password || !gender) {
+  if (!cnic || !password ) {
     return res
       .status(422)
-      .json({ message: "one or more of the fields are empty" });
+      .send({ message: "one or more of the fields are empty" });
   }
 
   await Voter.findOne({ cnic }).then((found) => {
     if (found) {
-      return res.status(400).json({ message: "voter already registered" });
+      return res.status(400).send({ message: "voter already registered" });
     }
   });
 
+  let gender = cnic.toString().charAt(cnic.length - 1)
+ 
   const newVoter = new Voter({
     cnic: cnic,
-    gender: gender,
     password: password,
+    gender: gender%2 === 0 ? "F" : "M"
   });
 
   newVoter.save();
@@ -74,7 +77,7 @@ router.post("/signup", async (req, res, next) => {
     res.json({ message: genOtp.toString() });
   }
  */
-  res.json(newVoter);
+  res.send(newVoter);
 });
 /* 
 router.post("/signupotp", async (req, res, next) => {

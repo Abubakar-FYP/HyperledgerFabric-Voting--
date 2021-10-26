@@ -1,59 +1,58 @@
 // import { method } from 'bluebird';
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useState } from 'react';
 import {Link} from 'react-router-dom';
-import M from 'materialize-css';
-import { useHistory } from 'react-router';
-import NavBar from '../Navbar';
-
+import axios from "axios"
+import {url} from "../../constants"
+import { toast } from 'react-toastify';
+import {useHistory} from "react-router-dom"
 const Signup =()=>{
-    const [Name ,setName ] = useState ("")
-    const [CNIC ,setCNIC ] = useState ("")
-    const [HouseNo , setHouseNo] = useState("")
-    const [StreetNo, setStreetNo] = useState("")
-    const [Age , setAge] = useState("")
-    const [Gender , setGender] = useState("")
-    const [Area, setArea] = useState("")
-    const [Province,setprovince] = useState ("")
-    const [Country , setCountry] = useState("")
 
-    const PostData =()=>{
-        let history = useHistory
-        fetch("/Signup",{
-        method:"post", 
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-            CNIC:""
-        })
-        })
-        .then(res=>res.json())
-        .then(data=>{
-            if (data.error){
-            M.toast({html: data.error,classes:"#c62828 red darken-3"})
-            }
-            else{
-            M.toast({html: data.message,classes:"#43a047 green darken-1"})
-            history.push('/Signin')    
+    const [password ,setPassword ] = useState ("")
+    const [CNIC ,setCNIC ] = useState ("")
+    const history = useHistory()
+    useEffect(() => {
+        const user = localStorage.getItem("userData")
+        if(user){
+            history.push("/")
         }
-        }).catch(err =>{
-            console.log(err)
-        })
+    }, [])
+    const handleSignup = async()=>{
+        if(!password, !CNIC){
+            alert("enter password and cnic")
+            return
+        }
+        try {
+            const res = await axios.post(url + "/signup"  , {password: password , cnic: CNIC})
+            console.log("signup user", res.data)
+            if(res){
+                toast.success("You Have Successfully Signup")
+            history.push("/signin")
+
+            }    
+        } catch (error) {
+            console.log(error)
+            toast.error("You are already registered")
+        }
+        
     }
+
 
     return (
         <div className="mycard">
              <div className= "card Signup-card">
            <h1>Sign Up </h1>
-            
+
             <input type="number" id="cnic" name="cnic" placeholder="CNIC" 
             value={CNIC}
             onChange={(e)=>setCNIC(e.target.value)}
            />
+            <input type="password" id="cnic" name="cnic" placeholder="Password" 
+            value={password}
+            onChange={(e)=>setPassword(e.target.value)}
+           />
 
-            
-           <button className ="btn waves-effect waves-light" onClick={()=>PostData()}> 
+           <button className ="btn waves-effect waves-light" onClick={handleSignup}> 
            Signup</button>
             <h5>
             Already have an Account? <Link to = '/Signin'>Click here</Link>

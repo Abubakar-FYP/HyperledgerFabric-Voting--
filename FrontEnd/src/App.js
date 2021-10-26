@@ -19,6 +19,8 @@ import VotingBallot from './components/Screens/VotingBallot';
 import ElectionCreation from './components/Screens/ElectionCreation';
 import AdminDashboard from './components/Screens/AdminDashboard';
 import Pulses from './Pulses';
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export const UserContext = createContext()
 
@@ -77,7 +79,7 @@ function App() {
       <BrowserRouter>
         {/* <Navbar/>
     <Routing/> */}
-
+<ToastContainer />
     <div>
       <NavBar />
     </div>
