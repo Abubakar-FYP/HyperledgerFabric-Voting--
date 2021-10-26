@@ -86,6 +86,19 @@ mongoose.connection.on("exit", (err) => {
 
 ///////*MongoDB connection//////////////////////
 
+const path = require("path")
+if (process.env.NODE_ENV === 'production') {
+  console.log("production mode")
+  app.use(express.static(path.resolve(process.cwd(), 'FrontEnd/build')))
+  app.get('*', (req, res) => {
+      res.sendFile(path.resolve(process.cwd(), 'FrontEnd/build/index.html'))
+  })
+} else {
+  app.get("/", (req, res) => {
+      res.send("Api is Running")
+  })
+}
+
 app.get("/", (req, res) => {
   res.send("home");
 });
