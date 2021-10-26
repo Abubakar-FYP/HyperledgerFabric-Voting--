@@ -6,8 +6,10 @@ const requireLogin = require("../Middleware/requirelogin");
 require("../Models/candidate");
 require("../Models/nadra");
 require("../Models/poll");
+require("../Models/polls");
 
 const Polls = mongoose.model("Polls");
+const Poll = mongoose.model("Poll");
 
 /*
 created two DBs, 
@@ -83,22 +85,6 @@ router.get("/getpollforcandidates/:voterId", async (req, res) => {
   }
 });
 
-router.post("/vote/:pollid/:voterid/:candidateid", async (req, res) => {
-  //get poll info
-  //insert voterinfo and candidateinfo
-  //insertpoll info
-});
-
-router.post("/getresultofallpolls", async (req, res) => {
-  //count number of times candidate came
-  //or remodel for count
-});
-
-router.put("/insertendtime", async (req, res) => {
-  //insert end time or just add 1 hour to model
-});
-router.get("/stoppoll/pollId", async (req, res) => {});
-
 router.get("/getvalidpolls", async (req, res) => {
   const polls = await Polls.find({ valid: true });
   if (polls === null || polls.length === 0) {
@@ -123,6 +109,23 @@ router.get("/getallpolls", async (req, res) => {
     res.json(polls);
   }
 });
+
+router.post("/vote/:pollid/:voterid/:candidateid", async (req, res) => {
+  //get poll info
+  //insert voterinfo and candidateinfo
+  //insertpoll info
+});
+
+router.post("/getresultofallpolls", async (req, res) => {
+  //count number of times candidate came
+  //or remodel for count
+});
+
+router.put("/insertendtime", async (req, res) => {
+  //insert end time or just add 1 hour to model
+});
+router.get("/stoppoll/pollId", async (req, res) => {});
+
 router.get("/gettimeremaining", async (req, res) => {});
 
 module.exports = router;

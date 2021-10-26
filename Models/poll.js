@@ -15,6 +15,11 @@ const pollSchema = new mongoose.Schema({
     type: Date,
   }, //enter this runtime
 
+  valid: {
+    type: Boolean,
+    default: true,
+  },
+
   voter: {
     type: mongoose.Types.ObjectId,
     ref: "Voter",

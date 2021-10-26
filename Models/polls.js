@@ -27,11 +27,6 @@ const pollsSchema = new mongoose.Schema({
     type: Date,
   }, //enter this runtime
 
-  valid: {
-    type: Boolean,
-    default: true,
-  },
-
   candidate: [
     {
       type: mongoose.Types.ObjectId,
