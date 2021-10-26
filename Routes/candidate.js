@@ -128,7 +128,7 @@ router.get("/getpositions", async (req, res) => {
 });
 
 router.get("/getmalevoters", async (req, res) => {
-  const voters = await Voter.find({ gender: "M", voteflag: true });
+  const voters = await Nadra.find({ gender: "Male", voteflag: true });
   if (voters == null) {
     res.json({ message: "no vote has been casted by males" });
   }
@@ -136,7 +136,7 @@ router.get("/getmalevoters", async (req, res) => {
 });
 
 router.get("/getfemalevoters", async (req, res) => {
-  const voters = await Voter.find({ gender: "F", voteflag: true });
+  const voters = await Nadra.find({ gender: "Female", voteflag: true });
   if (voters == null) {
     res.json({ message: "no vote has been casted by females" });
   }
