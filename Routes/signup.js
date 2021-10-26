@@ -61,7 +61,7 @@ router.post("/signup", async (req, res, next) => {
     }
   });
 
-  if (resp.nationality != "Pakistan") {
+  if (resp?.nationality != "Pakistan") {
     return res.status(400).json({ message: "user is not a pakistani citizen" });
   }
 

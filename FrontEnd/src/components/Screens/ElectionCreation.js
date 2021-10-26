@@ -1,114 +1,65 @@
-import React , {useEffect, useState} from 'react'
-import DatePicker from "react-datepicker"
+import React, { useEffect, useState } from 'react'
 import DateTimePicker from 'react-datetime-picker';
 import axios from "axios"
-import {url} from "../../constants"
-import {toast} from "react-toastify"
+import { url } from "../../constants"
+import { toast } from "react-toastify"
 const ElectionCreation = () => {
-    const [startDate, setStartDate] = React.useState(new Date());
-    const [endDate, setEndtDate] = React.useState(new Date());
-    const [createElection, setCreateElection] = React.useState(false)
-    const [boolean, setBoolean] = React.useState(true)
-    const [poolName, setPoolName] = React.useState("")
-    const [poolNameList, setPoolNameList] = React.useState([])
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndtDate] = useState(new Date());
+    const [createElection, setCreateElection] = useState(false)
+    const [boolean, setBoolean] = useState(true)
+    const [poolName, setPoolName] = useState("")
+    const [poolNameList, setPoolNameList] = useState([])
     console.log(poolNameList)
-    const [electionName, setElectionName] = React.useState("")
+    const [electionName, setElectionName] = useState("")
+    const [elections, setElections] = useState([])
+    const handleOnSubmit = async () => {
+        const dataToSend = {
+            electionName: electionName,
+            startTime: new Date(startDate).getTime(),
+            endTime: new Date(endDate).getTime(),
+            electionType: boolean ? "country" : "poal",
+            candidates: !boolean ? poolNameList : undefined
+        }
+        try {
+            console.log("clicked", dataToSend)
 
-    const [pendingParties, setPendingParties] = useState([])
-    const [approvedParties, setApprovedParties] = useState([])
-    const handleOnSubmit = () => {
-        setCreateElection(false)
-        setBoolean(true)
-        setPoolName("")
-        setPoolNameList([])
-        console.log("done")
-        setElectionName("")
+            const { data } = await axios.post(url + "/create/election", dataToSend)
+            console.log("res.data=======", data.election)
+            if (data.election) {
+                toast.success("Election is Created Successfully")
+                setCreateElection(false)
+                setBoolean(true)
+                setPoolName("")
+                setPoolNameList([])
+                console.log("done")
+                setElectionName("")
+            }
+        } catch (error) {
+            console.log(error.message)
+            toast.error(error.message)
+        }
+
     }
-    const getPendingParties = async () => {
-        const {data} = await axios.get(url + "/getpendingparties")
-        //    console.log("getpendingpartiesgetpendingpartiesgetpendingparties", data)
-           setPendingParties(data.message)
-    }
-    const getApprovedParties = async () => {
-        const {data} = await axios.get(url + "/getapprovedparties")
-        // console.log("getapprovedpartiesgetapprovedpartiesgetapprovedparties", data)
-        setApprovedParties(data.message)
-    }
-    const callForApis = () => {
-        getPendingParties()
-        getApprovedParties()
-    }
+
+    // console.log("pendingPartiespendingParties",pendingParties)
+    // console.log("approvedPartiesapprovedParties",approvedParties)
+    // console.log("start timeeee", startDate)
+    // console.log("end Dateeee", endDate)
     useEffect(() => {
-        callForApis()
+        (async () => {
+            try {
+                const { data } = await axios.get(url + "/get/election")
+                console.log("data=============", data)
+                setElections(data)
+            } catch (error) {
+                toast.error(error.message)
+            }
+        })();
     }, [])
-
-    const approveParty = async (id) => {
-        const {data} = await axios.put(url + "/approveparty" + "/" + id)
-        if(data.message) {
-            toast.success(data.message)
-            callForApis()
-
-        }
-    }
-    const rejectParty = async (id) => {
-        const {data} = await axios.delete(url + "/rejectparty" + "/" + id)
-        if(data.message) {
-            toast.success(data.message)
-        callForApis()
-
-        }
-    }
-    console.log("pendingPartiespendingParties",pendingParties)
-    console.log("approvedPartiesapprovedParties",approvedParties)
     return (
         <div className="container ">
-            <div className="row">
-                <div className="card">
-                    <div className="card-header">
-                        Pending Parties
-                    </div>
-                    <div className="card-body">
-                        <ul>
-                            {pendingParties?.map(party => (
-                                <li key={party._id} className="list-group-item">
-                                <div className="d-flex justify-content-between">
-                                    <h6>Party Name : {party.partyName}</h6>
-                                    <button 
-                                    onClick={() => approveParty(party._id)}
-                                    className="btn btn-primary">
-                                        Approve
-                                    </button>
-                                    <button 
-                                    onClick={() => rejectParty(party._id)}
-                                    className="btn btn-danger">
-                                        Reject
-                                    </button>
-                                </div>
-                            </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div className="row">
-                <div className="card">
-                    <div className="card-header">
-                        Approved Parties
-                    </div>
-                    <div className="card-body">
-                        <ul>
-                            {approvedParties.map(party => (
-                                <li key={party._id} className="list-group-item">
-                                <div className="d-flex justify-content-between">
-                                    <h6>Party Name: {party.partyName}</h6>
-                                    <button className="btn btn-success" disabled={true}>Approved </button>
-                                </div>
-                            </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-            </div>
+
             <div className="d-flex justify-content-end">
                 <button className={`btn ${!createElection ? "btn-secondary" : "btn-danger"}`}
                     onClick={() => setCreateElection(!createElection)}
@@ -125,7 +76,22 @@ const ElectionCreation = () => {
                             Active Elections
                         </div>
                         <div className="card-body">
+                            <div className="row">
+                                {elections?.map(el =>  
+                                new Date(Number(el.startTime)) > Date.now() && 
+                                new Date(Number(el.endTime)) > Date.now() ? (
+                                    <div className="card bg-success text-light col-md-4">
+                                        <div className="card-header">
+                                            Election Type : {el.electionType}
+                                        </div>
+                                        <div className="card-body">
+                                            <strong>Election Name</strong> : {el.electionName}
+                                        </div>
+                                    </div>
+                                ): null
+                                 )}
 
+                            </div>
                         </div>
                     </div>
                     <div className="card mt-5">
@@ -133,7 +99,22 @@ const ElectionCreation = () => {
                             Previos Elections
                         </div>
                         <div className="card-body">
+                        <div className="row">
+                                {elections?.map(el =>  
+                                Date.now() > new Date(Number(el.startTime))&& 
+                               Date.now() > new Date(Number(el.endTime)) ? (
+                                    <div className="card bg-danger text-light col-md-4">
+                                        <div className="card-header">
+                                            Election Type : {el.electionType}
+                                        </div>
+                                        <div className="card-body">
+                                            <strong>Election Name</strong> : {el.electionName}
+                                        </div>
+                                    </div>
+                                ): null
+                                 )}
 
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -145,7 +126,7 @@ const ElectionCreation = () => {
                     <div className="row">
                         <div className="col-md-6">
                             <div className="form-group">
-                                <label htmlFor="startTime">Start Date</label>
+                                <label htmlFor="startTime">Start Time</label>
                                 <DateTimePicker
                                     onChange={setStartDate}
                                     value={startDate}
@@ -166,10 +147,10 @@ const ElectionCreation = () => {
                         <div className="col-md-6">
                             <div className="form-group">
                                 <label htmlFor="electionName">Election Name</label>
-                                <input 
-                                value={electionName}
-                                onChange={e => setElectionName(e.target.value)}
-                                type="text" id="electionName" className="form-control" placeholder="Election Name" />
+                                <input
+                                    value={electionName}
+                                    onChange={e => setElectionName(e.target.value)}
+                                    type="text" id="electionName" className="form-control" placeholder="Election Name" />
                             </div>
                         </div>
                         <div className="col-md-6">
@@ -208,21 +189,21 @@ const ElectionCreation = () => {
 
                             </div>
 
-                            {poolNameList.length ? 
-                            <ul className="list-group">
-                                {poolNameList.map((val , index) => (
-                                <li
-                                key={index}
-                                className="list-group-item" value={val}>{val}</li> 
-                                ) )}
- 
-                          </ul> : null
+                            {poolNameList.length ?
+                                <ul className="list-group">
+                                    {poolNameList.map((val, index) => (
+                                        <li
+                                            key={index}
+                                            className="list-group-item" value={val}>{val}</li>
+                                    ))}
+
+                                </ul> : null
                             }
                         </div>
                         <div className="d-flex justify-content-end">
-                            <button 
-                            onClick={handleOnSubmit}
-                            className="btn btn-secondary">
+                            <button
+                                onClick={handleOnSubmit}
+                                className="btn btn-secondary">
                                 Done
                             </button>
                         </div>

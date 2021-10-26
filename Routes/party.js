@@ -17,6 +17,8 @@ const Criminal = mongoose.model("Criminal");
 //use the findparty or getparty dapi to check if its new or not
 //returns a list of candidates,chain this api to create candidate api
 router.post("/createparty", async (req, res) => {
+  console.log("req body ==========" , req.body)
+
   const { partyName, partyImg, partySymbol, partyLeaderCnic, candidate } =
     req.body;
 
