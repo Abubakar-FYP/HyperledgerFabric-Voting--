@@ -14,11 +14,6 @@ const voterSchema = new mongoose.Schema({
     default: false,
   }, //to check whether he has voted or not,Initially false
 
-  gender: {
-    type: String,
-    default: null,
-  },
-
   ballotId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Ballot",

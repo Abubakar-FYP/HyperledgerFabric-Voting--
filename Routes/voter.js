@@ -6,15 +6,16 @@ const requireLogin = require("../Middleware/requirelogin");
 
 //Registering Models
 require("../Models/voter");
+require("../Models/nadra");
 //Models
 const Voter = mongoose.model("Voter");
-
+const Nadra = mongoose.model("Nadra");
 //check all of these, if not working
 
 //this is for his dashboard,where when he/she signs up
-router.get("/getuserinfo/:_id", async (req, res) => {
-  await Voter.findOne({ _id: req.params._id })
-    .populate("ballotId")
+//gets userInfo against his/her cnic
+router.get("/getuserinfo/:cnic", async (req, res) => {
+  await Nadra.findOne({ cnic: req.params.cnic })
     .exec((err, docs) => {
       if (!err) {
         return res.status(200).json({ message: docs });

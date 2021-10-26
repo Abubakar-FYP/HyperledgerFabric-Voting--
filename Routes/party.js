@@ -92,27 +92,6 @@ router.get("/findparty/:_id", async (req, res) => {
     });
 });
 
-//takes _id as parameters
-//deletes a party
-router.delete("/deleteparty/:id", async (req, res) => {
-  const { _id } = req.params._id;
-
-  if (!_id) {
-    return res.status(400).json({ message: "field is empty" });
-  }
-
-  await Party.deleteOne({ _id: _id }, (resp) => {
-    if (resp) {
-      return res.status(200).json({ message: "party successfully deleted" });
-    }
-  }).catch((err) => {
-    console.log(err);
-    return res
-      .status(400)
-      .json({ message: "there's seems to be a problem deleting the Party" });
-  });
-});
-
 router.get("/getallpartyname", async (req, res) => {
   await Party.find({})
     .select("partyName")

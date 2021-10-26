@@ -9,7 +9,7 @@ const Party = mongoose.model("Party");
 
 //gets all the parties that are unapproved
 //populate when ready
-router.get("/findallunapprovedparties", async (req, res) => {
+router.get("/getpendingparties", async (req, res) => {
   Party.find({ is_valid: false })
     .then((resp) => {
       res.status(200).json({ message: resp });
@@ -21,7 +21,7 @@ router.get("/findallunapprovedparties", async (req, res) => {
 
 //dont need to populate because ot required
 //gets all the parties that are approved
-router.get("/findallapprovedparties", async (req, res) => {
+router.get("/getapprovedparties", async (req, res) => {
   await Party.find({ is_valid: true })
     .then((resp) => {
       res.status(200).json({ message: resp });
@@ -48,9 +48,11 @@ router.get("/getallparties", async (req, res) => {
 });
 
 //approves the party
+//takes a party _id
+//updates the is_valid field,meaning approves the party
 router.put("/approveparty/:partyId", async (req, res) => {
   Party.findOneAndUpdate(
-    { partyId: req.params.partyId },
+    { _id: req.params.partyId },
     { is_valid: true },
     (resp) => {
       res.status(200).json({ message: `party has been approved` });
@@ -58,6 +60,22 @@ router.put("/approveparty/:partyId", async (req, res) => {
   ).catch((err) => {
     console.log(err);
   });
+});
+
+router.delete("/rejectparty/:partyId", async (req, res) => {
+  let resp = await Party.findOne({ _id: req.params.partyId });
+
+  if (resp === null) {
+    return res.json({ message: `party does not exist` });
+  }
+
+  resp = await Party.findOneAndDelete({ _id: req.params.partyId });
+
+  if (resp === null) {
+    return res.json({ message: `party does not exist` });
+  } else {
+    return res.json({ message: `party has been deleted` });
+  }
 });
 
 module.exports = router;
