@@ -49,10 +49,20 @@ router.post("/signup", async (req, res, next) => {
   // console.log("signup api=============", req.body)
   const { cnic, password } = req.body;
 
-  if (!cnic || !password ) {
+  if (!cnic || !password) {
     return res
       .status(422)
       .send({ message: "one or more of the fields are empty" });
+  }
+
+  const resp = await Nadra.findOne({ cnic }).then((found) => {
+    if (found == null) {
+      return res.status(400).json({ message: "User does not exist" });
+    }
+  });
+
+  if (resp.nationality != "Pakistan") {
+    return res.status(400).json({ message: "user is not a pakistani citizen" });
   }
 
   await Voter.findOne({ cnic }).then((found) => {
@@ -61,12 +71,12 @@ router.post("/signup", async (req, res, next) => {
     }
   });
 
-  let gender = cnic.toString().charAt(cnic.length - 1)
- 
+  let gender = cnic.toString().charAt(cnic.length - 1);
+
   const newVoter = new Voter({
     cnic: cnic,
     password: password,
-    gender: gender%2 === 0 ? "F" : "M"
+    gender: gender % 2 === 0 ? "F" : "M",
   });
 
   newVoter.save();

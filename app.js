@@ -45,8 +45,6 @@ var party = require("./Routes/party");
 var candidate = require("./Routes/candidate");
 var poll = require("./Routes/poll");
 
-app.use([signup, ballot, vote, candidate, party, admin, campaign, voter, poll]); //using the routes
-
 const serverNumber = 1970;
 
 ///////MongoDB connection/////////////////////
