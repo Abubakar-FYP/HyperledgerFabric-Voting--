@@ -10,35 +10,6 @@ require("../Models/nadra");
 const Candidate = mongoose.model("Candidate");
 const Nadra = mongoose.model("Nadra");
 
-//use this route after the create party,
-//chain the createparty and this route, because
-//createparty returns an array of candidates
-//those candidates will now be added to Candidate Model
-//again
-router.post("/createcandidate", async (req, res) => {
-  const { candidate } = req.body; //traverse this array and insert one by one
-  if (!candidate) {
-    return res.status(400).json({ message: "field is empty" });
-  }
-
-  const candidates = candidate.map(async (item) => {
-    const newCandidate = new Candidate({
-      _id: item._id,
-      name: item.name,
-      cnic: item.cnic,
-      position: item.position,
-      ballotId: item.ballotId,
-      partyId: item.partyId,
-    });
-
-    await newCandidate.save().catch((err) => {
-      console.log(err);
-    });
-  });
-
-  res.status(200).json({ message: "Candidates have been registered" });
-});
-
 //delete's candidate with id in params
 //hold onto this one right now
 router.delete("/deletecandidate/:_id", async (req, res) => {

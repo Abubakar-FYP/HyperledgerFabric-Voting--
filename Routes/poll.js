@@ -44,22 +44,26 @@ router.post("/createpoll", async (req, res) => {
 
   endTime.setHours(startTime.getHours() + 1);
 
-  const newPoll = new Polls({
+  const obje = {};
+  obje.id = null;
+  const list = new Array();
+  console.log(candidate);
+  obje.id = candidate;
+
+  const newPol = {
     pollId: pollId,
     pollname: pollname,
     type: type,
     description: description,
-    candidate: candidate,
     endTime: endTime,
     startTime: startTime,
-  });
+  };
 
-  newPoll
-    .save()
-    .then((resp) => {
-      res.json({ message: "poll successfully created" });
-    })
-    .catch((err) => console.log(err));
+  newPol.candidate = obje;
+
+  console.log(newPol.candidate);
+
+  const newPoll = new Polls(newPol);
 });
 
 //gets voterId(candidate's) objectId
@@ -159,10 +163,27 @@ router.post("/vote/:pollid/:voterid/:candidateid", async (req, res) => {
 router.get("/getresultofallpolls", async (req, res) => {
   const polls = await Polls.find({});
   const candidates = await Candidate.find({});
+  let mapping;
+  let counter = 0;
 
-  for (const candidate in candidates) {
-    console.log("candidate========>", candidate);
-  }
+  polls
+    .map((candidate) => {
+      return candidate.candidate;
+    })
+    .map((itemList) => {
+      for (var i = 0; i < itemList.length; i++) {
+        for (const candidate of candidates) {
+          console.log(
+            "Candidate=======>",
+            candidate._id,
+            "Poll=======>",
+            candidate._id
+          );
+        }
+      }
+    });
+
+  res.json({ message: candidates });
 });
 // find all polls
 // find all candidates

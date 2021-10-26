@@ -34,8 +34,14 @@ const pollsSchema = new mongoose.Schema({
 
   candidate: [
     {
-      type: mongoose.Types.ObjectId,
-      ref: "Candidate",
+      id: {
+        type: mongoose.Types.ObjectId,
+        ref: "Candidate",
+      },
+      voteCount: {
+        type: Number,
+        defaut: 0,
+      },
     },
   ],
 });

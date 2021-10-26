@@ -17,26 +17,32 @@ const Criminal = mongoose.model("Criminal");
 //use the findparty or getparty dapi to check if its new or not
 //returns a list of candidates,chain this api to create candidate api
 router.post("/createparty", async (req, res) => {
-  const { partyName, partyImg, partyLeaderCnic, candidate } = req.body;
+  const {
+    partyName,
+    partyImg,
+    partySymbol,
+    partyLeaderCnic,
+    candidate,
+    ballotId,
+  } = req.body;
 
-  if (!partyName || !partyImg || !partyLeaderCnic || !candidate) {
+  if (
+    !partyName ||
+    !partyImg ||
+    !partyLeaderCnic ||
+    !partySymbol ||
+    !candidate ||
+    !ballotId
+  ) {
     return res.status(408).json({ message: "one or more fields are empty" });
   }
 
   const newParty = new Party({
     partyName,
     partyImg,
+    partySymbol,
     partyLeaderCnic,
-    candidate,
   });
-
-  const candidateList = candidate.map((item) => {
-    return new Candidate({
-      cnic: item.cnic,
-      position: item.position,
-      partyId: newParty._id,
-    });
-  }); // send these to candidate
 
   const candidateIds = candidateList.map((item) => {
     return item._id;
@@ -44,16 +50,22 @@ router.post("/createparty", async (req, res) => {
 
   newParty.candidate = candidateIds;
 
-  const resp = await newParty.save().then((resp) => {
-    if (resp) {
-      res.status(200).json({ message: "party sucessfully registered" });
-    } else {
-      res
-        .status(400)
-        .json({ message: "there was a problem registering party" });
-    }
+  const resp = await newParty.save();
+
+  const candidates = candidate.map(async (item) => {
+    const newCandidate = new Candidate({
+      cnic: item.cnic,
+      position: item.position,
+      partyId: newParty._id,
+      ballotId: item.ballotId,
+    });
+
+    await newCandidate.save().catch((err) => {
+      return console.log(err);
+    });
   });
-  return candidateList;
+
+  res.status(200).json({ message: "Party has been registered" });
 });
 
 //chain use during candidate registration by party leader
