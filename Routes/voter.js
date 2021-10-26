@@ -54,14 +54,25 @@ router.get("/checkifvotedalready/:_id", async (req, res) => {
 //voter will be assigned ballot as per, ballot names will be shown to him
 //he selects one,the whole object of that ballot will be saved
 //now that ballotid from that object will be inserted the voter's ballot
-router.put("/assignballotuser/voterid", async (req, res) => {
+router.put("/assignballotuser/:voterid", async (req, res) => {
   const getVoter = await Voter.findOne({ _id: req.params.voterid });
+  if (getVoter == null) {
+    return res.json({ message: "cannot assign ballotid to user" });
+  }
 
-  console.log(getVoter);
+  const nadra = await Nadra.findOne({ cnic: getVoter.cnic });
+  if (nadra == null) {
+    return res.json({ message: "cannot assign ballotid to user" });
+  }
+
+  const ballot = await Ballot.findOne({ ballotname: nadra.area });
+  if (ballot == null) {
+    return res.json({ message: "cannot assign ballotid to user" });
+  }
 
   await Voter.findOneAndUpdate(
     { _id: req.params.voterid },
-    { ballotId: req.params.ballotId },
+    { ballotId: ballot._id },
     (err, result) => {
       if (!err) {
         return res
