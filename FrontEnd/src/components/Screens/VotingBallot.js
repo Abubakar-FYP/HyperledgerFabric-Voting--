@@ -18,6 +18,7 @@ const VotingBallot = () => {
                 try {
                     const { data } = await axios.get(url + "/getcandidatebyballotid" + "/" + user?.doc?.ballotId)
                     console.log("users ballots=============", data.message)
+                    console.log("user ballot id=============>",user?.doc?.ballotId)
                     setBallots(data.message)
                 } catch (error) {
                     toast.error(error.message)
