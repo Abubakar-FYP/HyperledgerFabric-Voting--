@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import axios from "axios"
 import { url } from "../../constants"
+import {toast} from "react-toastify"
 const VotingBallot = () => {
     const [user, setUser] = useState(null)
-    const [ballots, setBallots] = useState([])
+    const [ballots, setBallots] = useState(null)
     useEffect(() => {
         const userData = JSON.parse(localStorage.getItem("userData"))
 
@@ -14,9 +15,14 @@ const VotingBallot = () => {
     useEffect(() => {
         if (user?.doc?.ballotId) {
             (async () => {
-                const { data } = await axios.get(url + "/getcandidatebyballotid" + "/" + user?.doc?.ballotId)
-                console.log("users ballots=============", data.message)
-                setBallots(data.message)
+                try {
+                    const { data } = await axios.get(url + "/getcandidatebyballotid" + "/" + user?.doc?.ballotId)
+                    console.log("users ballots=============", data.message)
+                    setBallots(data.message)
+                } catch (error) {
+                    toast.error(error.message)
+                }
+           
             })();
         }
 
@@ -70,11 +76,11 @@ const VotingBallot = () => {
                         </div>
                     </div>
                 </div>
-                {/* <div className="col-md-6">
+                <div className="col-md-6">
                     <div className="card">
                         <div className="card-body">
                             <div className="">
-                                {ballots && ballots?.length && ballots?.map(ballot => (
+                                {typeof ballots === "object" && ballots?.length && ballots?.map(ballot => (
                                     <div>
                                         <div className="mt-4">
                                             <strong>Candidate Name :  </strong>
@@ -86,6 +92,7 @@ const VotingBallot = () => {
                                         </div>
                                         <div className="mt-4">
                                             <button 
+                                            disabled={user?.doc?.voteflag}
                                             onClick={() => castAVote(ballot._id)}
                                             className="btn btn-success">Vote</button>
                                         </div>
@@ -95,7 +102,7 @@ const VotingBallot = () => {
                             </div>
                         </div>
                     </div>
-                </div> */}
+                </div>
             </div>
         </div>
     )

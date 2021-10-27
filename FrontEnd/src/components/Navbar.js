@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; //So we will be using the link instead of anchor tag in order to stop the refreshing of the pages
 import { useHistory } from "react-router-dom"
+import axios from "axios"
+import {url} from "../constants"
 const NavBar = () => {
   const [user, setUser] = useState(null)
+  const [election, setElection] = useState(null)
+  useEffect(() => {
+    (async () => {
+      const {data} = await axios.get(url + "/get/first/election")
+      console.log("dataaaaaaaaa==========", data)
+      setElection(data)
+    })();
+  }, [])
   const history = useHistory()
   useEffect(() => {
     const userFromLS = JSON.parse(localStorage.getItem("userData"))
@@ -32,7 +42,7 @@ const NavBar = () => {
 
         <li><Link to="/partiesstatus" style={{ listStyle: "none", textDecoration: "none" }}
           className="text-light">Parties Status</Link></li>
-        {user && user?.doc.role === "admin" ? (
+        {user && user?.doc?.role === "admin" ? (
           <>
             <li><Link className="text-light" to="/partyregisteration" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Party Registeration</Link></li>
             <li><Link className="text-light" to="/electioncreation" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Election Creation</Link></li>
@@ -40,7 +50,9 @@ const NavBar = () => {
             <li><Link className="text-light" to="/admindashboard" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Admin Dashboard</Link></li>
           </>
         ) : null}
-
+{user && user?.doc?.role !== "admin" && election && Date.now() >new Date(election?.endTime) ? (
+     <li><Link className="text-light" to="/admindashboard" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Admin Dashboard</Link></li>
+) : null}
         {!user  ? (
           <li><Link className="text-light" to="/signup" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Voter Registeration</Link></li>
         ) : null}

@@ -78,7 +78,7 @@ const ElectionCreation = () => {
                         <div className="card-body">
                             <div className="row">
                                 {elections?.map(el =>  
-                                new Date(Number(el.startTime)) > Date.now() && 
+                                new Date(Number(el.startTime)) < Date.now() && 
                                 new Date(Number(el.endTime)) > Date.now() ? (
                                     <div className="card bg-success text-light col-md-4">
                                         <div className="card-header">

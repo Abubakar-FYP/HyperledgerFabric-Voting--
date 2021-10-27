@@ -41,11 +41,13 @@ const PartiesStatus = () => {
         }
     }
     useEffect(() => {
-        const userData =JSON.parse( localStorage.getItem("useruserData"))
+        const userData =JSON.parse( localStorage.getItem("userData"))
         if(userData){
             setUser(userData)
         }
     }, [])
+    console.log("pending parties",pendingParties)
+    console.log("User============",user)
     return (
         <div className="container">
             {user && user?.doc?.role === "admin" ? (

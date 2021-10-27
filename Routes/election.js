@@ -60,6 +60,17 @@ router.get("/get/election" , async (req,res) => {
     }
 })
 
-
+router.get("/get/first/election", async (req,res)=> {
+    try {
+        const election = await Election.find().select("-candidates -parties").limit(1)
+        if(!election) {
+            return res.status(400).send("There are not elections present")
+        }
+        res.send(election)
+    } catch (error) {
+        res.status(500).send(error.message)
+        
+    }
+})
 
 module.exports = router;
