@@ -47,59 +47,49 @@ router.post("/signinadmin", requireLogin, (req, res) => {
 
 router.post("/signup", async (req, res, next) => {
   // console.log("signup api=============", req.body)
-  const { cnic, password } = req.body;
+  const { email, cnic, password } = req.body;
 
-  if (!cnic || !password) {
+  if (!email || !cnic || !password) {
     return res
       .status(422)
       .send({ message: "one or more of the fields are empty" });
   }
 
   const resp = await Nadra.findOne({ cnic: cnic });
-  if (!resp) return res.status(400).json({ message: "User does not exist" });
 
-  if (resp?.nationality !== "Pakistan") {
-    return res.status(400).json({ message: "user is not a pakistani citizen" });
+  if (!resp || resp.cnic !== cnic || resp.email !== email) {
+    res.status(400).json({ message: `User does not exist` });
+    return;
   }
 
-  await Voter.findOne({ cnic }).then((found) => {
-    if (found) {
-      return res.status(400).send({ message: "voter already registered" });
-    }
-  });
+  if (resp?.nationality !== "Pakistan") {
+    res.status(400).json({ message: "user is not a pakistani citizen" });
+    return;
+  }
+
+  const voter = await Voter.findOne({ cnic: cnic });
+  /* console.log("voterCnic=====>", voter); */
+  if (voter) {
+    res.status(400).send({ message: "voter already registered" });
+    return;
+  }
 
   const ballot = await Ballot.findOne({ ballotname: resp.area });
   if (ballot == null) {
     return res.json({ message: "cannot assign ballotid to user" });
   }
-
   let gender = cnic.toString().charAt(cnic.length - 1);
 
   const newVoter = new Voter({
     cnic: cnic,
     password: password,
     ballotId: ballot._id,
-    gender: gender % 2 === 0 ? "F" : "M",
+    email: email,
   });
 
   await newVoter.save();
-  /*  const genOtp = otp.otpSender(phoneNumber); //middleware,for sending otp, and saves the otp in variable
-  console.log(genOtp);
-
-  if (typeof genOtp == "string") {
-    res.json({ message: genOtp.toString() });
-  }
- */
   res.send(newVoter);
 });
-/* 
-router.post("/signupotp", async (req, res, next) => {
-  const genOtp = localStorage.getItem("myOtp"); //we get our otp from previous route
-
-  if (req.body.otp != genOtp) {
-    return res.status(404).json({ message: "the otp does not match" });
-  }
-}); */
 
 router.post("/signin", async (req, res) => {
   const { cnic, password } = req.body;
@@ -107,16 +97,16 @@ router.post("/signin", async (req, res) => {
   if (!cnic || !password) {
     return res.status(400).json({ message: "field is empty" });
   }
-  const doc = await Voter.findOne({ cnic: cnic, password: password })
-    .select("-password")
-  if(!doc) return res.status(400).send("You Are Not A Registered Voter")
+  const doc = await Voter.findOne({ cnic: cnic, password: password }).select(
+    "-password"
+  );
+  if (!doc) return res.status(400).send("You Are Not A Registered Voter");
 
-  const user = await Nadra.findOne({ cnic: cnic })
+  const user = await Nadra.findOne({ cnic: cnic });
 
   console.log("Result=========", user);
-    const token = jwt.sign({ _id: doc._id }, JWTKEY);
-    res.send({ token, doc, user });
-  
+  const token = jwt.sign({ _id: doc._id }, JWTKEY);
+  res.send({ token, doc, user });
 });
 /* 
 router.post("/signinotp", async (req, res) => {
