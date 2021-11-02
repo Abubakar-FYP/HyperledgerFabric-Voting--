@@ -7,6 +7,10 @@ const candidateSchema = new mongoose.Schema({
     default: 0000,
   },
 
+  name: {
+    type: String,
+  },
+
   position: {
     type: String,
     default: "",

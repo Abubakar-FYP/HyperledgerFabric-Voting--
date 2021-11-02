@@ -118,25 +118,11 @@ router.get("/getfemalevoters", async (req, res) => {
 //gets all candidates by ballot their ballot id
 //returns the list of candidates
 router.get("/getcandidatebyballotid/:ballotid", async (req, res) => {
-  await Candidate.find({
+  const candidate = await Candidate.find({
     ballotId: req.params.ballotid,
-  })
-    .populate({
-      path: "ballotId",
-    })
-    .exec((err, doc) => {
-      if (!err) {
-        if (doc.length == 0)
-          return res.json({
-            message: "candidates does not exist with this ballot id",
-          });
-        else {
-          return res.json({ message: doc });
-        }
-      } else {
-        console.log(err);
-      }
-    });
+  });
+  console.log(candidate);
+  res.json({ message: candidate });
 });
 
 module.exports = router;

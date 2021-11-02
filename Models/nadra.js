@@ -10,7 +10,7 @@ const NadraSchema = new mongoose.Schema({
   },
 
   cnic: {
-    type: Number,
+    type: String,
   },
 
   phoneNumber: {
