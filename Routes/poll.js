@@ -25,13 +25,21 @@ Poll : consist of polls in which vote are saved
  */
 
 router.post("/createpoll", async (req, res) => {
-  const { pollId, pollname, type, description, candidate } = req.body;
+  const { pollname, type, startTime, endTime, description, candidate } =
+    req.body;
 
-  if (!pollId || !pollname || !type || !description || !candidate) {
+  if (
+    !pollname ||
+    !type ||
+    !startTime ||
+    !endTime ||
+    !description ||
+    !candidate
+  ) {
     return res.json({ message: "one or more fields are empty" });
   }
 
-  await Polls.findOne({ pollId: pollId }).exec((err, doc) => {
+  await Polls.findOne({ pollname: pollname }).exec((err, doc) => {
     if (!err) {
       res.json({ message: doc });
     } else {
@@ -39,31 +47,22 @@ router.post("/createpoll", async (req, res) => {
     }
   });
 
-  const startTime = new Date();
-  const endTime = new Date();
-
-  endTime.setHours(startTime.getHours() + 1);
-
-  const obje = {};
-  obje.id = null;
-  const list = new Array();
   console.log(candidate);
+  const list = new Array();
   obje.id = candidate;
 
   const newPol = {
-    pollId: pollId,
     pollname: pollname,
     type: type,
     description: description,
     endTime: endTime,
     startTime: startTime,
+    candidate: candidate,
   };
 
   newPol.candidate = obje;
 
-  console.log(newPol.candidate);
-
-  const newPoll = new Polls(newPol);
+  console.log(newPol);
 });
 
 //gets voterId(candidate's) objectId
@@ -105,6 +104,7 @@ router.get("/getvalidpolls", async (req, res) => {
     res.json(polls);
   }
 });
+
 router.get("/getinvalidpolls", async (req, res) => {
   const polls = await Polls.find({ valid: false });
   if (polls === null || polls.length === 0) {
@@ -113,6 +113,7 @@ router.get("/getinvalidpolls", async (req, res) => {
     res.json(polls);
   }
 });
+
 router.get("/getallpolls", async (req, res) => {
   const polls = await Polls.find({});
   if (polls === null || polls.length === 0) {
@@ -204,5 +205,7 @@ router.put("/stoppoll", async (req, res) => {
   //compare and if same or exceeded
   //change its validity
 });
+
+router.post("/votepoll", async (req, res) => {});
 
 module.exports = router;
