@@ -2,14 +2,18 @@ import React, { useState, useEffect } from 'react'
 import axios from "axios"
 import { url } from "../../constants"
 import {toast} from "react-toastify"
+import {useHistory} from "react-router-dom"
 const VotingBallot = () => {
+    const history = useHistory()
     const [user, setUser] = useState(null)
     const [ballots, setBallots] = useState(null)
     useEffect(() => {
         const userData = JSON.parse(localStorage.getItem("userData"))
-
+console.log("user data=========", userData)
         if (userData) {
             setUser(userData)
+        }else{
+            history.push("/")
         }
     }, [])
     useEffect(() => {
@@ -20,6 +24,7 @@ const VotingBallot = () => {
                     console.log("users ballots=============", data.message)
                     console.log("user ballot id=============>",user?.doc?.ballotId)
                     setBallots(data.message)
+    
                 } catch (error) {
                     toast.error(error.message)
                 }
@@ -35,6 +40,9 @@ const VotingBallot = () => {
         console.log("clicked=", url + `/vote/${user?.doc?._id}/${id}`)
         const {data} = await axios.post(url + `/vote/${user?.doc?._id}/${id}`)
         console.log("casting vote response ==============", data)   
+        setUser(data.user)
+        const userData = JSON.parse(localStorage.getItem("userData"))
+        localStorage.setItem("userData", JSON.stringify({...userData, ...data.user}))
         } catch (error) {
             console.log("errror===========", error.message)
         }
