@@ -10,7 +10,8 @@ const Party = mongoose.model("Party");
 //gets all the parties that are unapproved
 //populate when ready
 router.get("/getpendingparties", async (req, res) => {
-  Party.find({ is_valid: false }).select("partyName _id")
+  Party.find({ is_valid: false })
+    .populate("candidate")
     .then((resp) => {
       res.status(200).json({ message: resp });
     })
@@ -22,7 +23,8 @@ router.get("/getpendingparties", async (req, res) => {
 //dont need to populate because ot required
 //gets all the parties that are approved
 router.get("/getapprovedparties", async (req, res) => {
-  await Party.find({ is_valid: true }).select("partyName _id")
+  await Party.find({ is_valid: true })
+    .select("partyName _id")
     .then((resp) => {
       res.status(200).json({ message: resp });
     })

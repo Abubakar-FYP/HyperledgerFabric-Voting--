@@ -25,45 +25,54 @@ Poll : consist of polls in which vote are saved
  */
 
 router.post("/createpoll", async (req, res) => {
-  const { pollId, pollname, type, description, candidate } = req.body;
+  const { pollname, type, description, startTime, endTime, candidate } =
+    req.body;
 
-  if (!pollId || !pollname || !type || !description || !candidate) {
+  if (
+    !pollname ||
+    !type ||
+    !startTime ||
+    !endTime ||
+    !description ||
+    !candidate
+  ) {
     return res.json({ message: "one or more fields are empty" });
   }
 
-  await Polls.findOne({ pollId: pollId }).exec((err, doc) => {
-    if (!err) {
-      res.json({ message: doc });
-    } else {
-      console.log(err);
+  const found = await Polls.findOne({ pollname: pollname });
+  if (found) {
+    if (found.pollname === pollname) {
+      return res
+        .status(400)
+        .json({ message: "poll already present with this name" });
     }
+  }
+
+  candidate.map((key, value) => {
+    console.log("key==>", key, " ", "value==>", value);
   });
 
-  const startTime = new Date();
-  const endTime = new Date();
-
-  endTime.setHours(startTime.getHours() + 1);
-
-  const obje = {};
-  obje.id = null;
-  const list = new Array();
-  console.log(candidate);
-  obje.id = candidate;
-
-  const newPol = {
-    pollId: pollId,
+  const newPol = new Polls({
     pollname: pollname,
     type: type,
     description: description,
     endTime: endTime,
     startTime: startTime,
-  };
+    candidate: candidate,
+  });
 
-  newPol.candidate = obje;
+  if (newPol.startTime == new Date() || newPol.startTime > new Date()) {
+    newPol.valid = true;
+  }
 
-  console.log(newPol.candidate);
-
-  const newPoll = new Polls(newPol);
+  newPol
+    .save()
+    .then(() => {
+      return res.json({ message: "poll saved successfully" });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
 //gets voterId(candidate's) objectId
@@ -105,6 +114,7 @@ router.get("/getvalidpolls", async (req, res) => {
     res.json(polls);
   }
 });
+
 router.get("/getinvalidpolls", async (req, res) => {
   const polls = await Polls.find({ valid: false });
   if (polls === null || polls.length === 0) {
@@ -113,6 +123,7 @@ router.get("/getinvalidpolls", async (req, res) => {
     res.json(polls);
   }
 });
+
 router.get("/getallpolls", async (req, res) => {
   const polls = await Polls.find({});
   if (polls === null || polls.length === 0) {
@@ -204,5 +215,15 @@ router.put("/stoppoll", async (req, res) => {
   //compare and if same or exceeded
   //change its validity
 });
+
+router.put("/startpoll", async (req, res) => {
+  const polls = await Polls.find({});
+  if (!polls) {
+    return res.json({ message: "There are no polls" });
+  }
+  res.json(polls);
+});
+
+router.post("/votepoll", async (req, res) => {});
 
 module.exports = router;

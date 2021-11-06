@@ -2,10 +2,6 @@ const { Schema } = require("mongoose"); //Admin editable only
 const mongoose = require("mongoose");
 
 const pollsSchema = new mongoose.Schema({
-  pollId: {
-    type: Number,
-  },
-
   pollname: {
     type: String,
   },
@@ -16,7 +12,7 @@ const pollsSchema = new mongoose.Schema({
 
   valid: {
     type: Boolean,
-    default: true,
+    default: false,
   },
 
   description: {
@@ -25,22 +21,23 @@ const pollsSchema = new mongoose.Schema({
 
   startTime: {
     type: Date,
-    default: new Date(Date.now().toString()),
-  }, //default
+  },
 
   endTime: {
     type: Date,
-  }, //enter this runtime
+  },
 
-  candidate: [
+  candidates: [
     {
-      id: {
-        type: mongoose.Types.ObjectId,
-        ref: "Candidate",
-      },
-      voteCount: {
-        type: Number,
-        defaut: 0,
+      candidate: {
+        id: {
+          type: mongoose.Types.ObjectId,
+          ref: "Candidate",
+        },
+        voteCount: {
+          type: Number,
+          defaut: 0,
+        },
       },
     },
   ],
