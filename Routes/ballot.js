@@ -10,17 +10,15 @@ const response = require("debug")("app:response");
 //Register Models
 require("../Models/ballot");
 require("../Models/party");
-require("../Models/vote");
 //Models
 const Ballot = mongoose.model("Ballot");
 const Party = mongoose.model("Party");
-const Vote = mongoose.model("Vote");
 const Campaign = mongoose.model("Campaign");
 
 router.post("/createballot", async (req, res) => {
-  const { ballotid, ballotname } = req.body; //send objectId of AreaId
+  const { _id, ballotid, ballotname, type, campaignId } = req.body; //send objectId of AreaId
 
-  if (!ballotid || !ballotname) {
+  if (!ballotid || !ballotname || !type || !campaignId) {
     return res.status(400).json({ message: "one or more fields are empty" });
   }
 
@@ -31,9 +29,15 @@ router.post("/createballot", async (req, res) => {
   });
 
   const newBallot = new Ballot({
+    _id,
     ballotid,
     ballotname,
+    type,
+    campaignId,
   });
+
+  newBallot.campaignId = mongoose.Types.ObjectId(newBallot.campaignId);
+  newBallot._id = mongoose.Types.ObjectId(newBallot._id);
 
   newBallot
     .save()
@@ -43,6 +47,18 @@ router.post("/createballot", async (req, res) => {
     .catch((err) => {
       return res.status(400).json({ message: err });
     });
+});
+
+router.put("/update_id", async (req, res) => {
+  const { _id, up_id } = req.body;
+
+  await Ballot.find({ _id: _id });
+});
+
+router.put("/updatecampaignidofballot", async (req, res) => {
+  const { _id, campaignId } = req.body;
+
+  await Ballot.findByIdAndUpdate({ _id: _id }, { campaignId: campaignId });
 });
 
 //use this on every insertion of ballot,
@@ -255,11 +271,14 @@ router.get("/getallballotwinner", async (req, res) => {
     .lean()
     .exec(async (err, docs) => {
       if (!err) {
-        docs.map(doc => (
-          doc.candidate = doc.candidate.sort((a, b) => b?.voteCount - a?.voteCount)
-        ))
+        docs.map(
+          (doc) =>
+            (doc.candidate = doc.candidate.sort(
+              (a, b) => b?.voteCount - a?.voteCount
+            ))
+        );
         // console.log("saperate docs=======", docs[i])
-        console.log("docs ==============", docs)
+        console.log("docs ==============", docs);
         res.json(docs);
       } else {
         console.log(err);
@@ -358,22 +377,22 @@ router.get("/getallcampaignwinner", async (req, res) => {
         // console.log("docs=====================", doc.ballotId[1].candidate)
         doc.ballotId.map(
           (ballot) =>
-          // console.log("ballot=================", ballot.candidate)
-          (ballot.candidate = ballot.candidate.sort(
-            (a, b) => b?.voteCount - a?.voteCount
-            // console.log("candidate===========", cand)
-          ))
+            // console.log("ballot=================", ballot.candidate)
+            (ballot.candidate = ballot.candidate.sort(
+              (a, b) => b?.voteCount - a?.voteCount
+              // console.log("candidate===========", cand)
+            ))
         )
       );
-      const allWinnerCandidatesFromABallot = docs.map(compaign => (
-        compaign.ballotId.map(ballot => ballot.candidate)
-      ))
+      const allWinnerCandidatesFromABallot = docs.map((compaign) =>
+        compaign.ballotId.map((ballot) => ballot.candidate)
+      );
 
       // get same parties from each compaign
-      // const data = 
+      // const data =
 
       // get all the winners
-      console.log("winners", allWinnerCandidatesFromABallot)
+      console.log("winners", allWinnerCandidatesFromABallot);
       res.send({
         candidates: allWinnerCandidatesFromABallot,
         // winners: firsWinningCandidates,
@@ -400,81 +419,80 @@ router.get("/getoverallpartywinner", async (req, res) => {
       docs.sort((a, b) => b?.voteCount - a?.voteCount);
       res.json({
         voteCount: docs[0].voteCount,
-        partyName: docs[0].partyName
+        partyName: docs[0].partyName,
       });
     });
 });
 
 router.get("/getallpartyvotes", async (req, res) => {
   await Party.find({})
-  .lean()
-  .populate({
-    path: "ballotId",
-    select: "ballotname",
-    populate: {
-      path: "candidate",
+    .lean()
+    .populate({
+      path: "ballotId",
+      select: "ballotname",
       populate: {
-        path: "partyId",
-        select: "partyName",
+        path: "candidate",
+        populate: {
+          path: "partyId",
+          select: "partyName",
+        },
       },
-    },
-  })
-  .exec((err, docs) => {
-    docs.sort((a, b) => b?.voteCount - a?.voteCount);
-    docs = docs.map(party => {
-      return {
-        voteCount: party.voteCount,
-        partyName: party.partyName
-      }
     })
-    console.log("docssss===========", docs)
-    res.send({
-      docs
+    .exec((err, docs) => {
+      docs.sort((a, b) => b?.voteCount - a?.voteCount);
+      docs = docs.map((party) => {
+        return {
+          voteCount: party.voteCount,
+          partyName: party.partyName,
+        };
+      });
+      console.log("docssss===========", docs);
+      res.send({
+        docs,
+      });
     });
-  })
-})
+});
 
-
-  router.get("/electionresultdata", async (req, res) => {
-    await Campaign.find({})
+router.get("/electionresultdata", async (req, res) => {
+  await Campaign.find({})
     // .select("campaignName voteCounts")
     .exec((err, docs) => {
-      let result = docs.map(cam => {
-        return{
+      let result = docs.map((cam) => {
+        return {
           campaignName: cam.campaignName,
-          voteCounts: cam.voteCounts    
-        }
-        })
+          voteCounts: cam.voteCounts,
+        };
+      });
       // docs.sort((a,b) => b?.voteCount - a?.voteCount);
-//       filteredResult = docs[docs.length - 1];
-//       result.partyName = filteredResult.partyName;
-//       result.voteCount = filteredResult.voteCount;
-//       result.ballotId = new Array();
-//       result.candidateName = new Array();
+      //       filteredResult = docs[docs.length - 1];
+      //       result.partyName = filteredResult.partyName;
+      //       result.voteCount = filteredResult.voteCount;
+      //       result.ballotId = new Array();
+      //       result.candidateName = new Array();
 
-//       for (const candidate of filteredResult.candidate) {
-//         /*  console.log("Candidate===================>", candidate);
-//         console.log(
-//           "BallotId===================>",
-//           candidate.ballotId.ballotid
-//         ); */
-//         result.candidateName.push(candidate.name);
-//         //name is coming up empty
-//         result.ballotId.push(candidate.ballotId.ballotid);
-//       }
-//       /* 
-//       console.log(
-//         //candidate[0].name is returning undefined
-//         "CandidateName===================>",
-//         filteredResult.candidate[0].name
-//       );
-//  */
+      //       for (const candidate of filteredResult.candidate) {
+      //         /*  console.log("Candidate===================>", candidate);
+      //         console.log(
+      //           "BallotId===================>",
+      //           candidate.ballotId.ballotid
+      //         ); */
+      //         result.candidateName.push(candidate.name);
+      //         //name is coming up empty
+      //         result.ballotId.push(candidate.ballotId.ballotid);
+      //       }
+      //       /*
+      //       console.log(
+      //         //candidate[0].name is returning undefined
+      //         "CandidateName===================>",
+      //         filteredResult.candidate[0].name
+      //       );
+      //  */
 
-//       console.log("Result======================>", result);
+      //       console.log("Result======================>", result);
       res.json({ result });
     });
-  })
- 
-    //overall winner (party) //hold
+});
+
+//overall winner (party) //hold
 
 module.exports = router;

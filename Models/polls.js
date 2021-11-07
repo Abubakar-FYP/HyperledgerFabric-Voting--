@@ -12,7 +12,7 @@ const pollsSchema = new mongoose.Schema({
 
   valid: {
     type: Boolean,
-    default: false,
+    default: true,
   },
 
   description: {
@@ -27,15 +27,17 @@ const pollsSchema = new mongoose.Schema({
     type: Date,
   },
 
-  candidate: [
+  candidates: [
     {
-      id: {
-        type: mongoose.Types.ObjectId,
-        ref: "Candidate",
-      },
-      voteCount: {
-        type: Number,
-        defaut: 0,
+      candidate: {
+        id: {
+          type: mongoose.Types.ObjectId,
+          ref: "Candidate",
+        },
+        voteCount: {
+          type: Number,
+          defaut: 0,
+        },
       },
     },
   ],
