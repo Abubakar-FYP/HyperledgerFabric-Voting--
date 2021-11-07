@@ -91,6 +91,23 @@ router.post("/signup", async (req, res, next) => {
   res.send(newVoter);
 });
 
+router.get("/profile", async (req, res) => {
+  const { cnic, password } = req.body;
+
+  if (!cnic || !password) {
+    return res.status(400).json({ message: "field is empty" });
+  }
+  const doc = await Voter.findOne({ cnic: cnic, password: password }).select(
+    "-password"
+  );
+  if (!doc) return res.status(400).send("You Are Not A Registered Voter");
+
+  const user = await Nadra.findOne({ cnic: cnic });
+
+  console.log("Result=========", user);
+  res.send({ doc, user });
+});
+
 router.post("/signin", async (req, res) => {
   const { cnic, password } = req.body;
 
