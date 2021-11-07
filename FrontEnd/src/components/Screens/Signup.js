@@ -10,6 +10,7 @@ const Signup =()=>{
 
     const [password ,setPassword ] = useState ("")
     const [CNIC ,setCNIC ] = useState ("")
+    const [email ,setEmail ] = useState ("")
     const history = useHistory()
     useEffect(() => {
         const user = localStorage.getItem("userData")
@@ -18,12 +19,12 @@ const Signup =()=>{
         }
     }, [])
     const handleSignup = async()=>{
-        if(!password, !CNIC){
-            alert("enter password and cnic")
+        if(!password || !CNIC || !email){
+            alert("Please fill all fields")
             return
         }
         try {
-            const res = await axios.post(url + "/signup"  , {password: password , cnic: CNIC})
+            const res = await axios.post(url + "/signup"  , {password: password , cnic: CNIC, email: email})
             console.log("signup user", res.data)
             if(res){
                 toast.success("You Have Successfully Signup")
@@ -46,6 +47,10 @@ const Signup =()=>{
             <input type="number" id="cnic" name="cnic" placeholder="CNIC" 
             value={CNIC}
             onChange={(e)=>setCNIC(e.target.value)}
+           />
+           <input type="text" id="email" name="email" placeholder="Email" 
+            value={email}
+            onChange={(e)=>setEmail(e.target.value)}
            />
             <input type="password" id="cnic" name="cnic" placeholder="Password" 
             value={password}
