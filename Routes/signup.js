@@ -57,7 +57,7 @@ router.post("/signup", async (req, res, next) => {
 
   const resp = await Nadra.findOne({ cnic: cnic });
 
-  if (!resp || resp.cnic !== cnic || resp.email !== email) {
+  if (!resp || resp.cnic !== cnic) {
     res.status(400).json({ message: `User does not exist` });
     return;
   }
@@ -67,9 +67,10 @@ router.post("/signup", async (req, res, next) => {
     return;
   }
 
-  const voter = await Voter.findOne({ cnic: cnic });
+  const voter1 = await Voter.findOne({ cnic: cnic });
+  const voter2 = await Voter.findOne({ email: email });
   /* console.log("voterCnic=====>", voter); */
-  if (voter) {
+  if (voter1 || voter2 || voter2?.email == email || voter1?.cnic == cnic) {
     res.status(400).send({ message: "voter already registered" });
     return;
   }
@@ -78,7 +79,6 @@ router.post("/signup", async (req, res, next) => {
   if (ballot == null) {
     return res.json({ message: "cannot assign ballotid to user" });
   }
-  let gender = cnic.toString().charAt(cnic.length - 1);
 
   const newVoter = new Voter({
     cnic: cnic,
