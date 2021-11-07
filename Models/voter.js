@@ -1,6 +1,10 @@
 const mongoose = require("mongoose"); //mongoose imported
 
 const voterSchema = new mongoose.Schema({
+  email: {
+    type: String,
+  },
+
   cnic: {
     type: Number,
   },

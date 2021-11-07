@@ -5,20 +5,16 @@ const pollsSchema = new mongoose.Schema({
   pollname: {
     type: String,
   },
-
   type: {
     type: String,
   },
-
   valid: {
     type: Boolean,
     default: true,
   },
-
   description: {
     type: String,
   },
-
   startTime: {
     type: Date,
   },

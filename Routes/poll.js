@@ -18,14 +18,33 @@ Polls : consist of polls created
 Poll : consist of polls in which vote are saved
 
 /createpoll , in Routes/polls.js , creates a poll runtime
-/getpollforcandidates/:voterId in Routes/polls.js , gets poll for registered and approved party candidates 
+
 /getvalidpolls , in Routes/polls.js , gets all valid polls, meaning that are in progress
 /getinvalidpolls,in Routes/polls.js , gets all invalid polls meaning that thev'e finished
 /getallpolls ,in Routes/polls.js , gets all poll
- */
+
+/startpoll , in Routes/polls.js, starts all the polls whose time has come
+/stoppoll , in Routes/polls.js, stops all the polls whose time has come
+
+
+//current work!!!!!!!!
+
+//create poll //good to go
+//voter vote in poll
+
+
+//show the previous election's result(check if already done),
+
+/getvalidpollforcandidates/:voterId in Routes/polls.js ,
+gets poll that are valid(whose time has started)
+for all(needs updation) 
+
+//show(current,previous) poll to all,
+//poll results all(invalid,result)(sorted)
+*/
 
 router.post("/createpoll", async (req, res) => {
-  const { pollname, type, description, startTime, endTime, candidate } =
+  const { pollname, type, description, startTime, endTime, candidates } =
     req.body;
 
   if (
@@ -34,7 +53,7 @@ router.post("/createpoll", async (req, res) => {
     !startTime ||
     !endTime ||
     !description ||
-    !candidate
+    !candidates
   ) {
     return res.json({ message: "one or more fields are empty" });
   }
@@ -48,22 +67,20 @@ router.post("/createpoll", async (req, res) => {
     }
   }
 
-  candidate.map((key, value) => {
-    console.log("key==>", key, " ", "value==>", value);
-  });
-
   const newPol = new Polls({
     pollname: pollname,
     type: type,
     description: description,
     endTime: endTime,
     startTime: startTime,
-    candidate: candidate,
+    candidates: candidates,
   });
 
   if (newPol.startTime == new Date() || newPol.startTime > new Date()) {
     newPol.valid = true;
   }
+
+  res.json(newPol);
 
   newPol
     .save()
@@ -115,6 +132,7 @@ router.get("/getvalidpolls", async (req, res) => {
   }
 });
 
+//invalid marks as previous or not started
 router.get("/getinvalidpolls", async (req, res) => {
   const polls = await Polls.find({ valid: false });
   if (polls === null || polls.length === 0) {
@@ -123,7 +141,7 @@ router.get("/getinvalidpolls", async (req, res) => {
     res.json(polls);
   }
 });
-
+//all started,yet to start and finished polls
 router.get("/getallpolls", async (req, res) => {
   const polls = await Polls.find({});
   if (polls === null || polls.length === 0) {
@@ -224,6 +242,23 @@ router.put("/startpoll", async (req, res) => {
   res.json(polls);
 });
 
-router.post("/votepoll", async (req, res) => {});
+router.post("/votepoll/p_id/v_id/:c_id", async (req, res) => {
+  //check if any poll exists or not
+  //if they do check poll id
+  //store votes in poll model
+  //increment in polls model, candidate.votCount field
+});
+
+router.get("/testshowpolls", async (req, res) => {
+  const polls = await Polls.find({}).populate({
+    path: "candidates",
+    populate: {
+      path: "candidate.id",
+      select: "-voters -voteCount -is_criminal",
+    },
+  });
+  console.log(polls);
+  res.json(polls);
+});
 
 module.exports = router;
