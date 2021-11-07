@@ -28,14 +28,15 @@ const Candidate = mongoose.model("Candidate");
 
 //current work!!!!!!!!
 
-//create poll //good to go
-//voter vote in poll //good to go
-//poll results all(invalid,result)(sorted) //good to go
-//show the previous election's result(check if already done) //good to go
-
-//show(current,previous) poll to all, working logic
-//startpoll 
-//stoppoll
+/createpoll
+/currentpolls
+/previouspolls
+/abouttostartpolls
+/getallpolls
+/getresultofallpolls
+/votepoll/:p_id/:v_id/:c_id  , p_id(pollId),v_id(voter_id),c_id(candidate_id)
+/stoppoll
+/startpoll 
 */
 
 router.post("/createpoll", async (req, res) => {
@@ -309,24 +310,50 @@ router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
 });
 
 router.put("/stoppoll", async (req, res) => {
-  const polls = await Polls.find({});
-
-  polls.map((poll) => {
-    console.log(poll.startTime, poll.endTime);
-    console.log(poll.startTime.getHours() == poll.endTime.getHours());
+  const polls = await Polls.find({ valid: true }).catch((err) => {
+    console.log(err);
   });
 
-  //find all polls
-  //check their start and end time
-  //compare and if same or exceeded
-  //change its validity
+  if (!polls || polls === null || polls === []) {
+    return res.json({ message: "There are no polls" });
+  }
+
+  polls.map((poll) => {
+    if (poll.endTime == new Date() || new Date() > poll.endTime) {
+      poll.valid = false;
+      poll
+        .save()
+        .then((resp) => console.log(resp))
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  });
+
+  res.json(polls);
 });
 
 router.put("/startpoll", async (req, res) => {
-  const polls = await Polls.find({});
-  if (!polls) {
+  const polls = await Polls.find({ valid: false }).catch((err) => {
+    console.log(err);
+  });
+
+  if (!polls || polls === null || polls === []) {
     return res.json({ message: "There are no polls" });
   }
+
+  polls.map((poll) => {
+    if (poll.startTime == new Date() || new Date() > poll.startTime) {
+      poll.valid = true;
+      poll
+        .save()
+        .then((resp) => console.log(resp))
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  });
+
   res.json(polls);
 });
 
