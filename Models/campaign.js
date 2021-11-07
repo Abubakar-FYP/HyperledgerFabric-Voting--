@@ -14,6 +14,7 @@ const campaign = new Schema({
     {
       type: mongoose.Types.ObjectId,
       ref: "Ballot",
+      default: null,
     },
   ],
 

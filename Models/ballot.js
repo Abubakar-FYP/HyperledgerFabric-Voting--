@@ -24,6 +24,7 @@ const ballotSchema = new mongoose.Schema({
     {
       type: mongoose.Types.ObjectId,
       ref: "Candidate",
+      default: null,
     },
   ],
 });

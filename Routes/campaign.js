@@ -11,10 +11,10 @@ const Campaign = mongoose.model("Campaign");
 const Ballot = mongoose.model("Ballot");
 
 router.post("/createcampaign", async (req, res) => {
-  const { campaignId, campaignName, ballot } = req.body;
+  const { campaignId, campaignName, ballotId } = req.body;
 
-  if (!campaignId || !campaignName || !ballot) {
-    return res.status(403).json({ error: "one or more fields are empty" });
+  if (!campaignId || !campaignName || !ballotId) {
+    return res.json({ error: "one or more fields are empty" });
   }
 
   await Campaign.findOne({ campaignId })
@@ -30,7 +30,7 @@ router.post("/createcampaign", async (req, res) => {
   const newCampaign = new Campaign({
     campaignId,
     campaignName,
-    ballot,
+    ballotId,
   });
 
   newCampaign
@@ -42,10 +42,33 @@ router.post("/createcampaign", async (req, res) => {
     })
     .catch((err) => {
       if (err) {
+        console.log(err);
         return res
           .status(403)
           .json({ error: "there seems to be an error saving the campaign" });
       }
+    });
+});
+
+//helper function
+router.put("/ballotidinsertintocampaign", async (req, res) => {
+  const { campaignId, ballotId } = req.body;
+  if (!campaignId || !ballotId) {
+    return res.json({ message: "one or more fields are empty" });
+  }
+
+  const ballotIds = ballotId.map((id) => {
+    return new Ballot({})._id;
+  });
+
+  const campaign = await Campaign.findOne({ _id: campaignId });
+
+  campaign.ballotId = ballotIds;
+  campaign
+    .save()
+    .then(() => res.json({ message: "successful" }))
+    .catch((err) => {
+      console.log(err);
     });
 });
 
