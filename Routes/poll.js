@@ -6,7 +6,6 @@ const { compareSync } = require("bcryptjs");
 
 require("../Models/candidate");
 require("../Models/nadra");
-require("../Models/poll");
 require("../Models/polls");
 require("../Models/voter");
 

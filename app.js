@@ -6,7 +6,7 @@ require("dotenv").config();
 const requirelogin = require("./Middleware/requirelogin"); //middleware
 
 const app = express();
-app.use(express.json({limit: '50mb'})); //to parse outgoing json in the post req
+app.use(express.json({ limit: "50mb" })); //to parse outgoing json in the post req
 
 const cors = require("cors");
 
@@ -24,11 +24,9 @@ app.use(express.urlencoded({ extended: true })); //parse html forms, like post m
 //Models registering
 require("./Models/admin");
 require("./Models/voter");
-require("./Models/vote");
 require("./Models/campaign");
 require("./Models/ballot");
 require("./Models/party");
-require("./Models/poll");
 require("./Models/polls");
 require("./Models/candidate");
 require("./Models/nadra");
@@ -86,17 +84,17 @@ mongoose.connection.on("exit", (err) => {
 
 ///////*MongoDB connection//////////////////////
 
-const path = require("path")
-if (process.env.NODE_ENV === 'production') {
-  console.log("production mode")
-  app.use(express.static(path.resolve(process.cwd(), 'FrontEnd/build')))
-  app.get('*', (req, res) => {
-      res.sendFile(path.resolve(process.cwd(), 'FrontEnd/build/index.html'))
-  })
+const path = require("path");
+if (process.env.NODE_ENV === "production") {
+  console.log("production mode");
+  app.use(express.static(path.resolve(process.cwd(), "FrontEnd/build")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(process.cwd(), "FrontEnd/build/index.html"));
+  });
 } else {
   app.get("/", (req, res) => {
-      res.send("Api is Running")
-  })
+    res.send("Api is Running");
+  });
 }
 
 app.get("/", (req, res) => {
