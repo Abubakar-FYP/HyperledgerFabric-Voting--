@@ -108,6 +108,41 @@ router.post("/signin", async (req, res) => {
   const token = jwt.sign({ _id: doc._id }, JWTKEY);
   res.send({ token, doc, user });
 });
+
+
+router.post("/get/reset/password/token" , async(req,res) => {
+  const {email} = req.body
+  if(!email) return res.status(400).send("Email is required")
+  const voter = await Voter.findOne({email: email})
+  if(!voter) return res.status(400).send("Voter with the give email is not present")
+
+  const randomNum = Math.round(Math.random()*34567456784568987654/26543)
+  const url = "http://localhost:3000/reset/password/" + `${randomNum}`
+
+  console.log("urlllllll==========", url)
+
+  voter.resetPassToken = randomNum
+
+  await voter.save()
+
+  res.status(200).send("Check Your Email")
+
+})
+router.post("/reset/password" , async(req,res) => {
+  const {newPassword, confirmPassword , token} = req.body
+  if(!newPassword || !confirmPassword || !token) return res.status(400).send("Some Fields Are Missing")
+  if(newPassword !== confirmPassword) return res.status(400).send("Both Passwords Should be same")
+  const voter = await Voter.findOne({resetPassToken: token})
+  if(!voter) return res.status(400).send("Token is not correct or it has been expired")
+console.log(voter)
+  voter.resetPassToken = null
+  voter.password = confirmPassword
+
+  await voter.save()
+
+  res.status(200).send("Password has been updated successfully")
+
+})
 /* 
 router.post("/signinotp", async (req, res) => {
   const genOtp = localStorage.getItem("sOtp");
