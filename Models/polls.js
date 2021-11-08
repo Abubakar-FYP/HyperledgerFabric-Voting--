@@ -32,9 +32,16 @@ const pollsSchema = new mongoose.Schema({
         },
         voteCount: {
           type: Number,
-          defaut: 0,
+          default: 0,
         },
       },
+    },
+  ],
+
+  voters: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "Voters",
     },
   ],
 });

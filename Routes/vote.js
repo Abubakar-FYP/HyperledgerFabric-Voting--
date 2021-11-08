@@ -7,13 +7,11 @@ const path = require("path");
 const requireLogin = require("../Middleware/requirelogin");
 
 require("../Models/voter");
-require("../Models/vote");
 require("../Models/ballot");
 require("../Models/party");
 require("../Models/candidate");
 
 const Voter = mongoose.model("Voter");
-const Vote = mongoose.model("Vote");
 const Ballot = mongoose.model("Ballot");
 const Party = mongoose.model("Party");
 const Candidate = mongoose.model("Candidate");
