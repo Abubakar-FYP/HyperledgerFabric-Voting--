@@ -41,7 +41,9 @@ const handleSignin =async () =>{
 
     }
     } catch (error) {
-        toast.error(error.message)
+        console.log(error.status)
+        console.log(error.message)
+        toast.error(error)
     }
 
 }

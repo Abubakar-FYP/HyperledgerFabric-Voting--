@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-
+const sendEmail = require("../utils/sendEmail")
 //middleware
 const jwt = require("jsonwebtoken");
 const { JWTKEY } = require("../Keys/keys");
@@ -91,13 +91,14 @@ router.post("/signup", async (req, res, next) => {
   res.send(newVoter);
 });
 
-router.get("/profile", async (req, res) => {
-  const { cnic, password } = req.body;
+router.post("/profile", async (req, res) => {
+  console.log("req.body", req.body)
+  const { cnic } = req.body;
 
-  if (!cnic || !password) {
+  if (!cnic) {
     return res.status(400).json({ message: "field is empty" });
   }
-  const doc = await Voter.findOne({ cnic: cnic, password: password }).select(
+  const doc = await Voter.findOne({ cnic: cnic }).select(
     "-password"
   );
   if (!doc) return res.status(400).send("You Are Not A Registered Voter");
@@ -142,7 +143,25 @@ router.post("/get/reset/password/token" , async(req,res) => {
 
   await voter.save()
 
-  res.status(200).send("Check Your Email")
+  const message = `Your "Reset Password Token" has been generated. Kindly click the link below to reset it.
+  \n\n${url}\n\n
+  If you have not requested this email, you may ignore it.`;
+  try {
+  console.log("Message===============", message)
+
+    await sendEmail({
+      email: voter.email,
+      subject: "Password recovery email",
+      message,
+    });
+    res.status(200).send(`Email sent to ${user.email}`);
+  } catch (err) {
+    // voter.resetPassToken = undefined
+
+    await voter.save({ validateBeforeSave: false });
+    return new Error("internal server error");
+  }
+  // res.status(200).send("Check Your Email")
 
 })
 router.post("/reset/password" , async(req,res) => {

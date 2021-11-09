@@ -24,7 +24,7 @@ const ResetPassword = ({match}) => {
             console.log("data ============", data)
             if(data){
                 toast.success(data)
-                history.push("/")
+                history.push("/signin")
             }
         } catch (error) {
             toast.error(error)

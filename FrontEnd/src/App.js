@@ -24,7 +24,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import PartiesStatus from './components/Screens/PartiesStatus';
 import ForgotPassword from './components/Screens/ForgotPassword';
 import ResetPassword from './components/Screens/ResetPassword';
-
+import axios from "axios"
+import {url} from "./constants"
 export const UserContext = createContext()
 
 const Routing = () => {
@@ -76,6 +77,17 @@ const Routing = () => {
   )
 }
 function App() {
+  useEffect(() => {
+    (async() => {
+      const userData = JSON.parse(localStorage.getItem("userData"))
+      if(userData){
+        console.log("userData============", userData)
+        const {data} = await axios.post(url + "/profile" , {cnic: userData?.user?.cnic})
+        console.log("dataaaaa=aaaaaaaa======",data)
+        localStorage.setItem("userData" , JSON.stringify(data))
+      }
+    })()
+  }, [])
   const [state, dispatch] = useReducer(reducer, intialState)
   return (
     <UserContext.Provider value={{ state, dispatch }} >
