@@ -74,6 +74,8 @@ const router =()=>{
 
            <button className ="btn waves-effect waves-light" onClick={handleSignin}> 
            Next</button>
+           <Link to="forgotpassword" className="my-3">Forgot Password?</Link>
+
             <h5>
             Don't have an Account? <Link to = '/Signup'>Click here</Link>
             </h5>

@@ -32,6 +32,10 @@ const voterSchema = new mongoose.Schema({
     type: String,
     default: "Voter",
   },
+  resetPassToken: {
+    type: String,
+    default: null
+  }
 }); //all the data's hash will be created to login next time*
 
 global.Voter = global.Voter || mongoose.model("Voter", voterSchema);

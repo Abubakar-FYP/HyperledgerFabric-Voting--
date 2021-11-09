@@ -22,6 +22,8 @@ import Pulses from './Pulses';
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import PartiesStatus from './components/Screens/PartiesStatus';
+import ForgotPassword from './components/Screens/ForgotPassword';
+import ResetPassword from './components/Screens/ResetPassword';
 
 export const UserContext = createContext()
 
@@ -93,6 +95,8 @@ function App() {
           <Route exact path="/electioncreation" component={ElectionCreation} />
           <Route exact path="/admindashboard" component={AdminDashboard} />
           <Route exact path="/partiesstatus" component={PartiesStatus} />
+          <Route exact path="/forgotpassword" component={ForgotPassword} />
+          <Route exact path="/reset/password/:token" component={ResetPassword} />
         </Switch>
       </BrowserRouter>
     </UserContext.Provider>
