@@ -1,7 +1,7 @@
 import React,{useState, useEffect} from 'react'
 import axios from "axios"
 import { url } from "../../constants"
-import { toast } from "react-toastify"
+import {Link} from "react-router-dom"
 const PartiesStatus = () => {
     const [user, setUser] = useState(null)
     const [pendingParties, setPendingParties] = useState([])
@@ -24,22 +24,6 @@ const PartiesStatus = () => {
         callForApis()
     }, [])
 
-    const approveParty = async (id) => {
-        const { data } = await axios.put(url + "/approveparty" + "/" + id)
-        if (data.message) {
-            toast.success(data.message)
-            callForApis()
-
-        }
-    }
-    const rejectParty = async (id) => {
-        const { data } = await axios.delete(url + "/rejectparty" + "/" + id)
-        if (data.message) {
-            toast.success(data.message)
-            callForApis()
-
-        }
-    }
     useEffect(() => {
         const userData =JSON.parse( localStorage.getItem("userData"))
         if(userData){
@@ -62,16 +46,12 @@ const PartiesStatus = () => {
                                             <li key={party._id} className="list-group-item">
                                                 <div className="d-flex justify-content-between">
                                                     <h6>Party Name : {party.partyName}</h6>
-                                                    <button
-                                                        onClick={() => approveParty(party._id)}
-                                                        className="btn btn-primary">
-                                                        Approve
-                                                    </button>
-                                                    <button
-                                                        onClick={() => rejectParty(party._id)}
-                                                        className="btn btn-danger">
-                                                        Reject
-                                                    </button>
+                                                    <Link to={`/pending-parties/${party._id}`}
+                                                        // onClick={() => approveParty(party._id)}
+                                                        className="btn btn-primary text-light">
+                                                        View
+                                                    </Link>
+                                                   
                                                 </div>
                                             </li>
                                         ))}
