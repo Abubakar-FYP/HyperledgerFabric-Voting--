@@ -19,8 +19,17 @@ const Criminal = mongoose.model("Criminal");
 router.post("/createparty", async (req, res) => {
   const { partyName, partyImg, partySymbol, partyLeaderCnic, candidate } =
     req.body;
-  const criminals = await Criminal.find({});
-  const candidates = await Party.find({}).select("partyLeaderCnic");
+  const candidates = await Candidate.find({})
+    .select(
+      "-position -partyId -voters -voteCount -is_criminal -_id -__v -ballotId -name"
+    )
+    .lean();
+
+  console.log(candidates);
+
+  const cnics = candidates.map((num) => {
+    return Number(num.cnic);
+  });
 
   if (
     !partyName ||
@@ -31,9 +40,25 @@ router.post("/createparty", async (req, res) => {
   ) {
     return res.status(408).json({ message: "one or more fields are empty" });
   }
-  const party = await Party.findOne({ partyName: partyName });
-  if (party)
-    return res.status(400).send("Party with same name is Already Exists");
+  const parties = await Party.find({}).lean();
+
+  let check3 = false;
+  let check4 = false;
+  parties.map((partys) => {
+    if (partys.partyName == partyName) {
+      check3 = true;
+    } //checks wheather party name is already present
+    if (partys.partyLeaderCnic == partyLeaderCnic) {
+      check4 = true;
+    } //checks wheather party leader has already registered a party
+  });
+
+  if (check3 == true)
+    return res.json({ message: "Party with same name is Already Exists" });
+
+  if (check4 == true)
+    return res.json({ message: "Party Leader has already registered a party" });
+
   const newParty = new Party({
     partyName,
     partyImg,
@@ -41,45 +66,51 @@ router.post("/createparty", async (req, res) => {
     partyLeaderCnic,
   });
 
-  const candidateCnic = candidate.map((item) => {
-    console.log("sentList========", item);
-    return item; //returns cnic
-  });
+  const candidateList = candidate.map((item) => {
+    /*     console.log("candidate========", item);
+     */ return item;
+  }); //returns candidates object 1 by 1
 
-  const idlist = candidates.map((candidate) => {
-    console.log("idlist-=======", candidate);
-    return candidate.partyLeaderCnic;
-  });
-
-  let check = false;
-  for (let i = 0; i < candidateCnic.length; i++) {
-    for (let j = 0; j < idlist.length; j++) {
-      if (candidateCnic[i] == idlist[j]) {
-        check = true;
+  let check1 = false;
+  for (let i = 0; i < candidateList.length; i++) {
+    for (let j = 0; j < cnics.length; j++) {
+      if (candidateList[i].cnic == cnics[j]) {
+        check1 = true;
       }
     }
-  }
+  } //checks if candidate already exists in Candidate DB
 
-  if (check) {
-    return res.json({ message: "Party cannot be registered due to candidate" });
+  if (check1) {
+    return res.json({
+      message: "Party cannot be registered due to candidate already registered",
+    });
   }
 
   const candidatel = candidate.map(async (item) => {
     const newCandidate = new Candidate({
       cnic: item.cnic,
+      name: item.name,
       position: item.position,
       partyId: newParty._id,
       ballotId: item.ballotId,
+      candidate,
     });
 
-    newParty.candidate = newCandidate._id;
-
+    newCandidate.ballotId = mongoose.Types.ObjectId(newCandidate.ballotId);
+    /*      console.log(typeof newCandidate.ballotId);
+     */
+    newParty.candidate.push(newCandidate._id);
+    /*     console.log(newCandidate);
+     */
     await newCandidate.save().catch((err) => {
       return console.log(err);
     });
   });
-
-  await newParty.save();
+  /*   console.log(newParty);
+   */
+  await newParty.save().catch((err) => {
+    return console.log(err);
+  });
 
   res.status(200).json({ message: "Party has been registered" });
 });
