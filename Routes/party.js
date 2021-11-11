@@ -30,11 +30,23 @@ router.post("/createparty", async (req, res) => {
     !partySymbol ||
     !candidate
   ) {
-    return res.status(408).json({ message: "one or more fields are empty" });
+    return res.json({ message: "one or more fields are empty" });
   }
 
-  const nadra = await Nadra.findOne({ cnic: partyLeaderCnic });
-  if (!nadra || nadra == null) {
+  const nadra = await Nadra.find({}).lean();
+
+  const nadraCnics = nadra.map((citizen) => {
+    return Number(citizen.cnic);
+  }); //converts mongoose number to number
+
+  let check5 = false;
+  nadraCnics.map((cnic) => {
+    if (cnic == partyLeaderCnic) {
+      check5 = true;
+    }
+  }); //checks whether party leader exists in nadra
+
+  if (!check5 || check5 == false) {
     return res.json({ message: "party leader does not exist in nadra" });
   }
 
@@ -44,11 +56,34 @@ router.post("/createparty", async (req, res) => {
     )
     .lean();
 
-  console.log(candidates);
-
+  /*   console.log(candidates);
+   */
   const cnics = candidates.map((num) => {
     return Number(num.cnic);
+  }); //converts Mongoose number,returns candidateDB cnics as JS Number
+
+  const fieldCnic = candidate.map((cand) => {
+    console.log(cand.cnic);
+    return Number(cand.cnic);
   });
+
+  let check6 = false;
+
+  fieldCnic.map((cnic) => {
+    for (var i = 0; i < nadraCnics; i++) {
+      if (cnic != nadraCnics) {
+        console.log(cnic);
+        check6 = true;
+      }
+    }
+  }); //checks if candidates exist in nadra
+
+  if (check6 || check6 == true) {
+    return res.json({
+      message:
+        "one or more of the candidates does not exist in nadra, check their cnic",
+    });
+  }
 
   const parties = await Party.find({}).lean();
 
@@ -88,8 +123,8 @@ router.post("/createparty", async (req, res) => {
         check1 = true;
       }
     }
-  } //checks if candidate already exists in Candidate DB
-
+  } //checks if a candidate already exists in Candidate DB
+  //even if one candidate is present, The party is rejected from creation
   if (check1) {
     return res.json({
       message: "Party cannot be registered due to candidate already registered",
@@ -115,7 +150,16 @@ router.post("/createparty", async (req, res) => {
     await newCandidate.save().catch((err) => {
       return console.log(err);
     });
-  });
+
+    const ballot = await Ballot.findOne({ _id: newCandidate.ballotId }).catch(
+      (err) => {
+        console.log(err);
+      }
+    );
+    ballot.candidate.push(newCandidate._id);
+    await ballot.save();
+  }); //saving candidates in model and candidates in ballot one by one
+
   /*   console.log(newParty);
    */
   await newParty.save().catch((err) => {
