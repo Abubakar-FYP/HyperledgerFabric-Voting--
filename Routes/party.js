@@ -8,17 +8,36 @@ const requireLogin = require("../Middleware/requirelogin");
 require("../Models/party");
 require("../Models/criminal");
 require("../Models/candidate");
+require("../Models/nadra");
 
 //Models
 const Party = mongoose.model("Party");
 const Candidate = mongoose.model("Candidate");
 const Criminal = mongoose.model("Criminal");
+const Nadra = mongoose.model("Nadra");
 
 //use the findparty or getparty dapi to check if its new or not
 //returns a list of candidates,chain this api to create candidate api
 router.post("/createparty", async (req, res) => {
+  //check for party leader nadra
   const { partyName, partyImg, partySymbol, partyLeaderCnic, candidate } =
     req.body;
+
+  if (
+    !partyName ||
+    !partyImg ||
+    !partyLeaderCnic ||
+    !partySymbol ||
+    !candidate
+  ) {
+    return res.status(408).json({ message: "one or more fields are empty" });
+  }
+
+  const nadra = await Nadra.findOne({ cnic: partyLeaderCnic });
+  if (!nadra || nadra == null) {
+    return res.json({ message: "party leader does not exist in nadra" });
+  }
+
   const candidates = await Candidate.find({})
     .select(
       "-position -partyId -voters -voteCount -is_criminal -_id -__v -ballotId -name"
@@ -31,15 +50,6 @@ router.post("/createparty", async (req, res) => {
     return Number(num.cnic);
   });
 
-  if (
-    !partyName ||
-    !partyImg ||
-    !partyLeaderCnic ||
-    !partySymbol ||
-    !candidate
-  ) {
-    return res.status(408).json({ message: "one or more fields are empty" });
-  }
   const parties = await Party.find({}).lean();
 
   let check3 = false;
