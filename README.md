@@ -20,3 +20,6 @@ Email: abubakarmujahid672@gmail.com
 LinkedIn: https://www.linkedin.com/in/abubakar-m-747940103/
 
 Twitter: abubakar_672
+
+# Landing Page
+![WhatsApp Image 2021-10-27 at 4 29 56 AM](https://user-images.githubusercontent.com/61330248/141429881-a0b98c29-d877-4957-b7a4-5106accbcff1.jpeg)
