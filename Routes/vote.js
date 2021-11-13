@@ -21,12 +21,14 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
     _id: req.params.voter,
   }).catch((err) => console.log(err));
 
-  /*  if (voter.voteflag === true) {
-    res.send({ message: "you cannot vote again" });
-  } */
+  console.log(voter.voteflag);
 
-  /* 
-  console.log("Voter=====>", voter); */
+  if (voter.voteflag == true) {
+   return res.json({ message:true});
+  } 
+
+  
+  console.log("Voter=====>", voter); 
 
   const candidate = await Candidate.findOne({
     _id: req.params.candidate,
@@ -67,10 +69,10 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
   candidate.voteCount = candidate.voteCount + 1;
   candidate.voters.push(req.params.voter);
 
-  await voter.save();
-  await campaign.save();
-  await candidate.save();
-  await party.save();
+  await voter.save().catch(err=>{console.log(err)})
+  await campaign.save().catch(err=>{console.log(err)});
+  await candidate.save().catch(err=>{console.log(err)});
+  await party.save().catch(err=>{console.log(err)});
 
   res.send({ message: "vote has been casted" });
 });

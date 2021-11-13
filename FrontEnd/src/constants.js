@@ -1,2 +1,3 @@
-// export const url = "http://localhost:1970"
-export const url = "http://a0a2-39-62-53-149.ngrok.io"
+export const url = "http://localhost:1970"
+/* 
+export const url = "http://a0a2-39-62-53-149.ngrok.io" */

@@ -28,8 +28,8 @@ const handleSignin =async () =>{
         return
     }
     try {
-    const {data} = await axios.post(url + "/signin" , {cnic: CNIC , password: password})
-    console.log("data==========", data)
+    const {data} = await axios.post(url + "/signin" , {cnic: CNIC , password: password});
+    console.log("data==============>", data)
     if(data){
         localStorage.setItem("userData" , JSON.stringify(data))
         toast.success("You have signin Successfully")
