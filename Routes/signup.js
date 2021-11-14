@@ -122,8 +122,13 @@ router.post("/signin", async (req, res) => {
   }
 
   const elections = await Elections.find({});
-  elections.sort((b, a) => a?.endTime - b?.endTime);
-  const latestElections = elections[0];
+  let latestElections;
+  if (elections == null || elections == undefined) {
+    elections = null;
+  } else {
+    elections.sort((b, a) => a?.endTime - b?.endTime);
+    latestElections = elections[0];
+  }
   //compare endTime of a election with new Date
   //see which is closer
   //finds the current or latest ended election
