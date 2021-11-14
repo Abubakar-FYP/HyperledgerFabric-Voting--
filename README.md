@@ -3,13 +3,13 @@ Voting System, A blockchain based web app that ensures complete anonymity and 10
 
 Weve used MERN stack as our main tech stack, incroporating MongoDB,ExpressJS, ReactJS and NodeJS. A huge part of the project is based on javascript mainly because of the popular tech stack.
 
-Then for our blockchain we have used one of the most popualar framework for residing with our custom built blockchain, Hyperledger Fabric. Hyperledger Fabric allows to build architectural based application that has the use case of a private blockchain. Pak Voting System is on of the best examples and provides the best use case for using private blockchain. 
+Then for our blockchain we have used one of the most popualar framework for residing with our custom built blockchain, Hyperledger Fabric. Hyperledger Fabric allows to build architectural based application that has the use case of a private blockchain. Pak Voting System is one of the best use cases for using private blockchain. 
 
-Along side with Hyperledger Fabric we also have used hyperledger explorer which is a user friendly interface that allows us to see blockchain transactions that is going accross the network.
+Along side with Hyperledger Fabric we also have used hyperledger explorer which provides a user friendly interface to see blockchain transactions that is going accross the network.
 
 The deployment of the website is still in continuation, Soon it'll be launched.
 
-If your interested in buying/funding this project or interested in collaborating with us, you can hit either of us on the contacts below.
+If your interested in buying/funding this project or interested in collaborating with us, You can contact either of us on the contacts below.
  
 # Contact:
 
@@ -19,7 +19,7 @@ Email: murtazaalimashadi1999@gmail.com
 
 LinkedIn: https://www.linkedin.com/in/syed-murtaza-ali-shah
 
-Twitter: @MurtazaAli7786
+Twitter: MurtazaAli7786
 
 ## Abubakar Mujahid
 
