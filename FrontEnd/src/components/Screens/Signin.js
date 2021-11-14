@@ -33,7 +33,11 @@ const handleSignin =async () =>{
     if(data){
         localStorage.setItem("userData" , JSON.stringify(data))
         toast.success("You have signin Successfully")
+        if(data?.doc?.role =="Voter"){
         history.push("/votingballot")
+        }else{
+        history.push("/")
+        }
         setTimeout(() => {
         window.location.reload()
 
