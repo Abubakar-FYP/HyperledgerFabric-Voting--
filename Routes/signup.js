@@ -100,13 +100,18 @@ router.post("/profile", async (req, res) => {
   if (!cnic) {
     return res.json({ message: "field is empty" });
   }
+
+  const elections = await Elections.find({});
+  elections.sort((b, a) => a?.endTime - b?.endTime);
+  const latestElections = elections[0];
+
   const doc = await Voter.findOne({ cnic: cnic }).select("-password");
   if (!doc) return res.send("You Are Not A Registered Voter");
 
   const user = await Nadra.findOne({ cnic: cnic });
 
   console.log("Result=========", user);
-  res.send({ doc, user });
+  res.send({ doc, user, latestElections });
 });
 
 router.post("/signin", async (req, res) => {
@@ -117,10 +122,14 @@ router.post("/signin", async (req, res) => {
   }
 
   const elections = await Elections.find({});
+  elections.sort((b, a) => a?.endTime - b?.endTime);
+  const latestElections = elections[0];
+  //compare endTime of a election with new Date
+  //see which is closer
+  //finds the current or latest ended election
 
-  if (!elections || elections == undefined || elections == null) {
-    return res.json({ message: "There are no currently running elections" });
-  }
+  console.log("Elections======>", elections);
+  //current elections or recently ended election
 
   const doc = await Voter.findOne({ cnic: cnic, password: password }).select(
     "-password"
@@ -131,7 +140,7 @@ router.post("/signin", async (req, res) => {
 
   console.log("Result=========", user);
   const token = jwt.sign({ _id: doc._id }, JWTKEY);
-  res.send({ token, doc, user });
+  res.send({ token, doc, user, latestElections });
 });
 
 router.post("/get/reset/password/token", async (req, res) => {
