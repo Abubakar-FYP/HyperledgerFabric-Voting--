@@ -18,33 +18,37 @@ router.post("/create/election", async (req, res) => {
       return res.status(400).send("One or more fields are not present");
     }
 
-    const elections = Election.find({});
+    const elections = await Election.find({});
 
-    let check1 = false;
-    let check2 = false;
+    let check1 = false; //checks for current
+    let check2 = false; //checks for future
     if (elections) {
       elections.map((election) => {
         if (
-          new Date() >= election.startTime &&
-          new Date() <= election.endTime
+          Number(new Date()) >= Number(election.startTime) &&
+          Number(new Date()) <= Number(election.endTime)
         ) {
           check1 = true;
         } //checks for any running elections or a single election
 
-        if (new Date() < election.startTime) {
+        if (Number(new Date()) < Number(election.startTime)) {
           check2 = true;
         } //checks for any elections that are about to start in future
       });
 
       if (check1 == true) {
-        return res.json(
-          "you cannot create a election, when an election is currently running"
-        );
+        console.log("current here");
+        return res
+          .status(400)
+          .send(
+            "you cannot create a election, when an election is currently running"
+          );
       }
       if (check2 == true) {
-        return res.json(
-          "you cannot create a election, when an election is in queue"
-        );
+        console.log("future here");
+        return res
+          .status(400)
+          .send("you cannot create a election, when an election is in queue");
       }
     } //checks for any currently running elections or future elections
 
