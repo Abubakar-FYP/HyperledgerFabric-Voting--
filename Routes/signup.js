@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const sendEmail = require("../utils/sendEmail")
+const sendEmail = require("../utils/sendEmail");
 //middleware
 const jwt = require("jsonwebtoken");
 const { JWTKEY } = require("../Keys/keys");
@@ -14,11 +14,13 @@ const { compareSync } = require("bcrypt");
 require("../Models/admin");
 require("../Models/voter");
 require("../Models/nadra");
+require("../Models/election");
 
 //models
 const Admin = mongoose.model("Admin");
 const Voter = mongoose.model("Voter");
 const Nadra = mongoose.model("Nadra");
+const Elections = mongoose.model("Election");
 
 //HERE OTP WORK WAS DONE
 
@@ -26,7 +28,7 @@ router.post("/signinadmin", requireLogin, (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ error: "one or more fields are empty" });
+    return res.json({ error: "one or more fields are empty" });
   }
 
   Admin.findOne({ email })
@@ -41,7 +43,7 @@ router.post("/signinadmin", requireLogin, (req, res) => {
       }
     })
     .catch((err) => {
-      return res.status(400).json({ message: err });
+      return res.json({ message: err });
     });
 });
 
@@ -58,12 +60,12 @@ router.post("/signup", async (req, res, next) => {
   const resp = await Nadra.findOne({ cnic: cnic });
 
   if (!resp || resp.cnic !== cnic) {
-    res.status(400).json({ message: `User does not exist` });
+    res.json({ message: `User does not exist` });
     return;
   }
 
   if (resp?.nationality !== "Pakistan") {
-    res.status(400).json({ message: "user is not a pakistani citizen" });
+    res.json({ message: "user is not a pakistani citizen" });
     return;
   }
 
@@ -71,7 +73,7 @@ router.post("/signup", async (req, res, next) => {
   const voter2 = await Voter.findOne({ email: email });
   /* console.log("voterCnic=====>", voter); */
   if (voter1 || voter2 || voter2?.email == email || voter1?.cnic == cnic) {
-    res.status(400).send({ message: "voter already registered" });
+    res.send({ message: "voter already registered" });
     return;
   }
 
@@ -92,62 +94,75 @@ router.post("/signup", async (req, res, next) => {
 });
 
 router.post("/profile", async (req, res) => {
-  console.log("req.body", req.body)
+  console.log("req.body", req.body);
   const { cnic } = req.body;
 
   if (!cnic) {
-    return res.status(400).json({ message: "field is empty" });
+    return res.json({ message: "field is empty" });
   }
-  const doc = await Voter.findOne({ cnic: cnic }).select(
-    "-password"
-  );
-  if (!doc) return res.status(400).send("You Are Not A Registered Voter");
+
+  const elections = await Elections.find({});
+  elections.sort((b, a) => a?.endTime - b?.endTime);
+  const latestElections = elections[0];
+
+  const doc = await Voter.findOne({ cnic: cnic }).select("-password");
+  if (!doc) return res.send("You Are Not A Registered Voter");
 
   const user = await Nadra.findOne({ cnic: cnic });
 
   console.log("Result=========", user);
-  res.send({ doc, user });
+  res.send({ doc, user, latestElections });
 });
 
 router.post("/signin", async (req, res) => {
   const { cnic, password } = req.body;
 
   if (!cnic || !password) {
-    return res.status(400).json({ message: "field is empty" });
+    return res.json({ message: "one or more fields is empty" });
   }
+
+  const elections = await Elections.find({});
+  elections.sort((b, a) => a?.endTime - b?.endTime);
+  const latestElections = elections[0];
+  //compare endTime of a election with new Date
+  //see which is closer
+  //finds the current or latest ended election
+
+  console.log("Elections======>", elections);
+  //current elections or recently ended election
+
   const doc = await Voter.findOne({ cnic: cnic, password: password }).select(
     "-password"
   );
-  if (!doc) return res.status(400).send("You Are Not A Registered Voter");
+  if (!doc) return res.send("You Are Not A Registered Voter");
 
   const user = await Nadra.findOne({ cnic: cnic });
 
   console.log("Result=========", user);
   const token = jwt.sign({ _id: doc._id }, JWTKEY);
-  res.send({ token, doc, user });
+  res.send({ token, doc, user, latestElections });
 });
 
+router.post("/get/reset/password/token", async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.send("Email is required");
+  const voter = await Voter.findOne({ email: email });
+  if (!voter) return res.send("Voter with the give email is not present");
 
-router.post("/get/reset/password/token" , async(req,res) => {
-  const {email} = req.body
-  if(!email) return res.status(400).send("Email is required")
-  const voter = await Voter.findOne({email: email})
-  if(!voter) return res.status(400).send("Voter with the give email is not present")
+  const randomNum = Math.round((Math.random() * 34567456784568987654) / 26543);
+  const url = "http://localhost:3000/reset/password/" + `${randomNum}`;
 
-  const randomNum = Math.round(Math.random()*34567456784568987654/26543)
-  const url = "http://localhost:3000/reset/password/" + `${randomNum}`
+  console.log("urlllllll==========", url);
 
-  console.log("urlllllll==========", url)
+  voter.resetPassToken = randomNum;
 
-  voter.resetPassToken = randomNum
-
-  await voter.save()
+  await voter.save();
 
   const message = `Your "Reset Password Token" has been generated. Kindly click the link below to reset it.
   \n\n${url}\n\n
   If you have not requested this email, you may ignore it.`;
   try {
-  console.log("Message===============", message)
+    console.log("Message===============", message);
 
     await sendEmail({
       email: voter.email,
@@ -162,23 +177,23 @@ router.post("/get/reset/password/token" , async(req,res) => {
     return new Error("internal server error");
   }
   // res.status(200).send("Check Your Email")
+});
+router.post("/reset/password", async (req, res) => {
+  const { newPassword, confirmPassword, token } = req.body;
+  if (!newPassword || !confirmPassword || !token)
+    return res.send("Some Fields Are Missing");
+  if (newPassword !== confirmPassword)
+    return res.send("Both Passwords Should be same");
+  const voter = await Voter.findOne({ resetPassToken: token });
+  if (!voter) return res.send("Token is not correct or it has been expired");
+  console.log(voter);
+  voter.resetPassToken = null;
+  voter.password = confirmPassword;
 
-})
-router.post("/reset/password" , async(req,res) => {
-  const {newPassword, confirmPassword , token} = req.body
-  if(!newPassword || !confirmPassword || !token) return res.status(400).send("Some Fields Are Missing")
-  if(newPassword !== confirmPassword) return res.status(400).send("Both Passwords Should be same")
-  const voter = await Voter.findOne({resetPassToken: token})
-  if(!voter) return res.status(400).send("Token is not correct or it has been expired")
-console.log(voter)
-  voter.resetPassToken = null
-  voter.password = confirmPassword
+  await voter.save();
 
-  await voter.save()
-
-  res.status(200).send("Password has been updated successfully")
-
-})
+  res.status(200).send("Password has been updated successfully");
+});
 /* 
 router.post("/signinotp", async (req, res) => {
   const genOtp = localStorage.getItem("sOtp");
