@@ -37,6 +37,7 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
   const party = await Party.findOne({
     _id: candidate.partyId,
   });
+  if(!party) return res.status(400).send("Part is Not Found")
   console.log("party========", party);
   console.log("Candidate=====>", candidate, candidate.partyId);
   const ballot = await Ballot.findOne({ _id: candidate.ballotId });
@@ -48,7 +49,7 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
   console.log("Campaign=====>", campaign);
 
   const newCount = campaign.voteCounts?.find(
-    (part) => part?.partyName === party.partyName
+    (part) => part?.partyName === party?.partyName
   );
   console.log("new count===========", newCount);
   if (newCount) {

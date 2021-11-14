@@ -39,10 +39,19 @@ console.log("user data=========", userData)
         try {
         console.log("clicked=", url + `/vote/${user?.doc?._id}/${id}`)
         const {data} = await axios.post(url + `/vote/${user?.doc?._id}/${id}`)
-        console.log("casting vote response ==============", data)   
-        setUser(data.user)
-        const userData = JSON.parse(localStorage.getItem("userData"))
-        localStorage.setItem("userData", JSON.stringify({...userData, ...data.user}))
+        console.log("casting vote response ==============", data)  
+        toast.success(data.message) 
+        setTimeout(async () => {
+            const userData = JSON.parse(localStorage.getItem("userData"))
+            if(userData){
+              console.log("userData============", userData)
+              const {data} = await axios.post(url + "/profile" , {cnic: userData?.user?.cnic})
+              console.log("dataaaaa=aaaaaaaa======",data)
+              setUser(data)
+              localStorage.setItem("userData" , JSON.stringify(data))
+            }
+        }, 2000);
+      
         } catch (error) {
             console.log("errror===========", error.message)
         }
