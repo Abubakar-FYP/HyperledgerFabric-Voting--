@@ -21,9 +21,8 @@ const electionSchema = new mongoose.Schema({
 ],
   parties: [
     {
-      id: { 
         type: mongoose.Schema.Types.ObjectId,
-         ref: "Party" },
+         ref: "Party" 
     },
   ],
 });

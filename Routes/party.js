@@ -18,10 +18,7 @@ const Criminal = mongoose.model("Criminal");
 const Nadra = mongoose.model("Nadra");
 const Election = mongoose.model("Election");
 
-//use the findparty or getparty dapi to check if its new or not
-//returns a list of candidates,chain this api to create candidate api
 router.post("/createparty", async (req, res) => {
-  //check for party leader nadra
   const { partyName, partyImg, partySymbol, partyLeaderCnic, candidate } =
     req.body;
 
@@ -111,14 +108,14 @@ router.post("/createparty", async (req, res) => {
     partyLeaderCnic,
   });
 
-  const elections = await Election.find({}).lean()
+  const elections = await Election.find({}).lean();
 
   let check8 = false;//current
   let check9 = false;//future
   let check10 = false;//if no upcoming
   //checks for future elections and inserts parties in upcoming elections
     if (elections) {
-      elections.map((election) => {
+      elections.map(async (election) => {
         if (
           Number(new Date()) >= Number(election.startTime) &&
           Number(new Date()) <= Number(election.endTime)
@@ -132,10 +129,20 @@ router.post("/createparty", async (req, res) => {
           newParty.participate.inelection = true;
         } //checks for any elections that are about to start in future
         console.log("new Date",Number(new Date),"end tIME",Number(election.endTime))
+       
         if((Number(new Date())<Number(election.endTime))){
-          console.log((Number(new Date())<Number(election.endTime)))
           check10 = true;
-          //if not then return 400 that no election is return
+          election.parties.push(newParty._id);
+          //pushes party id into election
+      /**     candidates.map((candidate)=>{
+            election.candidates.push(candidate.cnic);
+          })*/
+          await election.save();
+          //saving fine, find the right candidates
+          //sent list only issue
+          console.log(election);
+          //if not then return error that there are no upcoming
+          //similar to above condition
         }
       
       });
@@ -149,7 +156,7 @@ router.post("/createparty", async (req, res) => {
       }
 
       
-      if (check10 == true) {
+      if (check10 == false) {
         return res
           .status(400)
           .send(
@@ -209,7 +216,6 @@ router.post("/createparty", async (req, res) => {
   await newParty.save().catch((err) => {
     return console.log(err);
   });
-
   res.status(200).json({ message: "Party has been registered" });
   //check ballot candidate issue 
 });
@@ -261,5 +267,6 @@ router.get("/getallpartyname", async (req, res) => {
       }
     });
 });
+
 
 module.exports = router;
