@@ -107,13 +107,15 @@ router.post("/createparty", async (req, res) => {
   const newParty = new Party({
     partyName,
     partySymbol,
+    partyImg,
     partyLeaderCnic,
   });
 
   const elections = await Election.find({}).lean()
 
-  let check8 = false;
-  let check9 = false; 
+  let check8 = false;//current
+  let check9 = false;//future
+  let check10 = false;//if no upcoming
   //checks for future elections and inserts parties in upcoming elections
     if (elections) {
       elections.map((election) => {
@@ -129,6 +131,13 @@ router.post("/createparty", async (req, res) => {
           newParty.participate.election.push(election._id);
           newParty.participate.inelection = true;
         } //checks for any elections that are about to start in future
+        console.log("new Date",Number(new Date),"end tIME",Number(election.endTime))
+        if((Number(new Date())<Number(election.endTime))){
+          console.log((Number(new Date())<Number(election.endTime)))
+          check10 = true;
+          //if not then return 400 that no election is return
+        }
+      
       });
 
       if (check8 == true) {
@@ -136,6 +145,15 @@ router.post("/createparty", async (req, res) => {
           .status(400)
           .send(
             "you create party when an election is currently running"
+          );
+      }
+
+      
+      if (check10 == true) {
+        return res
+          .status(400)
+          .send(
+            "you cannot enter a party when there are no up-coming elections"
           );
       }
     }
@@ -193,7 +211,7 @@ router.post("/createparty", async (req, res) => {
   });
 
   res.status(200).json({ message: "Party has been registered" });
-  
+  //check ballot candidate issue 
 });
 
 //chain use during candidate registration by party leader
