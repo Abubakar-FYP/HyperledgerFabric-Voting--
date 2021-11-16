@@ -190,6 +190,28 @@ router.get("/getallpolls", async (req, res) => {
   res.json({ message: polls });
 });
 
+router.get("/getonepoll/:p_id", async (req, res) => {
+  const polls = await Polls.findOne({_id:req.params.p_id})
+    .populate({
+      path: "candidates",
+      populate: {
+        path: "candidate.id",
+        select: "-voters -voteCount -is_criminal -cnic -__v -ballotId",
+        populate: {
+          path: "partyId",
+          select:
+            "-partySymbol -partyImg -partyLeaderCnic -candidate -voters -voteCount -is_valid -_id -__v",
+        },
+      },
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.json({ message: "there was an error finding polls" });
+    });
+
+  res.json({ message: polls });
+});
+
 router.get("/getresultofallpolls", async (req, res) => {
   const polls = await Polls.find({})
     .populate({
