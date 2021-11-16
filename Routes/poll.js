@@ -202,7 +202,7 @@ router.get("/getonepoll/:p_id", async (req, res) => {
           select:
             "-partySymbol -partyImg -partyLeaderCnic -candidate -voters -voteCount -is_valid -_id -__v",
         },
-      },
+      }, 
     })
     .catch((err) => {
       console.log(err);
