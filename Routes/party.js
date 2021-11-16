@@ -9,12 +9,14 @@ require("../Models/party");
 require("../Models/criminal");
 require("../Models/candidate");
 require("../Models/nadra");
+require("../Models/election");
 
 //Models
 const Party = mongoose.model("Party");
 const Candidate = mongoose.model("Candidate");
 const Criminal = mongoose.model("Criminal");
 const Nadra = mongoose.model("Nadra");
+const Election = mongoose.model("Election");
 
 //use the findparty or getparty dapi to check if its new or not
 //returns a list of candidates,chain this api to create candidate api
@@ -63,7 +65,6 @@ router.post("/createparty", async (req, res) => {
   }); //converts Mongoose number,returns candidateDB cnics as JS Number
 
   const fieldCnic = candidate.map((cand) => {
-    console.log(cand.cnic);
     return Number(cand.cnic);
   });
 
@@ -72,7 +73,6 @@ router.post("/createparty", async (req, res) => {
   fieldCnic.map((cnic) => {
     for (var i = 0; i < nadraCnics; i++) {
       if (cnic != nadraCnics) {
-        console.log(cnic);
         check6 = true;
       }
     }
@@ -106,14 +106,42 @@ router.post("/createparty", async (req, res) => {
 
   const newParty = new Party({
     partyName,
-    partyImg,
     partySymbol,
     partyLeaderCnic,
   });
 
+  const elections = await Election.find({}).lean()
+
+  let check8 = false;
+  let check9 = false; 
+  //checks for future elections and inserts parties in upcoming elections
+    if (elections) {
+      elections.map((election) => {
+        if (
+          Number(new Date()) >= Number(election.startTime) &&
+          Number(new Date()) <= Number(election.endTime)
+        ) {
+          check8 = true;
+        } //checks for any running elections or a single election
+
+        if (Number(new Date()) < Number(election.startTime)) {
+          check9 = true;
+          newParty.participate.election.push(election._id);
+          newParty.participate.inelection = true;
+        } //checks for any elections that are about to start in future
+      });
+
+      if (check8 == true) {
+        return res
+          .status(400)
+          .send(
+            "you create party when an election is currently running"
+          );
+      }
+    }
+
   const candidateList = candidate.map((item) => {
-    /*     console.log("candidate========", item);
-     */ return item;
+     return item;
   }); //returns candidates object 1 by 1
 
   let check1 = false;
@@ -142,11 +170,10 @@ router.post("/createparty", async (req, res) => {
     });
 
     newCandidate.ballotId = mongoose.Types.ObjectId(newCandidate.ballotId);
-    /*      console.log(typeof newCandidate.ballotId);
-     */
-    newParty.candidate.push(newCandidate._id);
-    /*     console.log(newCandidate);
-     */
+    
+    newParty.candidate.push(newCandidate._id); 
+    //candidates to the party are added here
+    
     await newCandidate.save().catch((err) => {
       return console.log(err);
     });
@@ -156,17 +183,17 @@ router.post("/createparty", async (req, res) => {
         console.log(err);
       }
     );
-    ballot.candidate.push(newCandidate._id);
+    ballot.candidate.push(newCandidate._id);//check here
     await ballot.save();
   }); //saving candidates in model and candidates in ballot one by one
 
-  /*   console.log(newParty);
-   */
+ 
   await newParty.save().catch((err) => {
     return console.log(err);
   });
 
   res.status(200).json({ message: "Party has been registered" });
+  
 });
 
 //chain use during candidate registration by party leader
