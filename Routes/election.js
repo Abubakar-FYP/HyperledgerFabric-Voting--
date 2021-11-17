@@ -114,17 +114,9 @@ router.put("/stopelection",async (req,res)=>{
   //get all election
   //get all their including parties
   //invalid them for the next election
+  //all parties are excluded
+  //check if already participated and valid
   //parties particpate.inelection = false
 })
-
-router.put("/insert/party/election",async(req,res)=>{
-  //after election stops
-  //all parties are excluded
-  //this is for inclusion of already participated parties
-  //push in election
-  //check if already participated and valid
-  //if yes then push to new election
-});
-
 
 module.exports = router;
