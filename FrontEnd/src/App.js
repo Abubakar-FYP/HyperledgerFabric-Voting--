@@ -27,6 +27,7 @@ import ResetPassword from './components/Screens/ResetPassword';
 import axios from "axios"
 import {url} from "./constants"
 import PendingParties from './components/Screens/PendingParties';
+import Polls from './components/Screens/Polls';
 export const UserContext = createContext()
 
 const Routing = () => {
@@ -111,6 +112,7 @@ function App() {
           <Route exact path="/forgotpassword" component={ForgotPassword} />
           <Route exact path="/reset/password/:token" component={ResetPassword} />
           <Route exact path="/pending-parties/:id" component={PendingParties} />
+          <Route exact path="/polls" component={Polls} />
         </Switch>
       </BrowserRouter>
     </UserContext.Provider>
