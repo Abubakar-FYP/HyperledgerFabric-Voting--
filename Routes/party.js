@@ -296,7 +296,7 @@ router.get("/findparty/:_id", async (req, res) => {
     return res.status(400).json({ message: "field is empty" });
   }
 
-  const found = await Party.find({ _id: req.params._id })
+  await Party.find({ _id: req.params._id }) //not returning candidate name
     .populate({
       path: "candidate",
       populate: {
