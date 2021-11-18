@@ -61,7 +61,7 @@ const NavBar = () => {
           <li><Link className="text-light" to="/votingballot" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Voting Ballot</Link></li>
         ) : null}
 
-
+<li><Link className="text-light" to="/polls" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Polls</Link></li>
         {user ?
           <li><Link className="text-light" to="#" onClick={logoutTheUser} style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Logout</Link></li> : null
         }

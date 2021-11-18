@@ -73,23 +73,46 @@ const ElectionCreation = () => {
                 <div className="card-body">
                     <div className="card mt-5">
                         <div className="card-header">
+                            Elections in QUE
+                        </div>
+                        <div className="card-body">
+                            <div className="row">
+                                {elections?.map(el =>
+                                    new Date(Number(el.startTime)) > Date.now() &&
+                                        new Date(Number(el.endTime)) > Date.now() ? (
+                                        <div className="card bg-warning text-light col-md-4">
+                                            <div className="card-header">
+                                                Election Type : {el.electionType}
+                                            </div>
+                                            <div className="card-body">
+                                                <strong>Election Name</strong> : {el.electionName}
+                                            </div>
+                                        </div>
+                                    ) : null
+                                )}
+
+                            </div>
+                        </div>
+                    </div>
+                    <div className="card mt-5">
+                        <div className="card-header">
                             Active Elections
                         </div>
                         <div className="card-body">
                             <div className="row">
-                                {elections?.map(el =>  
-                                new Date(Number(el.startTime)) < Date.now() && 
-                                new Date(Number(el.endTime)) > Date.now() ? (
-                                    <div className="card bg-success text-light col-md-4">
-                                        <div className="card-header">
-                                            Election Type : {el.electionType}
+                                {elections?.map(el =>
+                                    new Date(Number(el.startTime)) < Date.now() &&
+                                        new Date(Number(el.endTime)) > Date.now() ? (
+                                        <div className="card bg-success text-light col-md-4">
+                                            <div className="card-header">
+                                                Election Type : {el.electionType}
+                                            </div>
+                                            <div className="card-body">
+                                                <strong>Election Name</strong> : {el.electionName}
+                                            </div>
                                         </div>
-                                        <div className="card-body">
-                                            <strong>Election Name</strong> : {el.electionName}
-                                        </div>
-                                    </div>
-                                ): null
-                                 )}
+                                    ) : null
+                                )}
 
                             </div>
                         </div>
@@ -99,20 +122,20 @@ const ElectionCreation = () => {
                             Previos Elections
                         </div>
                         <div className="card-body">
-                        <div className="row">
-                                {elections?.map(el =>  
-                                Date.now() > new Date(Number(el.startTime))&& 
-                               Date.now() > new Date(Number(el.endTime)) ? (
-                                    <div className="card bg-danger text-light col-md-4">
-                                        <div className="card-header">
-                                            Election Type : {el.electionType}
+                            <div className="row">
+                                {elections?.map(el =>
+                                    Date.now() > new Date(Number(el.startTime)) &&
+                                        Date.now() > new Date(Number(el.endTime)) ? (
+                                        <div className="card bg-danger text-light col-md-4">
+                                            <div className="card-header">
+                                                Election Type : {el.electionType}
+                                            </div>
+                                            <div className="card-body">
+                                                <strong>Election Name</strong> : {el.electionName}
+                                            </div>
                                         </div>
-                                        <div className="card-body">
-                                            <strong>Election Name</strong> : {el.electionName}
-                                        </div>
-                                    </div>
-                                ): null
-                                 )}
+                                    ) : null
+                                )}
 
                             </div>
                         </div>
@@ -182,7 +205,7 @@ const ElectionCreation = () => {
                                                 setPoolName("")
                                             }}
                                             className="btn btn-primary pb-5">
-                                            Pool Name  <i className="fas fa-plus"></i>
+                                            Poal Name  <i className="fas fa-plus"></i>
                                         </button>
                                     </div>
                                 </div>
