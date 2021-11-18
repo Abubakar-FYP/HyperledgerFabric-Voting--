@@ -41,11 +41,25 @@ const partySchema = new Schema({
     default: 0,
   },
 
-  //ballot reference ? reverse...
+  //checks if party is valid to take part in election
   is_valid: {
     type: Boolean,
     default: false,
   },
+
+  participate:{
+    election:[{
+      type:mongoose.Types.ObjectId,
+      ref:"Election",
+      default:null
+    }],
+    inelection:{
+      type:Boolean,
+      default:false                          
+    }
+  }
+
+
 });
 
 global.Party = global.Party || mongoose.model("Party", partySchema);

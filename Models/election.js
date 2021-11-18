@@ -13,12 +13,16 @@ const electionSchema = new mongoose.Schema({
   electionType: {
     type: String,
   },
-  candidates: {
-    type: [String],
-  },
+  candidates: [
+  {
+    type: String,
+    default:null
+  }
+],
   parties: [
     {
-      id: { type: mongoose.Schema.Types.ObjectId, ref: "Party" },
+        type: mongoose.Schema.Types.ObjectId,
+         ref: "Party" 
     },
   ],
 });
