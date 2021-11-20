@@ -14,7 +14,13 @@ const ElectionCreation = () => {
     const [electionName, setElectionName] = useState("")
     const [elections, setElections] = useState([])
     const handleOnSubmit = async () => {
-        const dataToSend = {
+        let dataToSend;
+        if(boolean){
+
+        }else{
+            
+        }
+         dataToSend = {
             electionName: electionName,
             startTime: new Date(startDate).getTime(),
             endTime: new Date(endDate).getTime(),

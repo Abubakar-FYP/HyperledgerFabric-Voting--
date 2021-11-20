@@ -1,30 +1,124 @@
-import React from 'react'
-
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { url } from "../../constants";
+import axios from "axios";
+import {Link} from "react-router-dom"
 const Polls = () => {
-    return (
-        <div className="container">
-            <div className="card">
-                <div className="card-header">Polls</div>
-                <div className="card-body">
-                    <div className="card mt-5">
-                        <div className="card-header">
-                            Active Polls
-                        </div>
-                        <div className="card-body">
-                            <div className="row">
-                                <div className="card bg-warning text-light col-md-4">
-                                    <div className="card-body">
-                                        <strong>Election Name</strong>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  const [activePolls, setActivePolls] = useState(null);
+  const [endedPolls, setEndedPolls] = useState(null);
+  const [allPolls, setAllPolls] = useState(null);
+
+  const getActivePolls = async () => {
+    try {
+      const { data } = await axios.get(url + "/currentpolls");
+
+      console.log("data from active polls", data.message);
+      setActivePolls(data.message);
+    } catch (error) {
+      console.log("error from active polls", error.message);
+      toast.error(error.message);
+    }
+  };
+  const getEndedPolls = async () => {
+    try {
+      const { data } = await axios.get(url + "/previouspolls");
+
+      console.log("data from ended polls", data);
+      setEndedPolls(data);
+    } catch (error) {
+      console.log("error from ended polls", error.message);
+      toast.error(error.message);
+    }
+  };
+  const getAllPolls = async () => {
+    try {
+      const { data } = await axios.get(url + "/getallpolls");
+
+      console.log("data from all polls", data.message);
+      setAllPolls(data.message);
+    } catch (error) {
+      console.log("error from all polls", error.message);
+      toast.error(error.message);
+    }
+  };
+
+  useEffect(() => {
+    getAllPolls();
+    getActivePolls();
+    getEndedPolls();
+  }, []);
+
+  return (
+    <div className="container">
+      <div className="card">
+        <div className="card-header">Polls</div>
+        <div className="card-body">
+          <div className="card mt-5">
+            <div className="card-header">Active Polls</div>
+            <div className="card-body">
+              <div className="row">
+                {activePolls &&
+                  activePolls.map((poll) => (
+                    <Link to={`/poll/${poll._id}`} style={{textDecoration: "none"}} className="card bg-warning text-light col-md-3">
+                      <div className="card-body">
+                        <p>
+                          <strong>Poal Name</strong>: {poll.pollname}
+                        </p>
+                        <p>
+                          <strong>Poal Type</strong>: {poll.type}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+              </div>
             </div>
+          </div>
+          <div className="card mt-5">
+            <div className="card-header">Ended Polls</div>
+            <div className="card-body">
+              <div className="row">
+                {endedPolls &&
+                  endedPolls.map((poll) => (
+                    <div className="card bg-warning text-light col-md-3">
+                      <div className="card-body">
+                        <p>
+                          <strong>Poal Name</strong>: {poll.pollname}
+                        </p>
+                        <p>
+                          <strong>Poal Type</strong>: {poll.type}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="card mt-5">
+            <div className="card-header">All Polls</div>
+            <div className="card-body">
+              <div className="row">
+                {allPolls &&
+                  allPolls.map((poll) => (
+                    <div className="card bg-warning text-light col-md-3">
+                      <div className="card-body">
+                        <p>
+                          <strong>Poal Name</strong>: {poll.pollname}
+                        </p>
+                        <p>
+                          <strong>Poal Type</strong>: {poll.type}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
 
         </div>
-    )
-}
+      </div>
+    </div>
+  );
+};
 
-export default Polls
+export default Polls;

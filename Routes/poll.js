@@ -99,7 +99,7 @@ router.get("/currentpolls", async (req, res) => {
         },
       },
     })
-    .select("-valid -voters -_id")
+    .select("-valid -voters")
     .catch((err) => {
       console.log(err);
       return res.json({ message: "there was an error finding polls" });
