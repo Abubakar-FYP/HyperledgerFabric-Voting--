@@ -22,8 +22,6 @@ router.post("/createparty", async (req, res) => {
   const { partyName, partyImg, partySymbol, partyLeaderCnic, candidate } =
     req.body;
 
-    console.log("HITTTTTT")
-
   if (
     !partyName ||
     !partyImg ||
@@ -34,58 +32,68 @@ router.post("/createparty", async (req, res) => {
     return res.json({ message: "one or more fields are empty" });
   }
 
-  const nadra = await Nadra.find({}).lean();
+  const elections = await Election.find({}).catch((err) => {
+    return res
+      .status(400)
+      .json({ message: "there was an error finding elections" });
+  });
 
-  const nadraCnics = nadra.map((citizen) => {
-    return Number(citizen.cnic);
-  }); //converts mongoose number to number
+  const nadra = await Nadra.find({})
+    .lean()
+    .catch((err) => {
+      return res
+        .status(400)
+        .json({ message: "there was an error finding citizens" });
+    });
 
-  let check5 = false;
-  nadraCnics.map((cnic) => {
-    if (cnic == partyLeaderCnic) {
-      check5 = true;
-    }
-  }); //checks whether party leader exists in nadra
-
-  if (!check5 || check5 == false) {
-    return res.json({ message: "party leader does not exist in nadra" });
-  }
+  const ballots = await Ballot.find({}).catch((err) => {
+    return res
+      .status(400)
+      .json({ message: "there was an error finding ballots" });
+  });
 
   const candidates = await Candidate.find({})
     .select(
       "-position -partyId -voters -voteCount -is_criminal -_id -__v -ballotId -name"
     )
-    .lean();
+    .lean()
+    .catch((err) => {
+      return res
+        .status(400)
+        .json({ message: "there was an error finding candidates" });
+    });
 
-  /*   console.log(candidates);
-   */
-  const cnics = candidates.map((num) => {
-    return Number(num.cnic);
-  }); //converts Mongoose number,returns candidateDB cnics as JS Number
+  const parties = await Party.find({})
+    .lean()
+    .catch((err) => {
+      return res
+        .status(400)
+        .json({ message: "there was an error finding parties" });
+    });
 
-
-  const fieldCnic = candidate.map((cand) => {
-    return Number(cand.cnic);
-  });
-
+  let check5 = false;
   let check6 = false;
+  nadra.map((citizen) => {
+    if (Number(citizen.cnic) == Number(partyLeaderCnic)) {
+      check5 = true;
+    } //checks whether party leader exists in nadra
 
-  fieldCnic.map((cnic) => {
-    for (var i = 0; i < nadraCnics; i++) {
-      if (cnic != nadraCnics) {
+    candidate.map((cand) => {
+      if (Number(candidate.cnic) != Number(citizen.cnic)) {
         check6 = true;
       }
-    }
-  }); //checks if candidates exist in nadra
+    }); //checks if candidates exist in nadra
+  });
 
-  if (check6 || check6 == true) {
+  if (!check5 || check5 == false)
+    return res.json({ message: "party leader does not exist in nadra" });
+
+  if (check6 || check6 == true)
     return res.json({
       message:
         "one or more of the candidates does not exist in nadra, check their cnic",
     });
-  }
 
-  const parties = await Party.find({}).lean();
   //check if candidate is a party leader of a party
 
   let check3 = false;
@@ -94,42 +102,47 @@ router.post("/createparty", async (req, res) => {
   let check12 = false;
 
   parties.map((partys) => {
+    //this is good
     if (partys.partyName == partyName) {
       check3 = true;
     } //checks wheather party name is already present
-  
+
     if (partys.partyLeaderCnic == partyLeaderCnic) {
       check4 = true;
     } //checks wheather party leader has alreayd registered a party
-  
-    partys.candidate.map((cand)=>{
-      
-      if(Number(cand.cnic)==Number(partyLeaderCnic)){
+
+    partys.candidate.map((cand) => {
+      if (Number(cand.cnic) == Number(partyLeaderCnic)) {
         check11 = true;
-      }//if party leader is a candidate of a party
+      } //if party leader is a candidate of a party
 
-      candidate.map((candi)=>{
-        if(candi.cnic==partys.partyLeaderCnic){
+      candidate.map((candi) => {
+        if (candi.cnic == partys.partyLeaderCnic) {
           check12 = true;
-        }//checks if any entered candidate is a party leader 
-      })
-
-    })
-
-  
+        } //checks if any entered candidate is a party leader
+      });
+    });
   });
 
   if (check3 == true)
-    return res.status(400).json({ message: "Party with same name is Already Exists" });
+    return res
+      .status(400)
+      .json({ message: "Party with same name is Already Exists" });
 
   if (check4 == true)
-    return res.status(400).json({ message: "Party Leader has already registered a party" });
-  
-  if(check11 == true)
-    return res.status(400).json({message: "Party Leader already belongs as a candidate in a party"});
-  
-  if(check12 == true)
-    return res.status(400).json({message: "One of the candidates is already a party leader"});
+    return res
+      .status(400)
+      .json({ message: "Party Leader has already registered a party" });
+
+  if (check11 == true)
+    return res.status(400).json({
+      message: "Party Leader already belongs as a candidate in a party",
+    });
+
+  if (check12 == true)
+    return res
+      .status(400)
+      .json({ message: "One of the candidates is already a party leader" });
 
   const newParty = new Party({
     partyName,
@@ -138,73 +151,67 @@ router.post("/createparty", async (req, res) => {
     partyLeaderCnic,
   });
 
-  const elections = await Election.find({});
-  console.log("Election HIIIIIIII")
-  let check8 = false;//current
-  let check9 = false;//future
-  let check10 = false;//if no upcoming
+  //////////////////
+
+  console.log("Election HIIIIIIII");
+  let check8 = false; //current
+  let check9 = false; //future
+  let check10 = false; //if no upcoming
   //checks for future elections and inserts parties in upcoming elections
-    if (elections) {
-      elections.map(async (election) => {
-        if (
-          Number(new Date()) >= Number(election.startTime) &&
-          Number(new Date()) <= Number(election.endTime)
-        ) {
-          check8 = true;
-        } //checks for any running elections or a single election
+  if (elections) {
+    elections.map(async (election) => {
+      // this is good
+      if (
+        Number(new Date()) >= Number(election.startTime) &&
+        Number(new Date()) <= Number(election.endTime)
+      ) {
+        check8 = true;
+      } //checks for any running elections or a single election
 
-        if (Number(new Date()) < Number(election.startTime)) {
-          check9 = true;
-          newParty.participate.election.push(election._id);
-          newParty.participate.inelection = true;
-        } //checks for any elections that are about to start in future
-        //console.log("new Date",Number(new Date),"end tIME",Number(election.endTime))
-       
-        if((Number(new Date())<Number(election.endTime))){
-          check10 = true;
-          election.parties.push(newParty._id);
-          //pushes party id into election
-           candidate.map((cand)=>{
-            election.candidates.push(cand.cnic);
-          })
+      if (Number(new Date()) < Number(election.startTime)) {
+        check9 = true;
+        newParty.participate.election.push(election._id);
+        newParty.participate.inelection = true;
+      } //checks for any elections that are about to start in future
+      //console.log("new Date",Number(new Date),"end tIME",Number(election.endTime))
 
-          console.log("Update Election=====>",election);
+      if (Number(new Date()) < Number(election.endTime)) {
+        check10 = true;
+        election.parties.push(newParty._id);
+        //pushes party id into election
+        candidate.map((cand) => {
+          election.candidates.push(cand.cnic);
+        });
 
-          await election.save().catch((err)=>{
-            res.status(400).json({message:"there was an error saving election"})
-          })
-        
-          //similar to above condition
-        }
-      
-      });
+        console.log("Update Election=====>", election);
 
-      if (check8 == true) {
-        return res
-          .status(400)
-          .send(
-            "you create party when an election is currently running"
-          );
+        await election.save().catch((err) => {
+          res
+            .status(400)
+            .json({ message: "there was an error saving election" });
+        });
+
+        //similar to above condition
       }
+    });
 
-      
-      if (check10 == false) {
-        return res
-          .status(400)
-          .send(
-            "you cannot enter a party when there are no up-coming elections"
-          );
-      }
+    if (check8 == true) {
+      return res
+        .status(400)
+        .send("you create party when an election is currently running");
     }
 
-  const candidateList = candidate.map((item) => {
-     return item;
-  }); //returns candidates object 1 by 1
+    if (check10 == false) {
+      return res
+        .status(400)
+        .send("you cannot enter a party when there are no up-coming elections");
+    }
+  }
 
-  let check1 = false;
-  for (let i = 0; i < candidateList.length; i++) {
-    for (let j = 0; j < cnics.length; j++) {
-      if (candidateList[i].cnic == cnics[j]) {
+  let check1 = false; //not good ?
+  for (let i = 0; i < candidate.length; i++) {
+    for (let j = 0; j < candidates.length; j++) {
+      if (candidate[i].cnic == candidates[j].cnic) {
         check1 = true;
       }
     }
@@ -216,7 +223,7 @@ router.post("/createparty", async (req, res) => {
     });
   }
 
-  const candidatel = candidate.map(async (item) => {
+  candidate.map(async (item) => {
     const newCandidate = new Candidate({
       cnic: item.cnic,
       name: item.name,
@@ -227,46 +234,46 @@ router.post("/createparty", async (req, res) => {
     });
 
     newCandidate.ballotId = mongoose.Types.ObjectId(newCandidate.ballotId);
-    
-    newParty.candidate.push(newCandidate._id); 
+
+    newParty.candidate.push(newCandidate._id);
     //candidates to the party are added here
 
-    console.log("New Candidate=====>",newCandidate);
-    
-    await newCandidate.save().catch((err)=>{
-      res.status(400).json({message:"there was an error saving election"})
-    })
+    console.log("New Candidate=====>", newCandidate);
 
-    
-    const ballots = await Ballot.find({})
-    .catch(
-      (err) => {
-         return res.status(400).json({message:"there was an error finding ballots"});  
-      }
-    );
-    console.log("Ballot HIIIIIIII")
-    ballots.map(async (ballot)=>{
-      if(ballot._id == newCandidate.ballotId){  
-        ballot.candidate.push(newCandidate._id);
-        console.log("Update Ballot====>",ballot);
-        
-        await ballot.save().catch((err)=>{
-        return res.status(400).json({message:"there was an error saving election"})
+    await newCandidate.save().catch((err) => {
+      //candidate save
+      res.status(400).json({ message: "there was an error saving election" });
     });
 
-      }
-    })
+    ballots.map(async (ballot) => {
+      //good
+      if (ballot._id == newCandidate.ballotId) {
+        ballot.candidate.push(newCandidate._id);
+        console.log("Update Ballot====>", ballot);
 
+        await ballot.save().catch((err) => {
+          //ballot save
+          console.log(err);
+          return res
+            .status(400)
+            .json({ message: "there was an error saving election" });
+        });
+      }
+    });
   }); //saving candidates in model and candidates in ballot one by one
 
   console.log("New Party=====>", newParty);
-  await newParty.save().catch((err)=>{
-    return res.status(400).json({message:"there was an error saving election"})
-  })
+  await newParty.save().catch((err) => {
+    //party save
+    console.log(err);
+    return res
+      .status(400)
+      .json({ message: "there was an error saving election" });
+  });
 
-  console.log("Complete HIIIIIIII")
+  console.log("Complete HIIIIIIII");
   res.status(200).json({ message: "Party has been registered" });
-  //check ballot candidate issue 
+  //check ballot candidate issue
 });
 
 //chain use during candidate registration by party leader
@@ -289,7 +296,7 @@ router.get("/findparty/:_id", async (req, res) => {
     return res.status(400).json({ message: "field is empty" });
   }
 
-  const found = await Party.find({ _id: req.params._id })
+  await Party.find({ _id: req.params._id }) //not returning candidate name
     .populate({
       path: "candidate",
       populate: {
@@ -330,32 +337,36 @@ router.get("/getallparty", async (req, res) => {
     });
 });
 
-
-router.get("/checkcnic",async (req,res)=>{
-  
-  const {cnic} = req.body;
-  console.log("CNIC====>",req.body);
+router.get("/checkcnic", async (req, res) => {
+  const { cnic } = req.body;
+  console.log("CNIC====>", req.body);
   const parties = await Party.find({})
-  .populate("candidate").select("-partyImg")
-  
+    .populate("candidate")
+    .select("-partyImg");
+
   let check = false;
 
-  parties.map((party)=>{
-    party.candidate.map((candidate)=>{
-      console.log(candidate.cnic,cnic);
-      if(candidate.cnic==cnic){
+  parties.map((party) => {
+    party.candidate.map((candidate) => {
+      console.log(candidate.cnic, cnic);
+      if (candidate.cnic == cnic) {
         check = true;
       }
-    })
-  })
-  
-  if(check==true){
-    res.json("good")
-  }else{
-    res.json("not good")
+    });
+  });
+
+  if (check == true) {
+    res.json("good");
+  } else {
+    res.json("not good");
   }
+});
 
-})
-
+router.get("/getallcnic", async (req, res) => {
+  const nadra = await Nadra.find({});
+  nadra.map((citizen) => {
+    console.log("citizen=====>", citizen.cnic);
+  });
+});
 
 module.exports = router;
