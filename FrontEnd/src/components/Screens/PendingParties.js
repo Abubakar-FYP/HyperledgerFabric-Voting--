@@ -5,13 +5,13 @@ import { toast } from "react-toastify"
 import {useHistory} from "react-router-dom"
 const PendingParties = ({ match }) => {
     const history = useHistory("")
-    const [pendingParties, setPendingParties] = useState([])
     const [user, setUser] = useState(null)
     const [selectedParty, setSelectedParty] = useState(null)
     const getPendingParties = async () => {
-        const { data } = await axios.get(url + "/getpendingparties")
+        const { data } = await axios.get(url + "/findparty" + `/${match.params.id}`)
         console.log("getpendingpartiesgetpendingpartiesgetpendingparties", data)
-        setPendingParties(data.message)
+        setSelectedParty(data.message[0])
+
     }
 
     const callForApis = () => {
@@ -23,13 +23,7 @@ const PendingParties = ({ match }) => {
             setSelectedParty(null)
         }
     }, [])
-    useEffect(() => {
-        if (pendingParties) {
-            const party = pendingParties.find(party => party._id === match.params.id)
-            console.log("party====", party)
-            setSelectedParty(party)
-        }
-    }, [pendingParties])
+
     const approveParty = async (id) => {
         const { data } = await axios.put(url + "/approveparty" + "/" + id)
         if (data.message) {
@@ -50,7 +44,6 @@ const PendingParties = ({ match }) => {
             setUser(userData)
         }
     }, [])
-    console.log("pendingParties", pendingParties)
     console.log("selected party ==============", selectedParty)
     return (
         <div className="container">
