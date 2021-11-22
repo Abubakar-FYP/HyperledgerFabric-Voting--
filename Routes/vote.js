@@ -34,9 +34,14 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
         _id: req.params.voter,
       }).catch((err) => console.log(err));
 
+      if (!voter || voter == null) {
+        return res.status(400).json({ message: "Voter does not exist" });
+      }
+
       console.log(voter.voteflag);
 
       if (voter.voteflag == true) {
+        //means that voter has already voted
         return res.json({ message: true });
       }
 
@@ -46,17 +51,28 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
         _id: req.params.candidate,
       }).catch((err) => console.log(err));
 
+      if (!candidate || candidate == null) {
+        return res.status(400).json({ message: "Candidate does not exist" });
+      }
+
       const party = await Party.findOne({
         _id: candidate.partyId,
       });
-      if (!party) return res.status(400).send("Part is Not Found");
+      if (!party || party == null)
+        return res.status(400).send("Party does not exist");
       console.log("party========", party);
       console.log("Candidate=====>", candidate, candidate.partyId);
       const ballot = await Ballot.findOne({ _id: candidate.ballotId });
+      if (!ballot || ballot == null) {
+        return res.status(400).json({ message: "Ballot does not exist" });
+      }
 
       console.log("Ballot=====>", ballot);
 
       const campaign = await Campaign.findOne({ _id: ballot.campaignId });
+      if (!campaign || campaign == null) {
+        return res.status(400).json({ message: "Campaign does not exist" });
+      }
 
       console.log("Campaign=====>", campaign);
 

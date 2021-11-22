@@ -113,17 +113,24 @@ router.get("/get/first/election", async (req, res) => {
 });
 
 router.put("/startelection", async (req, res) => {
-  const elections = Election.find({})
-    .populate("Party")
+  const elections = await Election.find({})
+    .populate("parties")
+    .select("-partyImg")
     .catch((err) => {
       console.log(err);
       res.json({ message: "there was an error fetching elections" });
     });
 
   elections.map(async (election) => {
-    if (Number(new Date()) >= Number(election.startTime)) election.valid = true;
+    if (
+      Number(new Date()) >= Number(election.startTime) &&
+      Number(new Date()) <= Number(election.endTime)
+    )
+      election.valid = true;
     await election.save();
   });
+
+  res.json({ message: elections });
 });
 
 router.put("/stopelection", async (req, res) => {
