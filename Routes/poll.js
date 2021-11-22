@@ -191,7 +191,7 @@ router.get("/getallpolls", async (req, res) => {
 });
 
 router.get("/getonepoll/:p_id", async (req, res) => {
-  const polls = await Polls.findOne({_id:req.params.p_id})
+  const polls = await Polls.findOne({ _id: req.params.p_id })
     .populate({
       path: "candidates",
       populate: {
@@ -202,7 +202,7 @@ router.get("/getonepoll/:p_id", async (req, res) => {
           select:
             "-partySymbol -partyImg -partyLeaderCnic -candidate -voters -voteCount -is_valid -_id -__v",
         },
-      }, 
+      },
     })
     .catch((err) => {
       console.log(err);
@@ -246,7 +246,9 @@ router.get("/getresultofallpolls", async (req, res) => {
   // send it
 });
 
-//p_id is pollid,v_id is voter id,c_id is candidate id
+//p_id is pollid
+//v_id is voter id
+//c_id is candidate id
 router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
   //check if any poll exists or not in polls Model
   await Voter.findOne({ _id: req.params.v_id })
@@ -296,42 +298,50 @@ router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
   if (poll == [] || !poll) {
     return res.json({ message: "there is no poll with this id" });
   } else {
-    let check = false;
-    poll.voters.map((voter) => {
-      if (voter == req.params.v_id) {
-        check = true;
-      }
-    });
-    if (check === true) {
-      return res.json({ message: "you have already voted in this poll" });
-    }
-    poll.voters.push(req.params.v_id);
-    poll.candidates.map((candidate) => {
-      console.log(candidate.candidate.id._id, req.params.c_id);
-      if (candidate.candidate.id._id == req.params.c_id) {
-        candidate.candidate.voteCount = candidate.candidate.voteCount + 1;
-      }
-    });
-
-    console.log(poll.candidates);
-
-    poll
-      .save()
-      .then(() => {
-        return res.json({ message: "voted successfully" });
-      })
-      .catch((err) => {
-        console.log(err);
+    if (
+      //checks if the poll entered is currently ongoing
+      Number(new Date()) >= poll.startTime &&
+      Number(new Date()) <= poll.endTime &&
+      poll.valid == true
+    ) {
+      let check = false;
+      poll.voters.map((voter) => {
+        if (voter == req.params.v_id) {
+          check = true;
+        }
       });
-  }
+      if (check === true) {
+        return res.json({ message: "you have already voted in this poll" });
+      }
+      poll.voters.push(req.params.v_id);
+      poll.candidates.map((candidate) => {
+        console.log(candidate.candidate.id._id, req.params.c_id);
+        if (candidate.candidate.id._id == req.params.c_id) {
+          candidate.candidate.voteCount = candidate.candidate.voteCount + 1;
+        }
+      });
 
+      console.log(poll.candidates);
+
+      poll
+        .save()
+        .then(() => {
+          return res.json({ message: "voted successfully" });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      return res.status(400).json({ message: "There is no poll in session" });
+    }
+  }
   //if they do check poll id
   //store votes in poll model
   //increment in polls model, candidate.votCount field
 });
 
 router.put("/stoppoll", async (req, res) => {
-  const polls = await Polls.find({ valid: true }).catch((err) => {
+  const polls = await Polls.find({}).catch((err) => {
     console.log(err);
   });
 
@@ -340,7 +350,7 @@ router.put("/stoppoll", async (req, res) => {
   }
 
   polls.map((poll) => {
-    if (poll.endTime == new Date() || new Date() > poll.endTime) {
+    if (Number(new Date()) >= Number(poll.endTime) && poll.valid == true) {
       poll.valid = false;
       poll
         .save()
@@ -355,7 +365,7 @@ router.put("/stoppoll", async (req, res) => {
 });
 
 router.put("/startpoll", async (req, res) => {
-  const polls = await Polls.find({ valid: false }).catch((err) => {
+  const polls = await Polls.find({}).catch((err) => {
     console.log(err);
   });
 
@@ -364,7 +374,12 @@ router.put("/startpoll", async (req, res) => {
   }
 
   polls.map((poll) => {
-    if (poll.startTime == new Date() || new Date() > poll.startTime) {
+    if (
+      //checks if its a polls valid time
+      Number(new Date()) >= Number(poll.startTime) &&
+      Number(new Date()) <= Number(poll.endTime) &&
+      poll.valid == false
+    ) {
       poll.valid = true;
       poll
         .save()
