@@ -2,10 +2,14 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 
-require("../Models/party");
-require("../Models/election");
+require("../Models/polls");
+require("../Models/poller");
 //
-const Party = mongoose.model("Party");
-const Election = require("../Models/election");
+const Polls = mongoose.model("Polls");
+const Poller = mongoose.model("Poller");
+
+
+//home page
+
 
 module.exports = router;

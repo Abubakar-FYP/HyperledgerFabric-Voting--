@@ -15,13 +15,16 @@ require("../Models/admin");
 require("../Models/voter");
 require("../Models/nadra");
 require("../Models/election");
+require("../Models/poller");
+require("../Models/polls");
 
 //models
 const Admin = mongoose.model("Admin");
 const Voter = mongoose.model("Voter");
 const Nadra = mongoose.model("Nadra");
 const Elections = mongoose.model("Election");
-
+const Poller = mongoose.model("Poller");
+const Polls = mongoose.model("Polls");
 //HERE OTP WORK WAS DONE
 
 router.post("/signinadmin", requireLogin, (req, res) => {
@@ -199,6 +202,64 @@ router.post("/reset/password", async (req, res) => {
 
   res.status(200).send("Password has been updated successfully");
 });
+
+router.post("/signup/poller",async(req,res)=>{
+  
+  if(!email||!password){
+    return res.status(400).json({message:"one or more fields are empty"});
+  }
+  
+  const pollers = await Poller.find({});
+
+  let check1 = false;
+  pollers.map((poller)=>{//checks if poller exists already
+    if(poller.email==email && poller.password==password){
+      check1 = true;
+    }
+  });
+
+  if(check1==true)
+    return res.status(400).json({message:"user already exists"});
+
+  const newPoller = new Poller({
+    email:email,
+    password:password
+  });
+
+  await newPoller.save().catch((err)=>{console.log(err)});
+  res.status(200).json({message:"successfully signed-up"})
+})
+
+router.post("/signin/poller",async (req,res)=>{
+  if(!email||!password){
+    return res.status(400).json({message:"one or more fields are empty"});
+  }
+
+  const _polls = await Polls.find({});
+  let latestPoll;
+  _polls.map((poll)=>{
+    if(Number(new Date()) >= Number(poll.startTime) && Number(new Date()) <= Number(poll.endTime)){
+      latestPoll = poll;
+    }
+  })
+
+  
+  let check1 = false;
+  const poller = await Poller
+  .findOne({email:email},{password:password})
+  .select("-password")
+
+  if(poller==null||!poller||poller==undefined){
+    return res.status(400).json({message:"user does not exist"});
+  }
+  
+    const token = jwt.sign({ _id: doc._id }, JWTKEY);
+
+    res.send({token,poller,latestPoll});
+  //token is the jwt token, poller is the user without the password
+  //latestPoll is the current single poll running 
+})
+
 /* 
 router.post("/signinotp", async (req, res) => {
   const genOtp = localStorage.getItem("sOtp");

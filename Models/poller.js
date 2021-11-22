@@ -1,7 +1,7 @@
 const { Schema } = require("mongoose"); //Admin editable only
 const mongoose = require("mongoose");
 
-const pollsSchema = new mongoose.Schema({
+const pollerSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
@@ -10,7 +10,11 @@ const pollsSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  pollvote:[{
+    type: mongoose.Types.ObjectId,
+    ref: "Polls"
+  }]
 });
 
-global.Polls = global.Polls || mongoose.model("Polls", pollsSchema);
-module.exports = global.Polls;
+global.Poller = global.Poller || mongoose.model("Poller", pollerSchema);
+module.exports = global.Poller;

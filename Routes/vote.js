@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const { restart } = require("nodemon");
-const path = require("path");
 
 const requireLogin = require("../Middleware/requirelogin");
 

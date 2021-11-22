@@ -8,10 +8,12 @@ require("../Models/candidate");
 require("../Models/nadra");
 require("../Models/polls");
 require("../Models/voter");
+require("../Models/poller");
 
 const Polls = mongoose.model("Polls");
 const Voter = mongoose.model("Voter");
 const Candidate = mongoose.model("Candidate");
+const Poller = mongoose.model("Poller");
 
 /*
 
@@ -247,22 +249,21 @@ router.get("/getresultofallpolls", async (req, res) => {
 });
 
 //p_id is pollid
-//v_id is voter id
+//v_id is poller id
 //c_id is candidate id
 router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
   //check if any poll exists or not in polls Model
-  await Voter.findOne({ _id: req.params.v_id })
-    .then((resp) => {
-      if (resp == null || !resp) {
-        return res.json({ message: "voter with the given id does not exist" });
-      }
-    })
+  const poller = await Poller.findOne({ _id: req.params.v_id }) //finds poller 
     .catch((err) => {
       console.log(err);
       return res.json({ message: "voter with the given id does not exist" });
     });
 
-  await Candidate.findOne({ _id: req.params.c_id })
+    if(poller==null||!poller){
+      return res.status(400).json({message:"poller does not exist"})
+    }
+
+  await Candidate.findOne({ _id: req.params.c_id }) //finds candidate
     .then((resp) => {
       if (resp == null || !resp) {
         return res.json({
@@ -277,7 +278,7 @@ router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
       });
     });
 
-  const poll = await Polls.findOne({ _id: req.params.p_id })
+  const poll = await Polls.findOne({ _id: req.params.p_id }) //finds poll
     .populate({
       path: "candidates",
       populate: {
@@ -323,7 +324,14 @@ router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
 
       console.log(poll.candidates);
 
-      poll
+      poller.pollvote.push(req.params.p_id);
+      
+      await poller.save().catch((err)=>{
+        console.log(err);
+        return res.status(400).json({message:"couldnt save poll in poller"});
+      })
+
+      await poll
         .save()
         .then(() => {
           return res.json({ message: "voted successfully" });
