@@ -55,12 +55,31 @@ router.post("/createpoll", async (req, res) => {
     return res.json({ message: "one or more fields are empty" });
   }
 
-  const found = await Polls.findOne({ pollname: pollname });
-  if (found) {
-    if (found.pollname === pollname) {
-      return res.json({ message: "poll already present with this name" });
-    }
-  }
+  let check1 = false; //check for poll name
+  let check2 = false; //check for current poll
+  let check3 = false; //check for about to start poll
+  const polls = await Polls.findOne({});
+  polls.map((poll) => {
+    if (poll.pollname == pollname) check1 = true;
+    if (
+      Number(new Date()) >= Number(poll.startTime) &&
+      Number(new Date()) <= Number(poll.endTime)
+    )
+      check2 = true;
+
+    if (Number(new Date()) < Number(poll.startTime)) check3 = true;
+  });
+
+  if (check1 == true || check1)
+    return res.json({ message: "poll already present with this name" });
+
+  if (check2 == true || check2)
+    return res.json({
+      message: "another poll is already running,cannot create a new poll",
+    });
+
+  if (check3 == true || check3)
+    return res.json({ message: "a poll is in que,connot create a new poll" });
 
   const newPol = new Polls({
     pollname: pollname,
@@ -71,13 +90,13 @@ router.post("/createpoll", async (req, res) => {
     candidates: candidates,
   });
 
-  if (newPol.startTime == new Date() || new Date() > newPol.startTime) {
+  if (newPol.startTime >= new Date()) {
     newPol.valid = true;
   } else {
     newPol.valid = false;
   }
 
-  newPol
+  await newPol
     .save()
     .then(() => {
       return res.json({ message: "poll saved successfully" });
@@ -253,15 +272,15 @@ router.get("/getresultofallpolls", async (req, res) => {
 //c_id is candidate id
 router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
   //check if any poll exists or not in polls Model
-  const poller = await Poller.findOne({ _id: req.params.v_id }) //finds poller 
+  const poller = await Poller.findOne({ _id: req.params.v_id }) //finds poller
     .catch((err) => {
       console.log(err);
       return res.json({ message: "voter with the given id does not exist" });
     });
 
-    if(poller==null||!poller){
-      return res.status(400).json({message:"poller does not exist"})
-    }
+  if (poller == null || !poller) {
+    return res.status(400).json({ message: "poller does not exist" });
+  }
 
   await Candidate.findOne({ _id: req.params.c_id }) //finds candidate
     .then((resp) => {
@@ -325,11 +344,11 @@ router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
       console.log(poll.candidates);
 
       poller.pollvote.push(req.params.p_id);
-      
-      await poller.save().catch((err)=>{
+
+      await poller.save().catch((err) => {
         console.log(err);
-        return res.status(400).json({message:"couldnt save poll in poller"});
-      })
+        return res.status(400).json({ message: "couldnt save poll in poller" });
+      });
 
       await poll
         .save()
