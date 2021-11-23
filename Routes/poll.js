@@ -55,10 +55,19 @@ router.post("/createpoll", async (req, res) => {
     return res.json({ message: "one or more fields are empty" });
   }
 
+  if(Number(endTime) < Number(startTime)){ //if end time is < start time
+    return res.status(400).json({message:"invalid time entered,end-time is less than start-time"});
+  }
+  
+  if(Number(startTime) < Number(new Date())){// if start time is < current time
+    return res.status(400).json({message:"invalid time entered, start time is less than current time"});
+  }
+
   let check1 = false; //check for poll name
   let check2 = false; //check for current poll
   let check3 = false; //check for about to start poll
-  const polls = await Polls.findOne({});
+  const polls = await Polls.find({});
+
   polls.map((poll) => {
     if (poll.pollname == pollname) check1 = true;
     if (
@@ -107,7 +116,8 @@ router.post("/createpoll", async (req, res) => {
 });
 //those which are in progress
 router.get("/currentpolls", async (req, res) => {
-  const polls = await Polls.find({ valid: true })
+
+  const polls = await Polls.find({})
     .populate({
       path: "candidates",
       populate: {
@@ -125,8 +135,20 @@ router.get("/currentpolls", async (req, res) => {
       console.log(err);
       return res.json({ message: "there was an error finding polls" });
     });
+    let currentPoll;
+    let check1 = false;//checks if current poll is present
+    polls.map((poll)=>{
+      if(Number(new Date()) >= Number(poll.startTime) && Number(new Date()) < Number(poll.endTime)){
+        currentPoll = poll;
+        check1 = true;
+      }
+    });
 
-  res.json({ message: polls });
+    if(!check1||check1==false){
+      return res.status(200).json({message:"there is no current poll running"});
+    }
+
+  res.json({ message: currentPoll });
 });
 
 //invalid marks as previous or not started
