@@ -13,6 +13,10 @@ const pollerSchema = new mongoose.Schema({
   pollvote:[{
     type: mongoose.Types.ObjectId,
     ref: "Polls"
+  }],
+  pollcandidate:[{
+    type: mongoose.Types.ObjectId,
+    ref: "Candidate"
   }]
 });
 

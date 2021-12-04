@@ -203,6 +203,7 @@ router.post("/reset/password", async (req, res) => {
   res.status(200).send("Password has been updated successfully");
 });
 
+//poller signup
 router.post("/signup/poller",async(req,res)=>{
   
   if(!email||!password){
@@ -227,9 +228,13 @@ router.post("/signup/poller",async(req,res)=>{
   });
 
   await newPoller.save().catch((err)=>{console.log(err)});
-  res.status(200).json({message:"successfully signed-up"})
-})
+  res.send(newPoller);
+});
 
+
+
+
+//poller signin
 router.post("/signin/poller",async (req,res)=>{
   if(!email||!password){
     return res.status(400).json({message:"one or more fields are empty"});
