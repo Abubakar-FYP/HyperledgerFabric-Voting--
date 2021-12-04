@@ -325,15 +325,15 @@ router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
     return res.status(400).json({ message: "poller does not exist" });
   }
 
-  let check4; //check if already participated in the same poll
+  let check5; //check if already participated in the same poll
 
   poller.pollvote.map((poll)=>{
     if(toString(poll)==toString(req.params.p_id)){
-      check4 = true;
+      check5 = true;
     }
   });
 
-  if(check4==true||check4)
+  if(check5==true||check5)
     return res.status(400).json({message:"poller has already participated in this poll"});
   
 
