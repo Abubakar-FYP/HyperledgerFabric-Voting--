@@ -55,12 +55,18 @@ router.post("/createpoll", async (req, res) => {
     return res.json({ message: "one or more fields are empty" });
   }
 
-  if(Number(endTime) < Number(startTime)){ //if end time is < start time
-    return res.status(400).json({message:"invalid time entered,end-time is less than start-time"});
+  if (Number(endTime) < Number(startTime)) {
+    //if end time is < start time
+    return res.status(400).json({
+      message: "invalid time entered,end-time is less than start-time",
+    });
   }
-  
-  if(Number(startTime) < Number(new Date())){// if start time is < current time
-    return res.status(400).json({message:"invalid time entered, start time is less than current time"});
+
+  if (Number(startTime) < Number(new Date())) {
+    // if start time is < current time
+    return res.status(400).json({
+      message: "invalid time entered, start time is less than current time",
+    });
   }
 
   let check1 = false; //check for poll name
@@ -115,8 +121,8 @@ router.post("/createpoll", async (req, res) => {
     });
 });
 //those which are in progress
-router.get("/currentpolls", async (req, res) => {
 
+router.get("/currentpolls", async (req, res) => {
   const polls = await Polls.find({})
     .populate({
       path: "candidates",
@@ -135,25 +141,30 @@ router.get("/currentpolls", async (req, res) => {
       console.log(err);
       return res.json({ message: "there was an error finding polls" });
     });
-    let currentPoll;
-    let check1 = false;//checks if current poll is present
-    polls.map((poll)=>{
-      if(Number(new Date()) >= Number(poll.startTime) && Number(new Date()) < Number(poll.endTime)){
-        currentPoll = poll;
-        check1 = true;
-      }
-    });
-
-    if(!check1||check1==false){
-      return res.status(200).json({message:"there is no current poll running"});
+  let currentPoll;
+  let check1 = false; //checks if current poll is present
+  polls.map((poll) => {
+    if (
+      Number(new Date()) >= Number(poll.startTime) &&
+      Number(new Date()) < Number(poll.endTime)
+    ) {
+      currentPoll = poll;
+      check1 = true;
     }
+  });
+
+  if (!check1 || check1 == false) {
+    return res
+      .status(200)
+      .json({ message: "there is no current poll running" });
+  }
 
   res.json({ message: currentPoll });
 });
 
 //invalid marks as previous or not started
 router.get("/previouspolls", async (req, res) => {
-  const polls = await Polls.find({ valid: false })
+  const polls = await Polls.find({})
     .populate({
       path: "candidates",
       populate: {
@@ -171,9 +182,10 @@ router.get("/previouspolls", async (req, res) => {
       console.log(err);
       return res.json({ message: "there was an error finding polls" });
     });
+
   const previousPolls = new Array();
   polls.map((poll) => {
-    if (new Date() > poll.endTime) {
+    if (Number(new Date()) >= Number(poll.endTime)) {
       previousPolls.push(poll);
     }
   });
@@ -200,12 +212,21 @@ router.get("/abouttostartpolls", async (req, res) => {
       console.log(err);
       return res.json({ message: "there was an error finding polls" });
     });
+
+  let check1 = false; //checks if there are no polls
   const upComingPolls = new Array();
   polls.map((poll) => {
-    if (new Date() < poll.startTime) {
+    if (Number(new Date()) < Number(poll.startTime)) {
       upComingPolls.push(poll);
     }
   });
+
+  if (upComingPolls == null || upComingPolls === [] || upComingPolls == []) {
+    console.log("empty");
+    return res
+      .status(400)
+      .json({ message: "there are no up-coming poll right now" });
+  }
 
   res.json(upComingPolls);
 });
@@ -348,6 +369,17 @@ router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
       console.log(err);
       return res.json({ message: "there was an error finding the poll with that id" });
     });
+  let check4 = false;
+  poll.voters.map((voter) => {
+    if (voter == req.params.v_id) {
+      check4 = true;
+    }
+  });
+
+  if (check4 == true)
+    return res
+      .status(400)
+      .json({ message: "voter has already voted in this poll" });
 
   if (poll == [] || !poll) {
     return res.json({ message: "there is no poll with this id" });
