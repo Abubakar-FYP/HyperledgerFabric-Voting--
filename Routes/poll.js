@@ -266,7 +266,7 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
 
   let check5; //check if already participated in the same poll
 
-  poller.pollvote.map((poll) => {
+  poller?.pollvote?.map((poll) => {
     if (toString(poll) == toString(req.params.p_id)) {
       check5 = true;
     }

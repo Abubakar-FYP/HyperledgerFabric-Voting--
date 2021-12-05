@@ -10,42 +10,76 @@ const ElectionCreation = () => {
     const [boolean, setBoolean] = useState(true)
     const [poolName, setPoolName] = useState("")
     const [poolNameList, setPoolNameList] = useState([])
+    const [type, setType] = useState("")
+    const [description, setDescription] = useState("")
     console.log(poolNameList)
     const [electionName, setElectionName] = useState("")
     const [elections, setElections] = useState([])
     const handleOnSubmit = async () => {
         let dataToSend;
-        if(boolean){
-
-        }else{
-            
-        }
-         dataToSend = {
-            electionName: electionName,
-            startTime: new Date(startDate).getTime(),
-            endTime: new Date(endDate).getTime(),
-            electionType: boolean ? "country" : "poal",
-            candidates: !boolean ? poolNameList : undefined
-        }
-        try {
-            console.log("clicked", dataToSend)
-
-            const { data } = await axios.post(url + "/create/election", dataToSend)
-            console.log("res.data=======", data.election)
-            if (data.election) {
-                toast.success("Election is Created Successfully")
-                setCreateElection(false)
-                setBoolean(true)
-                setPoolName("")
-                setPoolNameList([])
-                console.log("done")
-                setElectionName("")
+        if (boolean) {
+            dataToSend = {
+                electionName: electionName,
+                startTime: new Date(startDate).getTime(),
+                endTime: new Date(endDate).getTime(),
+                electionType: boolean ? "country" : "poal",
+                candidates: !boolean ? poolNameList : undefined
             }
-        } catch (error) {
-            console.log(error.message)
-            toast.error(error.message)
+            try {
+                console.log("clicked", dataToSend)
+    
+                const { data } = await axios.post(url + "/create/election", dataToSend)
+                console.log("res.data=======", data.election)
+                if (data.election) {
+                    toast.success("Election is Created Successfully")
+                    setCreateElection(false)
+                    setBoolean(true)
+                    setPoolName("")
+                    setPoolNameList([])
+                    console.log("done")
+                    setElectionName("")
+                }
+                return
+            } catch (error) {
+                console.log(error.message)
+                toast.error(error.message)
+                return
+            }
+        } else {
+            dataToSend = {
+                pollname: electionName,
+                startTime: new Date(startDate).getTime(),
+                endTime: new Date(endDate).getTime(),
+                type: type,
+                description: description,
+                items: poolNameList
+            }
+            try {
+                console.log("clicked1", dataToSend)
+    
+                const { data } = await axios.post(url + "/createpoll", dataToSend)
+                console.log("res.data=======", data.election)
+                if (data.election) {
+                    toast.success("Election is Created Successfully")
+                    setCreateElection(false)
+                    setBoolean(true)
+                    setPoolName("")
+                    setPoolNameList([])
+                    console.log("done")
+                    setElectionName("")
+                }
+            } catch (error) {
+                console.log(error.message)
+                toast.error(error.message)
+            }
         }
-
+        // dataToSend = {
+        //     electionName: electionName,
+        //     startTime: new Date(startDate).getTime(),
+        //     endTime: new Date(endDate).getTime(),
+        //     electionType: boolean ? "country" : "poal",
+        //     candidates: !boolean ? poolNameList : undefined
+        // }
     }
 
     // console.log("pendingPartiespendingParties",pendingParties)
@@ -179,7 +213,7 @@ const ElectionCreation = () => {
                                 <input
                                     value={electionName}
                                     onChange={e => setElectionName(e.target.value)}
-                                    type="text" id="electionName" className="form-control" placeholder="Election Name" />
+                                    type="text" id="electionName" className="form-control" placeholder={` ${boolean ? "Election Name" : "Poll Name"}`} />
                             </div>
                         </div>
                         <div className="col-md-6">
@@ -189,11 +223,37 @@ const ElectionCreation = () => {
                                     className={`btn btn-${boolean ? "primary" : "light"} mx-2`}>
                                     Country</button>
                                 <button
-                                    onClick={() => setBoolean(false)}
+                                    onClick={() => {
+                                        setType("")
+                                        setDescription("")
+                                        setElectionName("")
+                                        setPoolNameList([])
+                                        setBoolean(false)
+                                    }}
                                     className={`btn btn-${!boolean ? "primary" : "light"} active`}>
-                                    Poal</button>
+                                    Poll</button>
                             </div>
 
+                        </div>
+                        <div className={`my-5 ${!boolean ? "d-block" : "d-none"}`}>
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <label htmlFor="electionName">Poll Type</label>
+                                    <input
+                                        value={type}
+                                        onChange={e => setType(e.target.value)}
+                                        type="text" id="pollType" className="form-control" placeholder={`Poll Type`} />
+                                </div>
+                            </div>
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <label htmlFor="electionName">Poll Description</label>
+                                    <input
+                                        value={description}
+                                        onChange={e => setDescription(e.target.value)}
+                                        type="text" id="pollDescription" className="form-control" placeholder={`Poll Description`} />
+                                </div>
+                            </div>
                         </div>
                         <div className={`my-5 ${!boolean ? "d-block" : "d-none"}`}>
                             <div className="form-group">
@@ -201,17 +261,20 @@ const ElectionCreation = () => {
                                     <div className="col-md-8">
                                         <input type="text"
                                             value={poolName}
+                                            placeholder="Poll Item"
                                             onChange={e => setPoolName(e.target.value)}
                                             className="form-control" />
                                     </div>
                                     <div className="col-md-4">
                                         <button
                                             onClick={() => {
-                                                setPoolNameList([...poolNameList, poolName])
+                                                let obj = {item: {name: poolName}}
+
+                                                setPoolNameList([...poolNameList, obj])
                                                 setPoolName("")
                                             }}
                                             className="btn btn-primary pb-5">
-                                            Poal Name  <i className="fas fa-plus"></i>
+                                            Poll Items  <i className="fas fa-plus"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -223,12 +286,13 @@ const ElectionCreation = () => {
                                     {poolNameList.map((val, index) => (
                                         <li
                                             key={index}
-                                            className="list-group-item" value={val}>{val}</li>
+                                            className="list-group-item" value={val.item.name}>{val.item.name}</li>
                                     ))}
 
                                 </ul> : null
                             }
                         </div>
+                        {console.log("poolName List <><><><><><><><><><><><><><><><><><>",  poolNameList)}
                         <div className="d-flex justify-content-end">
                             <button
                                 onClick={handleOnSubmit}

@@ -2,9 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { url } from "../../constants";
 import { toast } from "react-toastify";
+import {useHistory} from "react-router-dom"
 const Poll = ({ match }) => {
-  const [onsePoll, setOnePoll] = useState(null);
-
+  const history = useHistory()
+  const [onePoll, setOnePoll] = useState(null);
+  const [isVoteCasted, setIsVoteCasted] = useState(false)
+const [user, setUser] = useState(null)
   const getSinglePoll = async () => {
     try {
       const { data } = await axios.get(
@@ -21,7 +24,49 @@ const Poll = ({ match }) => {
 
   useEffect(() => {
     getSinglePoll();
+    const userData = JSON.parse(localStorage.getItem("userData"))
+    if(userData){
+      setUser(userData)
+    }else{
+      toast.error("Login First To Cast Vote")
+      history.push("/")
+    }
+    
   }, []);
+  useEffect(() => {
+
+    console.log("cccdddddddddddddddddddddd", user)
+    if(user?.poller){
+
+      const isVoted = onePoll?.voters?.find(id => id === user.poller._id)
+      console.log("isVoteeeeeeeeedddddddddddddddd", isVoted)
+      if(isVoted){
+        setIsVoteCasted(true)
+      }else{
+        setIsVoteCasted(false)
+      }
+    }
+    
+  }, [user, onePoll])
+  const castAVote = async (canId) => {
+    console.log("clickeddddddddddd", canId)
+
+    try {
+      const { data } = await axios.post(
+        url + "/votepoll" + `/${match.params.id}` + `/${user?.poller?._id}` + `/${canId}`
+      );
+
+      console.log("data from vote casting", data);
+      // setOnePoll(data.message);
+      if(data.message){
+        toast.success(data.message)
+        setIsVoteCasted(true)
+      }
+    } catch (error) {
+      console.log("error from Vote Casting", error.message);
+      toast.error(error.message);
+    }
+  }
   return (
     <div className="mx-5">
       <div className="row">
@@ -30,13 +75,13 @@ const Poll = ({ match }) => {
             <div className="card-header">Poll Data</div>
             <div className="card-body">
               <p className="align-left">
-                <strong>Poal Name</strong>: {onsePoll?.pollname}
+                <strong>Poal Name</strong>: {onePoll?.pollname}
               </p>
               <p>
-                <strong>Poal Type</strong>: {onsePoll?.type}
+                <strong>Poal Type</strong>: {onePoll?.type}
               </p>
               <p>
-                <strong>Description</strong>: {onsePoll?.description}
+                <strong>Description</strong>: {onePoll?.description}
               </p>
             </div>
           </div>
@@ -45,7 +90,23 @@ const Poll = ({ match }) => {
           <div className="card">
             <div className="card-header">Candidates</div>
             <div className="card-body">
-                
+              <div className="">
+              {onePoll?.items?.length && onePoll.items.map(item => (
+                  <div key={item._id}>
+                  <div className="mt-4">
+                    <strong>Candidate Name :  </strong>
+                    {item.item.name}
+                  </div>
+                  <div className="mt-4">
+                    <button
+                      disabled={isVoteCasted}
+                      onClick={() => castAVote(item._id)}
+                      className="btn btn-success">Vote</button>
+                  </div>
+                  <hr />
+                </div>
+              ))}
+              </div>
             </div>
           </div>
         </div>
