@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
-const axios = require("axios");
 const requireLogin = require("../Middleware/requirelogin");
 
 require("../Models/candidate");
@@ -18,9 +17,9 @@ router.delete("/deletecandidate/:_id", async (req, res) => {
   if (!_id) {
     return res.status(400).json({ message: "field is empty" });
   }
-  Candidate.deleteOne({ _id: _id })
+  Candidate.deleteOne({ _id: req.params._id })
     .then(() => {
-      res.json(`${_id} has been deleted`);
+      res.json(`candidate has been deleted`);
     })
     .catch((err) => {
       console.log(err);

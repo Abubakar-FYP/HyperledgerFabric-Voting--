@@ -43,13 +43,14 @@ router.post("/create/election", async (req, res) => {
           .send(
             "you cannot create a election, when an election is currently running"
           );
-      }
+      } //current election check
+
       if (check2 == true) {
         console.log("future here");
         return res
           .status(400)
           .send("you cannot create a election, when an election is in queue");
-      }
+      } //future election check
     } //checks for any currently running elections or future elections
 
     if (electionType === "poal" && !candidates)
@@ -60,6 +61,7 @@ router.post("/create/election", async (req, res) => {
     election.startTime = startTime;
     election.endTime = endTime;
     election.electionType = electionType;
+    if (Number(new Date()) >= election.startTime) election.valid = true;
 
     if (electionType.toLowerCase() === "country") {
       const parties = await Party.find({ is_valid: true });
@@ -110,13 +112,82 @@ router.get("/get/first/election", async (req, res) => {
   }
 });
 
-router.put("/stopelection",async (req,res)=>{
-  //get all election
-  //get all their including parties
-  //invalid them for the next election
-  //all parties are excluded
+router.put("/startelection", async (req, res) => {
+  const elections = await Election.find({})
+    .populate("parties")
+    .select("-partyImg")
+    .catch((err) => {
+      console.log(err);
+      res.json({ message: "there was an error fetching elections" });
+    });
+
+  elections.map(async (election) => {
+    if (
+      Number(new Date()) >= Number(election.startTime) &&
+      Number(new Date()) <= Number(election.endTime)
+    )
+      election.valid = true;
+    await election.save();
+  });
+
+  res.json({ message: elections });
+});
+
+router.put("/stopelection", async (req, res) => {
+  const elections = await Election.find({})
+    .populate({
+      path: "parties",
+      select: "-partyImg",
+    })
+    .catch((err) => {
+      console.log(err);
+      res.json({ message: "there was an error fetching elections" });
+    });
+
+  /* for(var i=0;i<elections.length;i++){
+    if (Number(new Date()) >= Number(elections[i].endTime)) elections[i].valid = false;
+    if (elections[i].valid == false) {
+    for(var j=0;j<elections.parties.length;i++){
+
+      if (party.participate.inelection == true) {
+        //if election has ended, then set party to not participate in any election
+        party.participate.inelection = false;
+        const updateParty = await Party.findOne({ _id: party._id });
+        if (!updateParty || updateParty == null || updateParty == []) {
+          check1 = true;
+          break
+        }
+      }
+    }
+    }
+    
+  }
+ */
+
+  elections.map(async (election) => {
+    if (Number(new Date()) >= Number(election.endTime)) election.valid = false;
+    if (election.valid == false) {
+      //checks if election has ended
+      election.parties.map(async (party) => {
+        if (party.participate.inelection == true) {
+          //if election has ended, then set party to not participate in any election
+          const updateParty = await Party.findOne({ _id: party._id });
+          updateParty.participate.inelection = false;
+          await updateParty.save().catch((err) => {
+            console.log(err);
+          });
+        }
+      });
+    }
+    await election.save().catch((err) => {
+      console.log(err);
+    });
+  });
+
+  res.json({ message: elections });
+
   //check if already participated and valid
   //parties particpate.inelection = false
-})
+});
 
 module.exports = router;

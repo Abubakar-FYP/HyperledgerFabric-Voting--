@@ -14,17 +14,22 @@ const electionSchema = new mongoose.Schema({
     type: String,
   },
   candidates: [
-  {
-    type: String,
-    default:null
-  }
-],
-  parties: [
     {
-        type: mongoose.Schema.Types.ObjectId,
-         ref: "Party" 
+      type: String,
+      default: null,
     },
   ],
+  parties: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Party",
+    },
+  ],
+
+  valid: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Election = mongoose.model("Election", electionSchema);

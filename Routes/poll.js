@@ -8,10 +8,12 @@ require("../Models/candidate");
 require("../Models/nadra");
 require("../Models/polls");
 require("../Models/voter");
+require("../Models/poller");
 
 const Polls = mongoose.model("Polls");
 const Voter = mongoose.model("Voter");
 const Candidate = mongoose.model("Candidate");
+const Poller = mongoose.model("Poller");
 
 /*
 
@@ -53,12 +55,46 @@ router.post("/createpoll", async (req, res) => {
     return res.json({ message: "one or more fields are empty" });
   }
 
-  const found = await Polls.findOne({ pollname: pollname });
-  if (found) {
-    if (found.pollname === pollname) {
-      return res.json({ message: "poll already present with this name" });
-    }
+  if (Number(endTime) < Number(startTime)) {
+    //if end time is < start time
+    return res.status(400).json({
+      message: "invalid time entered,end-time is less than start-time",
+    });
   }
+
+  if (Number(startTime) < Number(new Date())) {
+    // if start time is < current time
+    return res.status(400).json({
+      message: "invalid time entered, start time is less than current time",
+    });
+  }
+
+  let check1 = false; //check for poll name
+  let check2 = false; //check for current poll
+  let check3 = false; //check for about to start poll
+  const polls = await Polls.find({});
+
+  polls.map((poll) => {
+    if (poll.pollname == pollname) check1 = true;
+    if (
+      Number(new Date()) >= Number(poll.startTime) &&
+      Number(new Date()) <= Number(poll.endTime)
+    )
+      check2 = true;
+
+    if (Number(new Date()) < Number(poll.startTime)) check3 = true;
+  });
+
+  if (check1 == true || check1)
+    return res.json({ message: "poll already present with this name" });
+
+  if (check2 == true || check2)
+    return res.json({
+      message: "another poll is already running,cannot create a new poll",
+    });
+
+  if (check3 == true || check3)
+    return res.json({ message: "a poll is in que,connot create a new poll" });
 
   const newPol = new Polls({
     pollname: pollname,
@@ -69,13 +105,13 @@ router.post("/createpoll", async (req, res) => {
     candidates: candidates,
   });
 
-  if (newPol.startTime == new Date() || new Date() > newPol.startTime) {
+  if (newPol.startTime >= new Date()) {
     newPol.valid = true;
   } else {
     newPol.valid = false;
   }
 
-  newPol
+  await newPol
     .save()
     .then(() => {
       return res.json({ message: "poll saved successfully" });
@@ -85,8 +121,9 @@ router.post("/createpoll", async (req, res) => {
     });
 });
 //those which are in progress
+
 router.get("/currentpolls", async (req, res) => {
-  const polls = await Polls.find({ valid: true })
+  const polls = await Polls.find({})
     .populate({
       path: "candidates",
       populate: {
@@ -104,13 +141,30 @@ router.get("/currentpolls", async (req, res) => {
       console.log(err);
       return res.json({ message: "there was an error finding polls" });
     });
+  let currentPoll;
+  let check1 = false; //checks if current poll is present
+  polls.map((poll) => {
+    if (
+      Number(new Date()) >= Number(poll.startTime) &&
+      Number(new Date()) < Number(poll.endTime)
+    ) {
+      currentPoll = poll;
+      check1 = true;
+    }
+  });
 
-  res.json({ message: polls });
+  if (!check1 || check1 == false) {
+    return res
+      .status(200)
+      .json({ message: "there is no current poll running" });
+  }
+
+  res.json({ message: currentPoll });
 });
 
 //invalid marks as previous or not started
 router.get("/previouspolls", async (req, res) => {
-  const polls = await Polls.find({ valid: false })
+  const polls = await Polls.find({})
     .populate({
       path: "candidates",
       populate: {
@@ -128,9 +182,10 @@ router.get("/previouspolls", async (req, res) => {
       console.log(err);
       return res.json({ message: "there was an error finding polls" });
     });
+
   const previousPolls = new Array();
   polls.map((poll) => {
-    if (new Date() > poll.endTime) {
+    if (Number(new Date()) >= Number(poll.endTime)) {
       previousPolls.push(poll);
     }
   });
@@ -157,12 +212,21 @@ router.get("/abouttostartpolls", async (req, res) => {
       console.log(err);
       return res.json({ message: "there was an error finding polls" });
     });
+
+  let check1 = false; //checks if there are no polls
   const upComingPolls = new Array();
   polls.map((poll) => {
-    if (new Date() < poll.startTime) {
+    if (Number(new Date()) < Number(poll.startTime)) {
       upComingPolls.push(poll);
     }
   });
+
+  if (upComingPolls == null || upComingPolls === [] || upComingPolls == []) {
+    console.log("empty");
+    return res
+      .status(400)
+      .json({ message: "there are no up-coming poll right now" });
+  }
 
   res.json(upComingPolls);
 });
@@ -191,7 +255,7 @@ router.get("/getallpolls", async (req, res) => {
 });
 
 router.get("/getonepoll/:p_id", async (req, res) => {
-  const polls = await Polls.findOne({_id:req.params.p_id})
+  const polls = await Polls.findOne({ _id: req.params.p_id })
     .populate({
       path: "candidates",
       populate: {
@@ -202,7 +266,7 @@ router.get("/getonepoll/:p_id", async (req, res) => {
           select:
             "-partySymbol -partyImg -partyLeaderCnic -candidate -voters -voteCount -is_valid -_id -__v",
         },
-      }, 
+      },
     })
     .catch((err) => {
       console.log(err);
@@ -246,21 +310,34 @@ router.get("/getresultofallpolls", async (req, res) => {
   // send it
 });
 
-//p_id is pollid,v_id is voter id,c_id is candidate id
+//p_id is pollid
+//v_id is poller id
+//c_id is candidate id
 router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
   //check if any poll exists or not in polls Model
-  await Voter.findOne({ _id: req.params.v_id })
-    .then((resp) => {
-      if (resp == null || !resp) {
-        return res.json({ message: "voter with the given id does not exist" });
-      }
-    })
+  const poller = await Poller.findOne({ _id: req.params.v_id }) //finds poller
     .catch((err) => {
       console.log(err);
       return res.json({ message: "voter with the given id does not exist" });
     });
 
-  await Candidate.findOne({ _id: req.params.c_id })
+  if (poller == null || !poller) {
+    return res.status(400).json({ message: "poller does not exist" });
+  }
+
+  let check5; //check if already participated in the same poll
+
+  poller.pollvote.map((poll)=>{
+    if(toString(poll)==toString(req.params.p_id)){
+      check5 = true;
+    }
+  });
+
+  if(check5==true||check5)
+    return res.status(400).json({message:"poller has already participated in this poll"});
+  
+
+  await Candidate.findOne({ _id: req.params.c_id }) //finds candidate
     .then((resp) => {
       if (resp == null || !resp) {
         return res.json({
@@ -271,11 +348,11 @@ router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
     .catch((err) => {
       console.log(err);
       return res.json({
-        message: "candidate with the given id does not exist",
+        message: "there was an error finding the candidate",
       });
     });
 
-  const poll = await Polls.findOne({ _id: req.params.p_id })
+  const poll = await Polls.findOne({ _id: req.params.p_id }) //finds poll
     .populate({
       path: "candidates",
       populate: {
@@ -290,48 +367,75 @@ router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      return res.json({ message: "poll with the given id does not exist" });
+      return res.json({ message: "there was an error finding the poll with that id" });
     });
+  let check4 = false;
+  poll.voters.map((voter) => {
+    if (voter == req.params.v_id) {
+      check4 = true;
+    }
+  });
+
+  if (check4 == true)
+    return res
+      .status(400)
+      .json({ message: "voter has already voted in this poll" });
 
   if (poll == [] || !poll) {
     return res.json({ message: "there is no poll with this id" });
   } else {
-    let check = false;
-    poll.voters.map((voter) => {
-      if (voter == req.params.v_id) {
-        check = true;
-      }
-    });
-    if (check === true) {
-      return res.json({ message: "you have already voted in this poll" });
-    }
-    poll.voters.push(req.params.v_id);
-    poll.candidates.map((candidate) => {
-      console.log(candidate.candidate.id._id, req.params.c_id);
-      if (candidate.candidate.id._id == req.params.c_id) {
-        candidate.candidate.voteCount = candidate.candidate.voteCount + 1;
-      }
-    });
-
-    console.log(poll.candidates);
-
-    poll
-      .save()
-      .then(() => {
-        return res.json({ message: "voted successfully" });
-      })
-      .catch((err) => {
-        console.log(err);
+    if (
+      //checks if the poll entered is currently ongoing
+      Number(new Date()) >= poll.startTime &&
+      Number(new Date()) <= poll.endTime &&
+      poll.valid == true
+    ) {
+      let check = false;
+      poll.voters.map((voter) => {
+        if (voter == req.params.v_id) {
+          check = true;
+        }
       });
-  }
+      if (check === true) {
+        return res.json({ message: "you have already voted in this poll" });
+      }
+      poll.voters.push(req.params.v_id);
+      poll.candidates.map((candidate) => {
+        console.log(candidate.candidate.id._id, req.params.c_id);
+        if (candidate.candidate.id._id == req.params.c_id) {
+          candidate.candidate.voteCount = candidate.candidate.voteCount + 1;
+        }
+      });
 
+      console.log(poll.candidates);
+
+      poller.pollvote.push(req.params.p_id);//pushing poll id to the poller
+      poller.pollcandidate.push(req.params.c_id);//pushing candidate to whom voted in poller
+
+      await poller.save().catch((err) => {
+        console.log(err);
+        return res.status(400).json({ message: "couldnt save poll in poller" });
+      });
+
+      await poll
+        .save()
+        .then(() => {
+          return res.json({ message: "voted successfully" });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      return res.status(400).json({ message: "There is no poll in session" });
+    }
+  }
   //if they do check poll id
   //store votes in poll model
   //increment in polls model, candidate.votCount field
 });
 
 router.put("/stoppoll", async (req, res) => {
-  const polls = await Polls.find({ valid: true }).catch((err) => {
+  const polls = await Polls.find({}).catch((err) => {
     console.log(err);
   });
 
@@ -340,7 +444,7 @@ router.put("/stoppoll", async (req, res) => {
   }
 
   polls.map((poll) => {
-    if (poll.endTime == new Date() || new Date() > poll.endTime) {
+    if (Number(new Date()) >= Number(poll.endTime) && poll.valid == true) {
       poll.valid = false;
       poll
         .save()
@@ -355,7 +459,7 @@ router.put("/stoppoll", async (req, res) => {
 });
 
 router.put("/startpoll", async (req, res) => {
-  const polls = await Polls.find({ valid: false }).catch((err) => {
+  const polls = await Polls.find({}).catch((err) => {
     console.log(err);
   });
 
@@ -364,7 +468,12 @@ router.put("/startpoll", async (req, res) => {
   }
 
   polls.map((poll) => {
-    if (poll.startTime == new Date() || new Date() > poll.startTime) {
+    if (
+      //checks if its a polls valid time
+      Number(new Date()) >= Number(poll.startTime) &&
+      Number(new Date()) <= Number(poll.endTime) &&
+      poll.valid == false
+    ) {
       poll.valid = true;
       poll
         .save()

@@ -32,6 +32,7 @@ require("./Models/candidate");
 require("./Models/nadra");
 require("./Models/criminal");
 require("./Models/election");
+require("./Models/poller");
 
 //Routes Registering
 var vote = require("./Routes/vote");
@@ -44,6 +45,7 @@ var party = require("./Routes/party");
 var candidate = require("./Routes/candidate");
 var poll = require("./Routes/poll");
 var election = require("./Routes/election");
+var poller = require("./Routes/poller");
 
 app.use([
   signup,
