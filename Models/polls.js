@@ -22,12 +22,11 @@ const pollsSchema = new mongoose.Schema({
     type: Date,
   },
 
-  candidates: [
+  items: [
     {
-      candidate: {
-        id: {
-          type: mongoose.Types.ObjectId,
-          ref: "Candidate",
+      item: {
+        name: {
+          type: String,
         },
         voteCount: {
           type: Number,

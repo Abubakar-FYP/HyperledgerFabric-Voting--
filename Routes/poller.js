@@ -8,8 +8,6 @@ require("../Models/poller");
 const Polls = mongoose.model("Polls");
 const Poller = mongoose.model("Poller");
 
-
 //home page
-
 
 module.exports = router;
