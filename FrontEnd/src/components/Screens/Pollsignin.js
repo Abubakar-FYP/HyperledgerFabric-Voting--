@@ -11,7 +11,7 @@ import { url } from "../../constants";
 import {toast} from "react-toastify"
 // import {OTPredirect} from './OTP';
 
-const Signin =(props)=>{
+const PollsSignin =(props)=>{
     const history = useHistory()
     const  [CNIC, setCNIC] = useState ("")
     const  [password , setPassword] = useState ("")
@@ -80,10 +80,10 @@ const router =()=>{
 
            <button className ="btn waves-effect waves-light" onClick={handleSignin}> 
            Next</button>
-           <Link to="/forgotpassword" className="my-3">Forgot Password?</Link>
+           <Link to="/polls/forgotpassword" className="my-3">Forgot Password?</Link>
 
             <h5>
-            Don't have an Account? <Link to = '/Signup'>Click here</Link>
+            Don't have an Account? <Link to = '/polls/signup'>Click here</Link>
             </h5>
         </div>
        </div>
@@ -92,4 +92,4 @@ const router =()=>{
 
 }
 
-export default Signin 
+export default PollsSignin 

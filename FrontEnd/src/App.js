@@ -29,6 +29,9 @@ import {url} from "./constants"
 import PendingParties from './components/Screens/PendingParties';
 import Polls from './components/Screens/Polls';
 import Poll from './components/Screens/Poll';
+import PollsRegisteration from './components/Screens/PollsRegisteration';
+import PollsSignin from './components/Screens/Pollsignin';
+import PollsForgotPassword from './components/Screens/PollsForgotPassword';
 export const UserContext = createContext()
 
 const Routing = () => {
@@ -106,11 +109,14 @@ function App() {
           <Route exact path="/partyregisteration" component={PartyRegisteration} />
           <Route exact path="/signin" component={Signin} />
           <Route exact path="/signup" component={Signup} />
+          <Route exact path="/polls/signup" component={PollsRegisteration} />
+          <Route exact path="/polls/signin" component={PollsSignin} />
           <Route exact path="/votingballot" component={VotingBallot} />
           <Route exact path="/electioncreation" component={ElectionCreation} />
           <Route exact path="/admindashboard" component={AdminDashboard} />
           <Route exact path="/partiesstatus" component={PartiesStatus} />
           <Route exact path="/forgotpassword" component={ForgotPassword} />
+          <Route exact path="/polls/forgotpassword" component={PollsForgotPassword} />
           <Route exact path="/reset/password/:token" component={ResetPassword} />
           <Route exact path="/pending-parties/:id" component={PendingParties} />
           <Route exact path="/polls" component={Polls} />
