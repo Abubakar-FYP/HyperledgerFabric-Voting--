@@ -42,7 +42,7 @@ router.post("/createpoll", async (req, res) => {
   const { pollname, type, description, startTime, endTime, items } = req.body;
 
   if (!pollname || !type || !startTime || !endTime || !description || !items) {
-    return res.json({ message: "one or more fields are empty" });
+    return res.status(400).json({ message: "one or more fields are empty" });
   }
 
   if (Number(endTime) < Number(startTime)) {
@@ -121,7 +121,9 @@ router.get("/currentpolls", async (req, res) => {
     .select("-valid -voters")
     .catch((err) => {
       console.log(err);
-      return res.status(400).json({ message: "there was an error finding polls" });
+      return res
+        .status(400)
+        .json({ message: "there was an error finding polls" });
     });
 
   let currentPoll;
@@ -151,7 +153,9 @@ router.get("/previouspolls", async (req, res) => {
     .select("-voters -_id")
     .catch((err) => {
       console.log(err);
-      return res.status(400).json({ message: "there was an error finding polls" });
+      return res
+        .status(400)
+        .json({ message: "there was an error finding polls" });
     });
 
   const previousPolls = new Array();
@@ -169,7 +173,9 @@ router.get("/abouttostartpolls", async (req, res) => {
     .select("-voters -_id")
     .catch((err) => {
       console.log(err);
-      return res.json({ message: "there was an error finding polls" });
+      return res
+        .status(400)
+        .json({ message: "there was an error finding polls" });
     });
 
   let check1 = false; //checks if there are no polls
@@ -201,23 +207,12 @@ router.get("/abouttostartpolls", async (req, res) => {
 
 //all started,yet to start and finished polls
 router.get("/getallpolls", async (req, res) => {
-  const polls = await Polls.find({})
-    .populate({
-      path: "candidates",
-      populate: {
-        path: "candidate.id",
-        select: "-voters -voteCount -is_criminal -cnic -__v -ballotId",
-        populate: {
-          path: "partyId",
-          select:
-            "-partySymbol -partyImg -partyLeaderCnic -candidate -voters -voteCount -is_valid -_id -__v",
-        },
-      },
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(400).json({ message: "there was an error finding polls" });
-    });
+  const polls = await Polls.find({}).catch((err) => {
+    console.log(err);
+    return res
+      .status(400)
+      .json({ message: "there was an error finding polls" });
+  });
 
   res.json({ message: polls });
 });
@@ -225,7 +220,9 @@ router.get("/getallpolls", async (req, res) => {
 router.get("/getonepoll/:p_id", async (req, res) => {
   const polls = await Polls.findOne({ _id: req.params.p_id }).catch((err) => {
     console.log(err);
-    return res.json({ message: "there was an error finding polls" });
+    return res
+      .status(400)
+      .json({ message: "there was an error finding polls" });
   });
 
   res.json({ message: polls });
@@ -234,7 +231,9 @@ router.get("/getonepoll/:p_id", async (req, res) => {
 router.get("/getresultofallpolls", async (req, res) => {
   const polls = await Polls.find({}).catch((err) => {
     console.log(err);
-    return res.json({ message: "there was an error finding polls" });
+    return res
+      .status(400)
+      .json({ message: "there was an error finding polls" });
   });
 
   polls.map((poll) => {
@@ -257,7 +256,9 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
   //check if any poll exists or not in polls Model
   const poller = await Poller.findOne({ _id: req.params.v_id }).catch((err) => {
     console.log(err);
-    return res.json({ message: "voter with the given id does not exist" });
+    return res
+      .status(400)
+      .json({ message: "voter with the given id does not exist" });
   });
 
   if (poller == null || !poller) {
@@ -280,7 +281,7 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
   const poll = await Polls.findOne({ _id: req.params.p_id }) //finds poll
     .catch((err) => {
       console.log(err);
-      return res.json({
+      return res.status(400).json({
         message: "there was an error finding the poll with that id",
       });
     });
@@ -298,7 +299,7 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
       .json({ message: "voter has already voted in this poll" });
 
   if (poll == [] || !poll) {
-    return res.json({ message: "there is no poll with this id" });
+    return res.status(400).json({ message: "there is no poll with this id" });
   } else {
     if (
       //checks if the poll entered is currently ongoing
@@ -313,7 +314,9 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
         }
       });
       if (check === true) {
-        return res.json({ message: "you have already voted in this poll" });
+        return res
+          .status(400)
+          .json({ message: "you have already voted in this poll" });
       }
 
       let check6 = false; //checks if item is present or not
@@ -368,7 +371,7 @@ router.put("/stoppoll", async (req, res) => {
   });
 
   if (!polls || polls === null || polls === []) {
-    return res.json({ message: "There are no polls" });
+    return res.status(400).json({ message: "There are no polls" });
   }
 
   polls.map((poll) => {
@@ -392,7 +395,7 @@ router.put("/startpoll", async (req, res) => {
   });
 
   if (!polls || polls === null || polls === []) {
-    return res.json({ message: "There are no polls" });
+    return res.status(400).json({ message: "There are no polls" });
   }
 
   polls.map((poll) => {
