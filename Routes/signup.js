@@ -238,9 +238,9 @@ router.post("/signup/poller", async (req, res) => {
 
 router.post("/signin/poller", async (req, res) => {
   const { email, password } = req.body;
-
+console.log("req.body=========================", req.body)
   if (!email || !password) {
-    return res.status(400).json({ message: "one or more fields are empty" });
+    return res.status(400).send({ message: "one or more fields are empty" });
   }
 
   const _polls = await Polls.find({});
@@ -268,7 +268,7 @@ router.post("/signin/poller", async (req, res) => {
     poller.password != password ||
     poller.email != email
   ) {
-    return res.status(400).json({ message: "user does not exist" });
+    return res.status(400).send({ message: "user does not exist" });
   }
 
   const token = jwt.sign({ password: poller.password }, JWTKEY);
