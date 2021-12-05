@@ -10,14 +10,23 @@ const pollerSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  pollvote:[{
-    type: mongoose.Types.ObjectId,
-    ref: "Polls"
-  }],
-  pollcandidate:[{
-    type: mongoose.Types.ObjectId,
-    ref: "Candidate"
-  }]
+  role: {
+    type: String,
+    required: true,
+    default: "Poller",
+  },
+  pollvote: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "Polls",
+    },
+  ],
+  pollcandidate: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "Candidate",
+    },
+  ],
 });
 
 global.Poller = global.Poller || mongoose.model("Poller", pollerSchema);
