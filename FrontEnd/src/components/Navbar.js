@@ -57,6 +57,10 @@ const NavBar = () => {
           <li><Link className="text-light" to="/signup" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Voter Registeration</Link></li>
         ) : null}
 
+{!user  ? (
+          <li><Link className="text-light" to="/polls/signup" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Polls Registeration</Link></li>
+        ) : null}
+
         {user && user?.doc?.role !== "admin" ? (
           <li><Link className="text-light" to="/votingballot" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Voting Ballot</Link></li>
         ) : null}

@@ -334,6 +334,18 @@ router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
     return res.status(400).json({ message: "poller does not exist" });
   }
 
+  let check5; //check if already participated in the same poll
+
+  poller.pollvote.map((poll)=>{
+    if(toString(poll)==toString(req.params.p_id)){
+      check5 = true;
+    }
+  });
+
+  if(check5==true||check5)
+    return res.status(400).json({message:"poller has already participated in this poll"});
+  
+
   await Candidate.findOne({ _id: req.params.c_id }) //finds candidate
     .then((resp) => {
       if (resp == null || !resp) {
@@ -345,7 +357,7 @@ router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
     .catch((err) => {
       console.log(err);
       return res.json({
-        message: "candidate with the given id does not exist",
+        message: "there was an error finding the candidate",
       });
     });
 
@@ -364,7 +376,7 @@ router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      return res.json({ message: "poll with the given id does not exist" });
+      return res.json({ message: "there was an error finding the poll with that id" });
     });
   let check4 = false;
   poll.voters.map((voter) => {
@@ -406,7 +418,8 @@ router.post("/votepoll/:p_id/:v_id/:c_id", async (req, res) => {
 
       console.log(poll.candidates);
 
-      poller.pollvote.push(req.params.p_id);
+      poller.pollvote.push(req.params.p_id);//pushing poll id to the poller
+      poller.pollcandidate.push(req.params.c_id);//pushing candidate to whom voted in poller
 
       await poller.save().catch((err) => {
         console.log(err);
