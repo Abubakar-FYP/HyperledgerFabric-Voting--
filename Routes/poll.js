@@ -139,7 +139,7 @@ router.get("/currentpolls", async (req, res) => {
     .select("-valid -voters")
     .catch((err) => {
       console.log(err);
-      return res.json({ message: "there was an error finding polls" });
+      return res.status(400).json({ message: "there was an error finding polls" });
     });
   let currentPoll;
   let check1 = false; //checks if current poll is present
@@ -155,7 +155,7 @@ router.get("/currentpolls", async (req, res) => {
 
   if (!check1 || check1 == false) {
     return res
-      .status(200)
+      .status(400)
       .json({ message: "there is no current poll running" });
   }
 
@@ -180,7 +180,7 @@ router.get("/previouspolls", async (req, res) => {
     .select("-voters -_id")
     .catch((err) => {
       console.log(err);
-      return res.json({ message: "there was an error finding polls" });
+      return res.status(400).json({ message: "there was an error finding polls" });
     });
 
   const previousPolls = new Array();
@@ -257,7 +257,7 @@ router.get("/getallpolls", async (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      return res.json({ message: "there was an error finding polls" });
+      return res.status(400).json({ message: "there was an error finding polls" });
     });
 
   res.json({ message: polls });

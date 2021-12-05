@@ -34,7 +34,7 @@ const handleSignin =async () =>{
     if(data){
         localStorage.setItem("userData" , JSON.stringify(data))
         toast.success("You have signin Successfully")
-        if(data?.doc?.role =="Voter"){
+        if(data?.poller?.role =="Poller"){
         history.push("/polls")
         }else{
         history.push("/")
