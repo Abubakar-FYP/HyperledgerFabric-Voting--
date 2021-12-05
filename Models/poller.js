@@ -19,12 +19,13 @@ const pollerSchema = new mongoose.Schema({
     {
       type: mongoose.Types.ObjectId,
       ref: "Polls",
+      default: null,
     },
   ],
-  pollcandidate: [
+  pollitem: [
     {
-      type: mongoose.Types.ObjectId,
-      ref: "Candidate",
+      type: String,
+      default: null,
     },
   ],
 });
