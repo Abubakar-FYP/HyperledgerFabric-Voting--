@@ -203,62 +203,81 @@ router.post("/reset/password", async (req, res) => {
   res.status(200).send("Password has been updated successfully");
 });
 
-router.post("/signup/poller",async(req,res)=>{
-  
-  if(!email||!password){
-    return res.status(400).json({message:"one or more fields are empty"});
+//no again account
+router.post("/signup/poller", async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: "one or more fields are empty" });
   }
-  
+
   const pollers = await Poller.find({});
 
   let check1 = false;
-  pollers.map((poller)=>{//checks if poller exists already
-    if(poller.email==email && poller.password==password){
+  pollers.map((poller) => {
+    //checks if poller exists already
+    if (poller.email == email) {
       check1 = true;
     }
   });
 
-  if(check1==true)
-    return res.status(400).json({message:"user already exists"});
+  if (check1 == true)
+    return res.status(400).json({ message: "user already exists" });
 
   const newPoller = new Poller({
-    email:email,
-    password:password
+    email: email,
+    password: password,
   });
 
-  await newPoller.save().catch((err)=>{console.log(err)});
-  res.status(200).json({message:"successfully signed-up"})
-})
+  await newPoller.save().catch((err) => {
+    console.log(err);
+  });
 
-router.post("/signin/poller",async (req,res)=>{
-  if(!email||!password){
-    return res.status(400).json({message:"one or more fields are empty"});
+  res.send(newPoller);
+});
+
+router.post("/signin/poller", async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: "one or more fields are empty" });
   }
 
   const _polls = await Polls.find({});
+
   let latestPoll;
-  _polls.map((poll)=>{
-    if(Number(new Date()) >= Number(poll.startTime) && Number(new Date()) <= Number(poll.endTime)){
+  _polls.map((poll) => {
+    if (
+      Number(new Date()) >= Number(poll.startTime) &&
+      Number(new Date()) <= Number(poll.endTime)
+    ) {
       latestPoll = poll;
     }
-  })
+  });
 
-  
   let check1 = false;
-  const poller = await Poller
-  .findOne({email:email},{password:password})
-  .select("-password")
+  const poller = await Poller.findOne({ email: email });
 
-  if(poller==null||!poller||poller==undefined){
-    return res.status(400).json({message:"user does not exist"});
+  /*   console.log(typeof poller.password, typeof password);
+  console.log(typeof poller.email, typeof email);
+ */
+  if (
+    poller == null ||
+    !poller ||
+    poller == undefined ||
+    poller.password != password ||
+    poller.email != email
+  ) {
+    return res.status(400).json({ message: "user does not exist" });
   }
-  
-    const token = jwt.sign({ _id: doc._id }, JWTKEY);
 
-    res.send({token,poller,latestPoll});
+  const token = jwt.sign({ password: poller.password }, JWTKEY);
+  poller.password = null;
+  console.log(poller);
+  res.send({ token, poller, latestPoll });
   //token is the jwt token, poller is the user without the password
-  //latestPoll is the current single poll running 
-})
+  //latestPoll is the current single poll running
+});
 
 /* 
 router.post("/signinotp", async (req, res) => {

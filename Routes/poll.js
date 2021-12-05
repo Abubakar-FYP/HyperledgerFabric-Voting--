@@ -215,13 +215,22 @@ router.get("/abouttostartpolls", async (req, res) => {
 
   let check1 = false; //checks if there are no polls
   const upComingPolls = new Array();
+
   polls.map((poll) => {
+    console.log(Number(new Date()), Number(poll.startTime));
+
     if (Number(new Date()) < Number(poll.startTime)) {
       upComingPolls.push(poll);
     }
   });
 
-  if (upComingPolls == null || upComingPolls === [] || upComingPolls == []) {
+  console.log(upComingPolls);
+
+  if (
+    upComingPolls === null ||
+    upComingPolls === [] ||
+    upComingPolls === undefined
+  ) {
     console.log("empty");
     return res
       .status(400)
