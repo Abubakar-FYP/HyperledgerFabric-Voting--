@@ -140,7 +140,7 @@ router.get("/currentpolls", async (req, res) => {
 
   if (!check1 || check1 == false) {
     return res
-      .status(200)
+      .status(400)
       .json({ message: "there is no current poll running" });
   }
 
@@ -169,6 +169,7 @@ router.get("/previouspolls", async (req, res) => {
 });
 
 router.get("/abouttostartpolls", async (req, res) => {
+ 
   const polls = await Polls.find({})
     .select("-voters -_id")
     .catch((err) => {
@@ -186,16 +187,11 @@ router.get("/abouttostartpolls", async (req, res) => {
 
     if (Number(new Date()) < Number(poll.startTime)) {
       upComingPolls.push(poll);
+      check1=true;
     }
   });
 
-  console.log(upComingPolls);
-
-  if (
-    upComingPolls === null ||
-    upComingPolls === [] ||
-    upComingPolls === undefined
-  ) {
+  if (check1==false) {
     console.log("empty");
     return res
       .status(400)
@@ -267,8 +263,9 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
 
   let check5; //check if already participated in the same poll
 
-  poller.pollvote.map((poll) => {
-    if (toString(poll) == toString(req.params.p_id)) {
+  poller?.pollvote?.map((poll) => {
+  //  console.log("Poller-Poll-Id===>",typeof toString(poll),"Poll-Sent-Id",typeof req.params.p_id)
+    if (toString(poll) == req.params.p_id) {
       check5 = true;
     }
   });

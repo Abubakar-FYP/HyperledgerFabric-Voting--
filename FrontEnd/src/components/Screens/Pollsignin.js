@@ -14,6 +14,7 @@ import {toast} from "react-toastify"
 const PollsSignin =(props)=>{
     const history = useHistory()
     const  [CNIC, setCNIC] = useState ("")
+    const  [email, setEmail] = useState ("")
     const  [password , setPassword] = useState ("")
     useEffect(() => {
         const user = localStorage.getItem("userData")
@@ -23,18 +24,18 @@ const PollsSignin =(props)=>{
     }, [])
 
 const handleSignin =async () =>{
-    if(!CNIC || !password){
+    if(!email || !password){
         toast.error("Fill All Fields")
         return
     }
     try {
-    const {data} = await axios.post(url + "/signin" , {cnic: CNIC , password: password});
+    const {data} = await axios.post(url + "/signin/poller" , {email , password});
     console.log("data==============>", data)
     if(data){
         localStorage.setItem("userData" , JSON.stringify(data))
         toast.success("You have signin Successfully")
-        if(data?.doc?.role =="Voter"){
-        history.push("/votingballot")
+        if(data?.poller?.role =="Poller"){
+        history.push("/polls")
         }else{
         history.push("/")
         }
@@ -45,9 +46,9 @@ const handleSignin =async () =>{
 
     }
     } catch (error) {
-        console.log(error.status)
-        console.log(error.message)
-        toast.error(error)
+        console.log("eeror",error)
+        console.log("eeeeerrrrrrrrrrrroooooooooooorrrrrrrrrrrrr=============",error.message)
+        toast.error(error.message)
     }
 
 }
@@ -68,9 +69,9 @@ const router =()=>{
        <div className="mycard">
        <div className = "card auth-card">
            <h1>Sign in </h1>
-            <input type="number" id="cnic" placeholder="CNIC"
-            value={CNIC}
-            onChange={(e)=> setCNIC (e.target.value)}
+            <input type="text" id="email" placeholder="Email"
+            value={email}
+            onChange={(e)=> setEmail (e.target.value)}
             />
 
             <input type="password" id="cnic" placeholder="Password"

@@ -9,7 +9,6 @@ import {useHistory} from "react-router-dom"
 const PollsRegisteration =()=>{
 
     const [password ,setPassword ] = useState ("")
-    const [CNIC ,setCNIC ] = useState ("")
     const [email ,setEmail ] = useState ("")
     const history = useHistory()
     useEffect(() => {
@@ -19,16 +18,18 @@ const PollsRegisteration =()=>{
         }
     }, [])
     const handleSignup = async()=>{
-        if(!password || !CNIC || !email){
+        if(!password || !email){
             alert("Please fill all fields")
             return
         }
         try {
-            const res = await axios.post(url + "/signup"  , {password: password , cnic: CNIC, email: email})
+        console.log("clicked", password, email)
+
+            const res = await axios.post(url + "/signup/poller"  , {password: password , email: email})
             console.log("signup user", res.data)
             if(res){
                 toast.success("You Have Successfully Signup")
-            history.push("/signin")
+            history.push("/polls/signin")
 
             }    
         } catch (error) {
@@ -47,7 +48,7 @@ const PollsRegisteration =()=>{
             value={email}
             onChange={(e)=>setEmail(e.target.value)}
            />
-            <input type="password" id="cnic" name="cnic" placeholder="Password" 
+            <input type="password" id="password" name="password" placeholder="Password" 
             value={password}
             onChange={(e)=>setPassword(e.target.value)}
            />

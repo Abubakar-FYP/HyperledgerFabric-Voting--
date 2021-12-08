@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; //So we will be using the link instead of anchor tag in order to stop the refreshing of the pages
 import { useHistory } from "react-router-dom"
 import axios from "axios"
-import {url} from "../constants"
+import { url } from "../constants"
 const NavBar = () => {
   const [user, setUser] = useState(null)
   const [election, setElection] = useState(null)
   useEffect(() => {
     (async () => {
-      const {data} = await axios.get(url + "/get/first/election")
+      const { data } = await axios.get(url + "/get/first/election")
       console.log("dataaaaaaaaa==========", data)
       setElection(data)
     })();
@@ -39,9 +39,11 @@ const NavBar = () => {
         <li><Link to="/" style={{ listStyle: "none", textDecoration: "none" }}
           className="text-light">Home</Link></li>
 
+        {user && user?.doc?.role === "Voter" ? (
+          <li><Link to="/partiesstatus" style={{ listStyle: "none", textDecoration: "none" }}
+            className="text-light">Parties Status</Link></li>
+        ) : null}
 
-        <li><Link to="/partiesstatus" style={{ listStyle: "none", textDecoration: "none" }}
-          className="text-light">Parties Status</Link></li>
         {user && user?.doc?.role === "admin" ? (
           <>
             <li><Link className="text-light" to="/partyregisteration" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Party Registeration</Link></li>
@@ -50,22 +52,25 @@ const NavBar = () => {
             <li><Link className="text-light" to="/admindashboard" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Admin Dashboard</Link></li>
           </>
         ) : null}
-{user && user?.doc?.role !== "admin" && election && Date.now() >new Date(election?.endTime) ? (
-     <li><Link className="text-light" to="/admindashboard" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Admin Dashboard</Link></li>
-) : null}
-        {!user  ? (
+        {user && user?.doc?.role !== "admin" && election && Date.now() > new Date(election?.endTime) ? (
+          <li><Link className="text-light" to="/admindashboard" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Admin Dashboard</Link></li>
+        ) : null}
+        {!user ? (
           <li><Link className="text-light" to="/signup" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Voter Registeration</Link></li>
         ) : null}
 
-{!user  ? (
+        {!user ? (
           <li><Link className="text-light" to="/polls/signup" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Polls Registeration</Link></li>
         ) : null}
 
-        {user && user?.doc?.role !== "admin" ? (
+        {user && user?.doc?.role === "Voter" ? (
           <li><Link className="text-light" to="/votingballot" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Voting Ballot</Link></li>
         ) : null}
 
-<li><Link className="text-light" to="/polls" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Polls</Link></li>
+        {user && user?.poller?.role !== "Poller" ? (
+          <li><Link className="text-light" to="/polls" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Polls</Link></li>
+        ) : null}
+
         {user ?
           <li><Link className="text-light" to="#" onClick={logoutTheUser} style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Logout</Link></li> : null
         }

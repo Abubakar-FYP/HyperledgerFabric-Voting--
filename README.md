@@ -9,7 +9,7 @@ Along side with Hyperledger Fabric we also have used hyperledger explorer which 
 
 The deployment of the website is still in continuation, Soon it'll be launched.
 
-If your interested in buying/funding this project or interested in collaborating with us, You can contact either of us on the contacts below.
+If your interested,You can contact either of us on the contacts below.
  
 # Contact:
 

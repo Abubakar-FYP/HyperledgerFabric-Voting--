@@ -58,18 +58,17 @@ const Polls = () => {
             <div className="card-body">
               <div className="row">
                 {activePolls &&
-                  activePolls.map((poll) => (
-                    <Link to={`/poll/${poll._id}`} style={{textDecoration: "none"}} className="card bg-warning text-light col-md-3">
+                    <Link to={`/poll/${activePolls?._id}`} style={{textDecoration: "none"}} className="card bg-warning text-light col-md-3">
                       <div className="card-body">
                         <p>
-                          <strong>Poal Name</strong>: {poll.pollname}
+                          <strong>Poal Name</strong>: {activePolls?.pollname}
                         </p>
                         <p>
-                          <strong>Poal Type</strong>: {poll.type}
+                          <strong>Poal Type</strong>: {activePolls?.type}
                         </p>
                       </div>
                     </Link>
-                  ))}
+                  }
               </div>
             </div>
           </div>
@@ -77,7 +76,7 @@ const Polls = () => {
             <div className="card-header">Ended Polls</div>
             <div className="card-body">
               <div className="row">
-                {endedPolls &&
+                {endedPolls?.length &&
                   endedPolls.map((poll) => (
                     <div className="card bg-warning text-light col-md-3">
                       <div className="card-body">
@@ -98,7 +97,7 @@ const Polls = () => {
             <div className="card-header">All Polls</div>
             <div className="card-body">
               <div className="row">
-                {allPolls &&
+                {allPolls?.length &&
                   allPolls.map((poll) => (
                     <div className="card bg-warning text-light col-md-3">
                       <div className="card-body">
