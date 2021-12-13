@@ -28,6 +28,10 @@ const pollerSchema = new mongoose.Schema({
       default: null,
     },
   ],
+  resetPassToken: {
+    type: String,
+    default: null,
+  },
 });
 
 global.Poller = global.Poller || mongoose.model("Poller", pollerSchema);

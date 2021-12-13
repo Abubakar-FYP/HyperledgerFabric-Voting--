@@ -22,6 +22,10 @@ const partySchema = new Schema({
     type: Number,
   },
 
+  partyLeaderEmail: {
+    type: String,
+  },
+
   candidate: [
     {
       type: mongoose.Types.ObjectId,
@@ -47,19 +51,19 @@ const partySchema = new Schema({
     default: false,
   },
 
-  participate:{
-    election:[{
-      type:mongoose.Types.ObjectId,
-      ref:"Election",
-      default:null
-    }],
-    inelection:{
-      type:Boolean,
-      default:false                          
-    }
-  }
-
-
+  participate: {
+    election: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Election",
+        default: null,
+      },
+    ],
+    inelection: {
+      type: Boolean,
+      default: false,
+    },
+  },
 });
 
 global.Party = global.Party || mongoose.model("Party", partySchema);

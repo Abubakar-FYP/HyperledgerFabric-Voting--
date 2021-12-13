@@ -26,6 +26,7 @@ router.post("/createparty", async (req, res) => {
   if (
     !partyName ||
     !partyImg ||
+    !partyLeaderEmail ||
     !partyLeaderCnic ||
     !partySymbol ||
     !candidate
@@ -52,12 +53,6 @@ router.post("/createparty", async (req, res) => {
       .status(400)
       .json({ message: "there was an error finding ballots" });
   });
-
-  /* for (const cand of candidate) {
-    for (const ballot of ballots) {
-      console.log(cand.ballotId.toString() == ballot._id);
-    }
-  } */
 
   const candidates = await Candidate.find({})
     .select(
@@ -117,6 +112,7 @@ router.post("/createparty", async (req, res) => {
   let check4 = false;
   let check11 = false;
   let check12 = false;
+  let check14 = false;
 
   parties.map((partys) => {
     //this is good
@@ -127,6 +123,10 @@ router.post("/createparty", async (req, res) => {
     if (partys.partyLeaderCnic == partyLeaderCnic) {
       check4 = true;
     } //checks wheather party leader has already registered a party
+
+    if (partys.partyLeaderEmail == partyLeaderEmail) {
+      check14 = true;
+    } //checks if party leader email is already registered to another party leader
 
     partys.candidate.map((cand) => {
       if (Number(cand.cnic) == Number(partyLeaderCnic)) {
@@ -154,6 +154,13 @@ router.post("/createparty", async (req, res) => {
     return res
       .status(400)
       .json({ message: "Party Leader has already registered a party" });
+  }
+
+  if (check14 == true) {
+    console.log("Party Leader email is already being used");
+    return res
+      .status(400)
+      .json({ message: "Party leader email is already in use" });
   }
 
   if (check11 == true) {
