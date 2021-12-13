@@ -25,8 +25,8 @@ router.post("/create/election", async (req, res) => {
     if (elections) {
       elections.map((election) => {
         if (
-          Number(new Date()) >= Number(election.startTime) &&
-          Number(new Date()) <= Number(election.endTime)
+          Number(Date.now()) >= Number(election.startTime) &&
+          Number(Date.now()) <= Number(election.endTime)
         ) {
           check1 = true;
         } //checks for any running elections or a single election
@@ -188,6 +188,31 @@ router.put("/stopelection", async (req, res) => {
 
   //check if already participated and valid
   //parties particpate.inelection = false
+});
+
+router.get("/get/election/foruser",async (req,res)=>{
+  //returned to the user
+  const elections = await Election.find({}).populate("parties candidates")
+
+  console.log("New Date====>",new Date(),"Date Now====>",Date.now());
+
+  let currentElection;
+  let check1 = false; //checks if there are current running elections
+
+  elections.map((election)=>{//checks for currently running elections
+    console.log(Date.now() >= election.startTime && Date.now() < election.endTime);
+    if(Date.now() >= election.startTime && Date.now() < election.endTime){
+      currentElection = election;
+      check1 = true;
+      console.log("inside here")
+      }
+  });
+
+  if(check1 == false)
+    return res.status(400).json({message:"there are no currently running elections"});
+  
+
+  return res.status(200).json({message:currentElection});
 });
 
 module.exports = router;

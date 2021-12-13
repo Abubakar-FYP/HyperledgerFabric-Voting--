@@ -28,6 +28,7 @@
     "messagebird": "^3.6.4",
     "mongoose": "^5.13.11",
     "mongoose-autopopulate": "^0.16.0",
+    "node-cron": "^3.0.0",
     "node-fetch": "^3.0.0",
     "nodemailer": "^6.7.0",
     "nodemon": "^2.0.15",
