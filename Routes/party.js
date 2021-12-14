@@ -20,7 +20,7 @@ const Election = mongoose.model("Election");
 const Ballot = mongoose.model("Ballot");
 
 router.post("/createparty", async (req, res) => {
-  const { partyName, partyImg, partySymbol, partyLeaderCnic, candidate } =
+  const { partyName, partyImg, partySymbol,partyLeaderEmail, partyLeaderCnic, candidate } =
     req.body;
 
   if (
@@ -181,6 +181,7 @@ router.post("/createparty", async (req, res) => {
     partyName,
     partySymbol,
     partyImg,
+    partyLeaderEmail,
     partyLeaderCnic,
   });
 

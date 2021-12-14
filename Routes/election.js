@@ -190,17 +190,34 @@ router.put("/stopelection", async (req, res) => {
   //parties particpate.inelection = false
 });
 
+router.get("/get/election/byid/:id",async (req,res)=>{
+  const election = await Election.findOne({_id:req.params.id}).populate({
+    path:"parties",
+    populate:{
+      path:"candidate"
+    }
+  });
+
+  if(election == null || election == undefined){
+    return res.status(400).json({message:"election not found"});
+  }
+  return res.status(200).json({message:election});
+})
+
+
 router.get("/get/election/foruser",async (req,res)=>{
   //returned to the user
-  const elections = await Election.find({}).populate("parties candidates")
-
-  console.log("New Date====>",new Date(),"Date Now====>",Date.now());
+  const elections = await Election.find({}).populate({
+    path:"parties",
+    populate:{
+      path:"candidate",
+    }
+  });
 
   let currentElection;
   let check1 = false; //checks if there are current running elections
 
   elections.map((election)=>{//checks for currently running elections
-    console.log(Date.now() >= election.startTime && Date.now() < election.endTime);
     if(Date.now() >= election.startTime && Date.now() < election.endTime){
       currentElection = election;
       check1 = true;
