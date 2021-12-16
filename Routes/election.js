@@ -194,7 +194,13 @@ router.get("/get/election/byid/:id",async (req,res)=>{
   const election = await Election.findOne({_id:req.params.id}).populate({
     path:"parties",
     populate:{
-      path:"candidate"
+      path:"candidate",
+      populate:{
+        path:"ballotId",
+        populate:{
+          path:"candidate"
+        }
+      }
     }
   });
 
@@ -211,8 +217,14 @@ router.get("/get/election/foruser",async (req,res)=>{
     path:"parties",
     populate:{
       path:"candidate",
+      populate:{
+        path:"ballotId",
+        populate:{
+          path:"candidate"
+        }
+      }
     }
-  });
+  });//gets the election(ballots/candidates/party info of that election)
 
   let currentElection;
   let check1 = false; //checks if there are current running elections

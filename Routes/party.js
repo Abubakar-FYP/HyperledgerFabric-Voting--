@@ -231,7 +231,7 @@ router.post("/createparty", async (req, res) => {
 
     if (check8 == true) {
       return res.status(400).json({
-        message: "you create party when an election is currently running",
+        message: "you cannot create a party when an election is currently running",
       });
     }
 
