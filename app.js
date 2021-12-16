@@ -4,6 +4,9 @@ const { MONGOURI } = require("./Keys/keys");
 const bodyparser = require("body-parser");
 require("dotenv").config();
 const requirelogin = require("./Middleware/requirelogin"); //middleware
+const cron = require("node-cron");
+
+const Election = require("./Models/election");
 
 const app = express();
 app.use(express.json({ limit: "50mb" })); //to parse outgoing json in the post req
@@ -106,3 +109,41 @@ const serverDebuger = require("debug")("app:server");
 app.listen(serverNumber, () => {
   serverDebuger(`connected to ${serverNumber}`);
 });
+
+//stop election cronjob for every 1 min
+cron.schedule("*/1 * * * * *",router.put("/stopelection", async (req, res) => {
+  const elections = await Election.find({})
+    .populate({
+      path: "parties",
+      select: "-partyImg",
+    })
+    .catch((err) => {
+      console.log(err);
+      res.json({ message: "there was an error fetching elections" });
+    });
+
+  elections.map(async (election) => {
+    if (Number(new Date()) >= Number(election.endTime)) election.valid = false;
+    if (election.valid == false) {
+      //checks if election has ended
+      election.parties.map(async (party) => {
+        if (party.participate.inelection == true) {
+          //if election has ended, then set party to not participate in any election
+          const updateParty = await Party.findOne({ _id: party._id });
+          updateParty.participate.inelection = false;
+          await updateParty.save().catch((err) => {
+            console.log(err);
+          });
+        }
+      });
+    }
+    await election.save().catch((err) => {
+      console.log(err);
+    });
+  });
+
+  res.json({ message: elections });
+
+  //check if already participated and valid
+  //parties particpate.inelection = false
+}))

@@ -18,7 +18,7 @@ router.post("/create/election", async (req, res) => {
       return res.status(400).send("One or more fields are not present");
     }
 
-    const elections = await Election.find({});
+    const elections = await Election.find({}).lean();
 
     let check1 = false; //checks for current
     let check2 = false; //checks for future
@@ -61,7 +61,11 @@ router.post("/create/election", async (req, res) => {
     election.startTime = startTime;
     election.endTime = endTime;
     election.electionType = electionType;
-    if (Number(new Date()) >= election.startTime) election.valid = true;
+    if (Number(election.startTime) >= (Date.now())) election.valid = true;
+
+    console.log(Date.now() <= Number(election.startTime));
+    console.log(Date.now() , Number(election.startTime) )
+    console.log(typeof Date.now(),typeof Number(election.startTime))
 
     if (electionType.toLowerCase() === "country") {
       const parties = await Party.find({ is_valid: true });
@@ -144,26 +148,6 @@ router.put("/stopelection", async (req, res) => {
       res.json({ message: "there was an error fetching elections" });
     });
 
-  /* for(var i=0;i<elections.length;i++){
-    if (Number(new Date()) >= Number(elections[i].endTime)) elections[i].valid = false;
-    if (elections[i].valid == false) {
-    for(var j=0;j<elections.parties.length;i++){
-
-      if (party.participate.inelection == true) {
-        //if election has ended, then set party to not participate in any election
-        party.participate.inelection = false;
-        const updateParty = await Party.findOne({ _id: party._id });
-        if (!updateParty || updateParty == null || updateParty == []) {
-          check1 = true;
-          break
-        }
-      }
-    }
-    }
-    
-  }
- */
-
   elections.map(async (election) => {
     if (Number(new Date()) >= Number(election.endTime)) election.valid = false;
     if (election.valid == false) {
@@ -188,7 +172,7 @@ router.put("/stopelection", async (req, res) => {
 
   //check if already participated and valid
   //parties particpate.inelection = false
-});
+})
 
 router.get("/get/election/byid/:id",async (req,res)=>{
   const election = await Election.findOne({_id:req.params.id}).populate({
@@ -209,7 +193,6 @@ router.get("/get/election/byid/:id",async (req,res)=>{
   }
   return res.status(200).json({message:election});
 })
-
 
 router.get("/get/election/foruser",async (req,res)=>{
   //returned to the user
@@ -243,5 +226,7 @@ router.get("/get/election/foruser",async (req,res)=>{
 
   return res.status(200).json({message:currentElection});
 });
+
+
 
 module.exports = router;

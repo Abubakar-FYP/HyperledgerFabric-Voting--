@@ -1,9 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = require("mongoose");
 
-require("../Models/ballot");
-const Ballot = mongoose.model("Ballot");
-
 const partySchema = new Schema({
   partyName: {
     type: String,
