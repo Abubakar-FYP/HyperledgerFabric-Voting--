@@ -6,8 +6,6 @@ require("dotenv").config();
 const requirelogin = require("./Middleware/requirelogin"); //middleware
 const cron = require("node-cron");
 
-const Election = require("./Models/election");
-
 const app = express();
 app.use(express.json({ limit: "50mb" })); //to parse outgoing json in the post req
 
@@ -50,6 +48,8 @@ var poll = require("./Routes/poll");
 var election = require("./Routes/election");
 var poller = require("./Routes/poller");
 
+const Election = mongoose.model("Election");
+
 app.use([
   signup,
   ballot,
@@ -61,6 +61,7 @@ app.use([
   voter,
   poll,
   election,
+  poller,
 ]); //using the routes
 
 const serverNumber = 1970;
@@ -110,8 +111,10 @@ app.listen(serverNumber, () => {
   serverDebuger(`connected to ${serverNumber}`);
 });
 
-//stop election cronjob for every 1 min
-cron.schedule("*/1 * * * * *",router.put("/stopelection", async (req, res) => {
+//stop election cronjob for every 30 sec
+cron.schedule("30 * * * * *", async () => {
+  //CRON-JOB STOP ELECTION
+  console.log("Start Stopping Election");
   const elections = await Election.find({})
     .populate({
       path: "parties",
@@ -122,6 +125,8 @@ cron.schedule("*/1 * * * * *",router.put("/stopelection", async (req, res) => {
       res.json({ message: "there was an error fetching elections" });
     });
 
+  /* console.log(elections);
+   */
   elections.map(async (election) => {
     if (Number(new Date()) >= Number(election.endTime)) election.valid = false;
     if (election.valid == false) {
@@ -141,9 +146,36 @@ cron.schedule("*/1 * * * * *",router.put("/stopelection", async (req, res) => {
       console.log(err);
     });
   });
-
-  res.json({ message: elections });
-
   //check if already participated and valid
   //parties particpate.inelection = false
-}))
+  console.log("End Stopping Election");
+});
+
+//start election cronjob for every 5 sec
+cron.schedule("5 * * * * *", async () => {
+  console.log("start election");
+  const elections = await Election.find({}).catch((err) => {
+    console.log(err);
+  });
+
+  let check1 = false;
+  elections.map(async (election) => {
+    /* console.log(
+      "Now",
+      Date.now(),
+      "Start",
+      Number(election.endTime),
+      Number(Date.now()) <= Number(election.endTime)
+    ); */
+    if (
+      Number(Date.now()) >= election.startTime &&
+      Number(Date.now()) <= election.endTime
+    ) {
+      election.valid = true;
+      await election.save();
+      check1 = true;
+    }
+  });
+  console.log();
+  console.log("end start election");
+});
