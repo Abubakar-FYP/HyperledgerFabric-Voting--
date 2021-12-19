@@ -5,10 +5,12 @@ const requireLogin = require("../Middleware/requirelogin");
 
 require("../Models/candidate");
 require("../Models/nadra");
+require("../Models/voter");
 
 const Candidate = mongoose.model("Candidate");
 const Nadra = mongoose.model("Nadra");
 const Ballot = mongoose.model("Ballot");
+const Voter = mongoose.model("Voter");
 
 //delete's candidate with id in params
 //hold onto this one right now
@@ -99,19 +101,61 @@ router.get("/getpositions", async (req, res) => {
 });
 
 router.get("/getmalevoters", async (req, res) => {
-  const voters = await Nadra.find({ gender: "Male", voteflag: true });
-  if (voters == null) {
-    res.json({ message: "no vote has been casted by males" });
+  const voters = await Voter.find({ voteflag: true });
+  const nadra = await Nadra.find({});
+  const male = new Array();
+
+  voters.map((voter) => {
+    nadra.map((citizen) => {
+      if (voter.cnic == citizen.cnic && citizen.gender == "Male") {
+        console.log("Male==>", citizen);
+        male.push(voter);
+      }
+    });
+  });
+
+  if (voters == null || voters == []) {
+    return res
+      .status(400)
+      .json({ message: "no vote has been casted by males" });
   }
-  res.json(voters);
+
+  if (nadra == null || nadra == []) {
+    return res
+      .status(400)
+      .json({ message: "there are no candidates in nadra" });
+  }
+
+  return res.status(200).json(male);
 });
 
 router.get("/getfemalevoters", async (req, res) => {
-  const voters = await Nadra.find({ gender: "Female", voteflag: true });
-  if (voters == null) {
-    res.json({ message: "no vote has been casted by females" });
+  const voters = await Voter.find({ voteflag: true });
+  const nadra = await Nadra.find({});
+  const female = new Array();
+
+  voters.map((voter) => {
+    nadra.map((citizen) => {
+      if (voter.cnic == citizen.cnic && citizen.gender == "Female") {
+        female.push(voter);
+        console.log("Female==>", citizen);
+      }
+    });
+  });
+
+  if (voters == null || voters == []) {
+    return res
+      .status(400)
+      .json({ message: "no vote has been casted by females" });
   }
-  res.json(voters);
+
+  if (nadra == null || nadra == []) {
+    return res
+      .status(400)
+      .json({ message: "there are no candidates in nadra" });
+  }
+
+  return res.status(200).json(female);
 });
 
 //gets all candidates by ballot their ballot id
