@@ -249,7 +249,7 @@ router.get("/get/election/previous", async (req, res) => {
     }
   });
 
-  res.json({ message: elections });
+  res.status(200).json({ message: elections });
 });
 
 module.exports = router;
