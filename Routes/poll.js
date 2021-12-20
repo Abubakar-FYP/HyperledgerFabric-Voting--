@@ -45,14 +45,17 @@ router.post("/createpoll", async (req, res) => {
     return res.status(400).json({ message: "one or more fields are empty" });
   }
 
-  if (Number(endTime) < Number(startTime)) {
+  if (endTime < startTime) {
     //if end time is < start time
     return res.status(400).json({
       message: "invalid time entered,end-time is less than start-time",
     });
   }
 
-  if (Number(startTime) < Number(new Date())) {
+  console.log(Date.now() , startTime);
+  console.log(Date.now() > startTime);
+  
+  if (Date.now() > startTime) {
     // if start time is < current time
     return res.status(400).json({
       message: "invalid time entered, start time is less than current time",
@@ -99,12 +102,6 @@ router.post("/createpoll", async (req, res) => {
     items: items,
   });
 
-  if (newPol.startTime >= new Date()) {
-    newPol.valid = true;
-  } else {
-    newPol.valid = false;
-  }
-
   await newPol
     .save()
     .then(() => {
@@ -129,9 +126,11 @@ router.get("/currentpolls", async (req, res) => {
   let currentPoll;
   let check1 = false; //checks if current poll is present
   polls.map((poll) => {
+    console.log(Number(Date.now()), Number(poll.startTime),
+    Number(Date.now()), Number(poll.endTime));
     if (
-      Number(new Date()) >= Number(poll.startTime) &&
-      Number(new Date()) < Number(poll.endTime)
+      Number(Date.now()) >= Number(poll.startTime) &&
+      Number(Date.now()) < Number(poll.endTime)
     ) {
       currentPoll = poll;
       check1 = true;
@@ -203,14 +202,19 @@ router.get("/abouttostartpolls", async (req, res) => {
 
 //all started,yet to start and finished polls
 router.get("/getallpolls", async (req, res) => {
-  const polls = await Polls.find({}).catch((err) => {
+  const polls = await Polls.find({})
+  .catch((err) => {
     console.log(err);
     return res
       .status(400)
       .json({ message: "there was an error finding polls" });
   });
 
-  res.json({ message: polls });
+  if(polls==null||!polls||polls==[]){
+    return res.status(400).json({message:"polls not found"});
+  }
+
+  res.status(200).json({ message: polls });
 });
 
 router.get("/getonepoll/:p_id", async (req, res) => {
@@ -221,16 +225,25 @@ router.get("/getonepoll/:p_id", async (req, res) => {
       .json({ message: "there was an error finding polls" });
   });
 
+  if(polls==null||!polls||polls==[]){
+    return res.status(400).json({message:"poll not found"});
+  }
+
   res.json({ message: polls });
 });
 
 router.get("/getresultofallpolls", async (req, res) => {
-  const polls = await Polls.find({}).catch((err) => {
+  const polls = await Polls.find({})
+  .catch((err) => {
     console.log(err);
     return res
       .status(400)
       .json({ message: "there was an error finding polls" });
   });
+
+  if(polls==null||!polls||polls==[]){
+    return res.status(400).json({message:"polls not found"});
+  }
 
   polls.map((poll) => {
     console.log(
@@ -282,6 +295,10 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
         message: "there was an error finding the poll with that id",
       });
     });
+
+  if(poll==null||!poll||poll==[]){
+      return res.status(400).json({message:"poll not found"});
+  }
 
   let check4 = false;
   poll.voters.map((voter) => {
@@ -362,6 +379,7 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
   //increment in polls model, item.voteCount field
 });
 
+//Add to cron-job
 router.put("/stoppoll", async (req, res) => {
   const polls = await Polls.find({}).catch((err) => {
     console.log(err);
@@ -383,11 +401,11 @@ router.put("/stoppoll", async (req, res) => {
     }
   });
 
-  res.json(polls);
-});
+})
 
 router.put("/startpoll", async (req, res) => {
-  const polls = await Polls.find({}).catch((err) => {
+  const polls = await Polls.find({})
+  .catch((err) => {
     console.log(err);
   });
 
@@ -398,9 +416,8 @@ router.put("/startpoll", async (req, res) => {
   polls.map((poll) => {
     if (
       //checks if its a polls valid time
-      Number(new Date()) >= Number(poll.startTime) &&
-      Number(new Date()) <= Number(poll.endTime) &&
-      poll.valid == false
+      Number(Date.now()) >= Number(poll.startTime) &&
+      Number(Date.now()) <= Number(poll.endTime)
     ) {
       poll.valid = true;
       poll
@@ -412,7 +429,6 @@ router.put("/startpoll", async (req, res) => {
     }
   });
 
-  res.json(polls);
 });
 
 module.exports = router;
