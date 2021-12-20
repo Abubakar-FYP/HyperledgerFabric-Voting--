@@ -18,6 +18,14 @@ router.post("/create/election", async (req, res) => {
       return res.status(400).send("One or more fields are not present");
     }
 
+    if(endTime < startTime){
+      return res.status(400).json({message:"invalid time entered, end-time is less than start time"});
+    }
+
+    if(Date.now() > startTime){
+      return res.status(400).json({message:"invalid time entered, start time is less than current time"});
+    }
+
     const elections = await Election.find({}).lean();
 
     let check1 = false; //checks for current
