@@ -67,16 +67,16 @@ router.put("/approveparty/:partyId", async (req, res) => {
 router.delete("/rejectparty/:partyId", async (req, res) => {
   let resp = await Party.findOne({ _id: req.params.partyId });
 
-  if (resp === null) {
-    return res.json({ message: `party does not exist` });
+  if (resp == null) {
+    return res.status(400).json({ message: `party does not exist` });
   }
 
   resp = await Party.findOneAndDelete({ _id: req.params.partyId });
 
   if (resp === null) {
-    return res.json({ message: `party does not exist` });
+    return res.status(400).json({ message: `party does not exist` });
   } else {
-    return res.json({ message: `party has been deleted` });
+    return res.status(200).json({ message: `party has been deleted` });
   }
 });
 

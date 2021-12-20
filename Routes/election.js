@@ -234,4 +234,30 @@ router.get("/get/election/foruser", async (req, res) => {
   return res.status(200).json({ message: currentElection });
 });
 
+//gets previous election result
+//get all parties in an election and store it in an array
+//sort the parties of that array while traversing inside election
+//sort them by their vote count
+router.get("/get/election/previous", async (req, res) => {
+  const elections = await Election.find({}).populate("parties");
+  let previousElections = new Array();
+  elections.map((election) => {
+    if (Date.now() >= election.endTime) {
+      previousElections.push(election);
+    }
+  });
+  const parties = new Array();
+  parties.push(elections[11].parties[0]);
+  parties.push(elections[13].parties[0]);
+  parties.push(elections[15].parties[0]);
+
+  parties.sort((a, b) => {
+    return a?.voteCount - b?.voteCount;
+  });
+
+  //console.log(parties);
+
+  res.json({ message: parties });
+});
+
 module.exports = router;

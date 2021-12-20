@@ -111,7 +111,7 @@ app.listen(serverNumber, () => {
   serverDebuger(`connected to ${serverNumber}`);
 });
 
-//stop election cronjob for every 30 sec
+/* //stop election cronjob for every 30 sec
 cron.schedule("30 * * * * *", async () => {
   //CRON-JOB STOP ELECTION
   console.log("Start Stopping Election");
@@ -125,8 +125,7 @@ cron.schedule("30 * * * * *", async () => {
       res.json({ message: "there was an error fetching elections" });
     });
 
-  /* console.log(elections);
-   */
+
   elections.map(async (election) => {
     if (Number(new Date()) >= Number(election.endTime)) election.valid = false;
     if (election.valid == false) {
@@ -160,13 +159,7 @@ cron.schedule("5 * * * * *", async () => {
 
   let check1 = false;
   elections.map(async (election) => {
-    /* console.log(
-      "Now",
-      Date.now(),
-      "Start",
-      Number(election.endTime),
-      Number(Date.now()) <= Number(election.endTime)
-    ); */
+   
     if (
       Number(Date.now()) >= election.startTime &&
       Number(Date.now()) <= election.endTime
@@ -179,3 +172,4 @@ cron.schedule("5 * * * * *", async () => {
   console.log();
   console.log("end start election");
 });
+ */
