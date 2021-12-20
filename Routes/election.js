@@ -244,20 +244,12 @@ router.get("/get/election/previous", async (req, res) => {
   elections.map((election) => {
     if (Date.now() >= election.endTime) {
       previousElections.push(election);
+
+      election.parties.sort((a,b)=>{return b?.voteCount-a.voteCount})
     }
   });
-  const parties = new Array();
-  parties.push(elections[11].parties[0]);
-  parties.push(elections[13].parties[0]);
-  parties.push(elections[15].parties[0]);
 
-  parties.sort((a, b) => {
-    return a?.voteCount - b?.voteCount;
-  });
-
-  //console.log(parties);
-
-  res.json({ message: parties });
+  res.json({ message: elections });
 });
 
 module.exports = router;
