@@ -142,9 +142,7 @@ router.get("/currentpolls", async (req, res) => {
   });
 
   if (!check1 || check1 == false) {
-    return res
-      .status(400)
-      .send( "there is no current poll running" );
+    return res.status(400).send("there is no current poll running");
   }
 
   res.json({ message: currentPoll });
@@ -220,18 +218,22 @@ router.get("/getallpolls", async (req, res) => {
 });
 
 router.get("/getonepoll/:p_id", async (req, res) => {
-  const polls = await Polls.findOne({ _id: req.params.p_id }).catch((err) => {
+  const poll = await Polls.findOne({ _id: req.params.p_id }).catch((err) => {
     console.log(err);
     return res
       .status(400)
       .json({ message: "there was an error finding polls" });
   });
 
-  if (polls == null || !polls || polls == []) {
+  if (poll == null || !poll || poll == []) {
     return res.status(400).json({ message: "poll not found" });
   }
 
-  res.json({ message: polls });
+  const newPoll = poll.items.sort((a, b) => {
+    return b?.item?.voteCount - a?.item?.voteCount;
+  });
+
+  res.json({ message: newPoll });
 });
 
 router.get("/getresultofallpolls", async (req, res) => {
