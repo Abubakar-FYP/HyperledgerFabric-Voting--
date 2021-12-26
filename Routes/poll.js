@@ -229,11 +229,11 @@ router.get("/getonepoll/:p_id", async (req, res) => {
     return res.status(400).json({ message: "poll not found" });
   }
 
-  const newPoll = poll.items.sort((a, b) => {
+  poll.items.sort((a, b) => {
     return b?.item?.voteCount - a?.item?.voteCount;
   });
 
-  res.json({ message: newPoll });
+  res.json({ message: poll });
 });
 
 router.get("/getresultofallpolls", async (req, res) => {
