@@ -97,9 +97,10 @@ const Polls = () => {
             <div className="card-header">All Polls</div>
             <div className="card-body">
               <div className="row">
+                {console.log("allPollsallPollsallPollsallPolls", allPolls)}
                 {allPolls?.length &&
                   allPolls.map((poll) => (
-                    <div className="card bg-warning text-light col-md-3">
+                    <Link to={`/poll/result/${poll?._id}`} style={{textDecoration: "none"}} className="card bg-warning text-light col-md-3">
                       <div className="card-body">
                         <p>
                           <strong>Poal Name</strong>: {poll.pollname}
@@ -108,7 +109,7 @@ const Polls = () => {
                           <strong>Poal Type</strong>: {poll.type}
                         </p>
                       </div>
-                    </div>
+                    </Link>
                   ))}
               </div>
             </div>
