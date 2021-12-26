@@ -32,6 +32,7 @@ import Poll from './components/Screens/Poll';
 import PollsRegisteration from './components/Screens/PollsRegisteration';
 import PollsSignin from './components/Screens/Pollsignin';
 import PollsForgotPassword from './components/Screens/PollsForgotPassword';
+import PollResult from './components/Screens/PollResult';
 export const UserContext = createContext()
 
 const Routing = () => {
@@ -121,6 +122,7 @@ function App() {
           <Route exact path="/pending-parties/:id" component={PendingParties} />
           <Route exact path="/polls" component={Polls} />
           <Route exact path="/poll/:id" component={Poll} />
+          <Route exact path="/poll/result/:id" component={PollResult} />
         </Switch>
       </BrowserRouter>
     </UserContext.Provider>
