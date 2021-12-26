@@ -51,7 +51,7 @@ const PollResult = ({ match }) => {
                             <span className='' style={{ fontSize: "20px" }}> Total Vote Count :
                             </span>
 
-                            {onePoll.voters.length}
+                            {onePoll?.voters?.length}
                         </p>
 
                         <p className='col-12 float-left'>
@@ -68,7 +68,7 @@ const PollResult = ({ match }) => {
                         </p>
 
                         <h1>Poll Items</h1>
-                       {onePoll?.items.length && onePoll.items.map(item => 
+                       {onePoll?.items?.length && onePoll.items.map(item => 
                          <div key={item._id} className='card bg-primary text-light mx-3' style={{width: "20%"}}>
                          <div className='card-header'>Poll Item</div>
                          <div className='card-body'>
