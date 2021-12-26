@@ -12,6 +12,7 @@ const PartyRegisteration = () => {
     cnic: "",
     partyName: "",
     partySymbol: "",
+    partyLeaderEmail: ""
   };
   const initialState2 = {
     canName: "",
@@ -112,7 +113,8 @@ const PartyRegisteration = () => {
       leaderCnic: party.cnic,
       partySymbol: party.partySymbol,
       partyLogo: partyLogo,
-      type: selectedType
+      type: selectedType,
+      partyLeaderEmail: party.partyLeaderEmail
     }
     localStorage.setItem("party", JSON.stringify(partyLeader))
     const data = {
@@ -144,6 +146,7 @@ const PartyRegisteration = () => {
       partyImg: party.partyLogo,
       partySymbol : party.partySymbol,
       partyLeaderCnic: party.leaderCnic,
+      partyLeaderEmail: party.partyLeaderEmail,
       candidate: data.map(p => {
         return {
           cnic: p.candidateCnic,
@@ -189,6 +192,7 @@ const PartyRegisteration = () => {
       !party.partyName ||
       !party.cnic ||
       !party.partySymbol ||
+      !party.partyLeaderEmail || 
       !partyLogo
     ) {
       showCandidate[1](false);
@@ -201,6 +205,7 @@ const PartyRegisteration = () => {
     party.cnic,
     party.partySymbol,
     partyLogo,
+    party.partyLeaderEmail
   ]);
 
   useEffect(() => {
@@ -218,6 +223,7 @@ const PartyRegisteration = () => {
       !party.cnic ||
       !party.partySymbol ||
       !partyLogo ||
+      !party.partyLeaderEmail ||
       !candidate.canCnic ||
       !candidate.canName ||
       !selectedArea ||
@@ -237,6 +243,7 @@ const PartyRegisteration = () => {
     candidate.canName,
     selectedArea,
     selectedCompaign,
+    party.partyLeaderEmail,
     ballotId
   ])
   useEffect(() => {
@@ -250,6 +257,7 @@ const PartyRegisteration = () => {
       newParty.leaderName = partyLS.leaderName
       newParty.partyName = partyLS.partyName
       newParty.partySymbol = partyLS.partySymbol
+      newParty.partyLeaderEmail = partyLS.partyLeaderEmail
       setParty(newParty)
       setPartyLogo(partyLS.partyLogo)
     }
@@ -264,7 +272,7 @@ const PartyRegisteration = () => {
           <div className="card-header">Party Registeration</div>
           <div className="card-body">
             <div className="row">
-              <div className="col-md-6 col-12">
+              <div className="col-md-4 col-12">
                 <div className="form-group">
                   <label htmlFor="leader_name">Leader Name</label>
                   <input
@@ -277,7 +285,20 @@ const PartyRegisteration = () => {
                   />
                 </div>
               </div>
-              <div className="col-md-6 col-12">
+              <div className="col-md-4 col-12">
+                <div className="form-group">
+                  <label htmlFor="leader_name">Leader Email</label>
+                  <input
+                    value={party.partyLeaderEmail}
+                    onChange={handlePartyRegisteration}
+                    id="leader_email"
+                    className="form-control"
+                    type="email"
+                    name="partyLeaderEmail"
+                  />
+                </div>
+              </div>
+              <div className="col-md-4 col-12">
                 <div className="form-group">
                   <label htmlFor="cnic">CNIC</label>
                   <input

@@ -68,10 +68,16 @@ const PollResult = ({ match }) => {
                         </p>
 
                         <h1>Poll Items</h1>
-                       {onePoll?.items?.length && onePoll.items.map(item => 
-                         <div key={item._id} className='card bg-primary text-light mx-3' style={{width: "20%"}}>
+                       {onePoll?.items?.length && onePoll.items.map((item, index) => 
+                         <div key={item._id} className={`card bg-${index === 0 ? "success" : "primary"} text-light mx-3`} style={{width: "20%"}}>
                          <div className='card-header'>Poll Item</div>
                          <div className='card-body'>
+                             {index === 0 && 
+                                 <p className='col-12 float-left'>
+                                 <span className='' style={{ fontSize: "30px" }}> Winner Candidate
+                                 </span>
+                             </p>
+                             }
                              <p className='col-12 float-left'>
                                  <span className='' style={{ fontSize: "20px" }}> Name :
                                  </span>
