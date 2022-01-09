@@ -4,9 +4,11 @@ const mongoose = require("mongoose");
 
 require("../Models/party");
 require("../Models/election");
+require("../Models/ballot");
 //
 const Party = mongoose.model("Party");
-const Election = require("../Models/election");
+const Election = mongoose.model("Election");
+const Ballot = mongoose.model("Ballot");
 
 router.post("/create/election", async (req, res) => {
   try {
@@ -18,12 +20,16 @@ router.post("/create/election", async (req, res) => {
       return res.status(400).send("One or more fields are not present");
     }
 
-    if(endTime < startTime){
-      return res.status(400).json({message:"invalid time entered, end-time is less than start time"});
+    if (endTime < startTime) {
+      return res.status(400).json({
+        message: "invalid time entered, end-time is less than start time",
+      });
     }
 
-    if(Date.now() > startTime){
-      return res.status(400).json({message:"invalid time entered, start time is less than current time"});
+    if (Date.now() > startTime) {
+      return res.status(400).json({
+        message: "invalid time entered, start time is less than current time",
+      });
     }
 
     const elections = await Election.find({}).lean();
@@ -108,6 +114,7 @@ router.get("/get/election", async (req, res) => {
     const elections = await Election.find().select("-candidates -parties");
     if (!elections)
       return res.status(400).send("There are not elections present");
+
     res.send(elections);
   } catch (error) {
     res.status(500).send(error.message);
@@ -161,6 +168,8 @@ router.put("/stopelection", async (req, res) => {
       res.json({ message: "there was an error fetching elections" });
     });
 
+  const ballots = await Ballot.find({});
+
   elections.map(async (election) => {
     if (Number(new Date()) >= Number(election.endTime)) election.valid = false;
     if (election.valid == false) {
@@ -179,6 +188,17 @@ router.put("/stopelection", async (req, res) => {
     await election.save().catch((err) => {
       console.log(err);
     });
+  });
+
+  //Delete all ballot candidates
+
+  ballots.map((ballot) => {
+    console.log(ballot);
+    /* 
+    ballot.candidate = [];
+    await ballot.save().catch((err) => {
+      console.log(err);
+    }); */
   });
 
   res.json({ message: elections });
@@ -253,7 +273,9 @@ router.get("/get/election/previous", async (req, res) => {
     if (Date.now() >= election.endTime) {
       previousElections.push(election);
 
-      election.parties.sort((a,b)=>{return b?.voteCount-a.voteCount})
+      election.parties.sort((a, b) => {
+        return b?.voteCount - a.voteCount;
+      });
     }
   });
 

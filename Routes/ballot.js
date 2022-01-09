@@ -215,9 +215,9 @@ router.put(
 router.get("/getcandidateswithballotid/:ballotId", async (req, res) => {
   Candidate.find({ ballotId: req.params.ballotId }).exec((err, docs) => {
     if (!err) {
-      res.status(200).json({ message: docs });
+      return res.status(200).json({ message: docs });
     } else {
-      res.status(400).json({ message: err });
+      return res.status(400).json({ message: err });
     }
   });
 });

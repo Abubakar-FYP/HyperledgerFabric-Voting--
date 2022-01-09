@@ -22,6 +22,9 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
   let check1 = false; //check for running elections
   elections.map(async (election) => {
     //checks if there are current running elections
+
+    console.log(Number(new Date()), election.startTime);
+    console.log(Number(new Date()), election.endTime);
     if (
       Number(new Date()) >= election.startTime &&
       Number(new Date()) <= election.endTime &&

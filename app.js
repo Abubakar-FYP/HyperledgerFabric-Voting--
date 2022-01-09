@@ -36,17 +36,17 @@ require("./Models/election");
 require("./Models/poller");
 
 //Routes Registering
-var vote = require("./Routes/vote");
-var voter = require("./Routes/voter");
-var signup = require("./Routes/signup");
-var admin = require("./Routes/admin");
-var ballot = require("./Routes/ballot");
-var campaign = require("./Routes/campaign");
-var party = require("./Routes/party");
-var candidate = require("./Routes/candidate");
-var poll = require("./Routes/poll");
-var election = require("./Routes/election");
-var poller = require("./Routes/poller");
+const vote = require("./Routes/vote");
+const voter = require("./Routes/voter");
+const signup = require("./Routes/signup");
+const admin = require("./Routes/admin");
+const ballot = require("./Routes/ballot");
+const campaign = require("./Routes/campaign");
+const party = require("./Routes/party");
+const candidate = require("./Routes/candidate");
+const poll = require("./Routes/poll");
+const election = require("./Routes/election");
+const poller = require("./Routes/poller");
 
 const Election = mongoose.model("Election");
 

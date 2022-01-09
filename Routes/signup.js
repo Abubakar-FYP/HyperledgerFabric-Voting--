@@ -119,11 +119,9 @@ router.post("/profile", async (req, res) => {
 
 router.post("/signin", async (req, res) => {
   const { cnic, password } = req.body;
-
   if (!cnic || !password) {
     return res.json({ message: "one or more fields is empty" });
   }
-
   const elections = await Elections.find({});
   let latestElections;
   if (elections == null || elections == undefined) {
@@ -132,23 +130,15 @@ router.post("/signin", async (req, res) => {
     elections.sort((b, a) => a?.endTime - b?.endTime);
     latestElections = elections[0];
   }
-  //compare endTime of a election with new Date
-  //see which is closer
-  //finds the current or latest ended election
-
-  console.log("Elections======>", elections);
-  //current elections or recently ended election
-
+  console.log("Latest------->", latestElections);
   const doc = await Voter.findOne({ cnic: cnic, password: password }).select(
     "-password"
   );
   if (!doc) return res.send("You Are Not A Registered Voter");
-
   const user = await Nadra.findOne({ cnic: cnic });
-
   console.log("Result=========", user);
   const token = jwt.sign({ _id: doc._id }, JWTKEY);
-  res.send({ token, doc, user, latestElections });
+  res.status(200).send({ token, doc, user, latestElections });
 });
 
 router.post("/get/reset/password/token", async (req, res) => {
@@ -186,6 +176,7 @@ router.post("/get/reset/password/token", async (req, res) => {
   }
   // res.status(200).send("Check Your Email")
 });
+
 router.post("/reset/password", async (req, res) => {
   const { newPassword, confirmPassword, token } = req.body;
   if (!newPassword || !confirmPassword || !token)
@@ -238,9 +229,9 @@ router.post("/signup/poller", async (req, res) => {
 
 router.post("/signin/poller", async (req, res) => {
   const { email, password } = req.body;
-console.log("req.body=========================", req.body)
+  console.log("req.body=========================", req.body);
   if (!email || !password) {
-    return res.status(400).send("one or more fields are empty" );
+    return res.status(400).send("one or more fields are empty");
   }
 
   const _polls = await Polls.find({});
