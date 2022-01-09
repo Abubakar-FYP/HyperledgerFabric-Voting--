@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
+const sendEmail = require("../utils/sendEmail");
 const requireLogin = require("../Middleware/requirelogin");
 const { compareSync } = require("bcryptjs");
 
@@ -44,6 +45,8 @@ router.post("/createpoll", async (req, res) => {
   if (!pollname || !type || !startTime || !endTime || !description || !items) {
     return res.status(400).json({ message: "one or more fields are empty" });
   }
+
+  const pollers = await Poller.find({});
 
   if (endTime < startTime) {
     //if end time is < start time
@@ -101,6 +104,26 @@ router.post("/createpoll", async (req, res) => {
     startTime: startTime,
     items: items,
   });
+
+  try {
+    const emailsList = pollers.map((poller) => {
+      return poller.email;
+    });
+    const emails = emailsList.join(",");
+    //console.log("Emails==>", emails);
+    console.log(startTime, endTime);
+    //console.log("Emails==>", emails);
+    console.log(`\n\n\n This email is about to notify you that a new poll is coming up at
+      ${new Date(Number(startTime))} and is closing at ${new Date(endTime)}`);
+    await sendEmail({
+      email: emails,
+      subject: "Poll Commence Email",
+      message: `This email is about to notify you that a new poll is coming up at
+         ${new Date(Number(startTime))} and is closing at ${new Date(endTime)}`,
+    });
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
 
   await newPol
     .save()
@@ -367,6 +390,19 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
         return res.status(400).json({ message: "couldnt save poll in poller" });
       });
 
+      try {
+        console.log(
+          `\n This email is about to notify you that the you have casted your vote in poll successfully`
+        );
+        await sendEmail({
+          email: poller.email,
+          subject: "Vote Successfully Casted in Poll",
+          message: `This email is about to notify you that the you have casted your vote in poll successfully`,
+        });
+      } catch (error) {
+        res.status(400).send(error.message);
+      }
+
       await poll
         .save()
         .then(() => {
@@ -394,6 +430,8 @@ router.put("/stoppoll", async (req, res) => {
     return res.status(400).json({ message: "There are no polls" });
   }
 
+  const pollers = await Poller.find({});
+
   polls.map((poll) => {
     if (Number(new Date()) >= Number(poll.endTime) && poll.valid == true) {
       poll.valid = false;
@@ -405,6 +443,26 @@ router.put("/stoppoll", async (req, res) => {
         });
     }
   });
+
+  try {
+    const emailsList = pollers.map((poller) => {
+      return poller.email;
+    });
+    const emails = emailsList.join(",");
+    //console.log("Emails==>", emails);
+    console.log(startTime, endTime);
+    //console.log("Emails==>", emails);
+    console.log(
+      `\n\n\n This email is about to notify you that the current poll has ended`
+    );
+    await sendEmail({
+      email: emails,
+      subject: "Poll Commence Email",
+      message: `This email is about to notify you that the current poll has ended`,
+    });
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
 });
 
 router.put("/startpoll", async (req, res) => {
