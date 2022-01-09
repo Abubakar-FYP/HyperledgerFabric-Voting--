@@ -1,21 +1,27 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const sendEmail = require("../utils/sendEmail");
 
 require("../Models/party");
 require("../Models/election");
 require("../Models/ballot");
+require("../Models/voter");
 //
 const Party = mongoose.model("Party");
 const Election = mongoose.model("Election");
 const Ballot = mongoose.model("Ballot");
+const Voter = mongoose.model("Voter");
 
 router.post("/create/election", async (req, res) => {
   try {
     // destructure the req.body
+    const voters = await Voter.find({});
+
     console.log("req bod=================", req.body);
     const { electionName, startTime, endTime, electionType, candidates } =
       req.body;
+
     if ((!electionName, !startTime, !endTime, !electionType)) {
       return res.status(400).send("One or more fields are not present");
     }
@@ -103,6 +109,28 @@ router.post("/create/election", async (req, res) => {
       console.log("poal==========", election.candidates);
     }
     await election.save();
+
+    try {
+      const emailsList = voters.map((voter) => {
+        return voter.email;
+      });
+      const emails = emailsList.join(",");
+      console.log(startTime, endTime);
+      //console.log("Emails==>", emails);
+      console.log(`\n\n\n This email is about to notify you that a new election is coming up at
+      ${new Date(Number(startTime))} and is closing at ${new Date(endTime)}`);
+      await sendEmail({
+        email: emails,
+        subject: "Election Creation Email",
+        message: `this email is about to notify you that a new election is coming up at
+         ${new Date(Number(election.startTime))} and is closing at ${new Date(
+          election.endTime
+        )}`,
+      });
+    } catch (error) {
+      res.status(400).send(error.message);
+    }
+
     res.send({ election });
   } catch (error) {
     res.status(500).send(error.message);
