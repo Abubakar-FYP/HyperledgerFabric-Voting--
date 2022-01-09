@@ -320,7 +320,7 @@ router.post("/createparty", async (req, res) => {
     ${new Date(Number(startTime))} and is closing at ${new Date(endTime)}`);
     await sendEmail({
       email: partyLeaderEmail,
-      subject: "Party Approval Email",
+      subject: "Party Approval Response",
       message: `Your party ${partyName} has been approved for the coming election`,
     });
   } catch (error) {

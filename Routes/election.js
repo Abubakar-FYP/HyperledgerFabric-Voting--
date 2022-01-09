@@ -121,7 +121,7 @@ router.post("/create/election", async (req, res) => {
       ${new Date(Number(startTime))} and is closing at ${new Date(endTime)}`);
       await sendEmail({
         email: emails,
-        subject: "Election Creation Email",
+        subject: "Election Commence Email",
         message: `this email is about to notify you that a new election is coming up at
          ${new Date(Number(election.startTime))} and is closing at ${new Date(
           election.endTime
@@ -196,6 +196,7 @@ router.put("/stopelection", async (req, res) => {
       res.json({ message: "there was an error fetching elections" });
     });
 
+  const voters = await Voter.find({});
   const ballots = await Ballot.find({});
 
   elections.map(async (election) => {
@@ -218,15 +219,32 @@ router.put("/stopelection", async (req, res) => {
     });
   });
 
-  //Delete all ballot candidates
+  //sends email to all voters
+  try {
+    const emailsList = voters.map((voter) => {
+      return voter.email;
+    });
+    const emails = emailsList.join(",");
+    //console.log("Emails==>", emails);
+    console.log(
+      `\n This email is about to notify you that the current election has ended`
+    );
+    await sendEmail({
+      email: emails,
+      subject: "Election Ended",
+      message: `This email is about to notify you that the current election has ended`,
+    });
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
 
+  //Delete all ballot candidates
   ballots.map((ballot) => {
     console.log(ballot);
-    /* 
     ballot.candidate = [];
     await ballot.save().catch((err) => {
       console.log(err);
-    }); */
+    });
   });
 
   res.json({ message: elections });
