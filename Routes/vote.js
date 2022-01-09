@@ -112,6 +112,19 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
         console.log(err);
       });
 
+      try {
+        console.log(
+          `\n This email is about to notify you that the you have casted your vote successfully`
+        );
+        await sendEmail({
+          email: voter.email,
+          subject: "Vote Successfully Casted",
+          message: `This email is about to notify you that the you have casted your vote successfully`,
+        });
+      } catch (error) {
+        res.status(400).send(error.message);
+      }
+
       res.send({ message: "vote has been casted" });
     } //checks if there are current running elections
   });
