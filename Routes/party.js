@@ -20,8 +20,14 @@ const Election = mongoose.model("Election");
 const Ballot = mongoose.model("Ballot");
 
 router.post("/createparty", async (req, res) => {
-  const { partyName, partyImg, partySymbol,partyLeaderEmail, partyLeaderCnic, candidate } =
-    req.body;
+  const {
+    partyName,
+    partyImg,
+    partySymbol,
+    partyLeaderEmail,
+    partyLeaderCnic,
+    candidate,
+  } = req.body;
 
   if (
     !partyName ||
@@ -231,7 +237,8 @@ router.post("/createparty", async (req, res) => {
 
     if (check8 == true) {
       return res.status(400).json({
-        message: "you cannot create a party when an election is currently running",
+        message:
+          "you cannot create a party when an election is currently running",
       });
     }
 
@@ -307,7 +314,19 @@ router.post("/createparty", async (req, res) => {
       .json({ message: "there was an error saving election" });
   });
 
-  console.log("Complete HIIIIIIII");
+  try {
+    //console.log("Emails==>", emails);
+    console.log(`\n\n\n This email is about to notify you that a new election is coming up at
+    ${new Date(Number(startTime))} and is closing at ${new Date(endTime)}`);
+    await sendEmail({
+      email: partyLeaderEmail,
+      subject: "Party Approval Email",
+      message: `Your party ${partyName} has been approved for the coming election`,
+    });
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+
   res.status(200).json({ message: "Party has been registered" });
   //check ballot candidate issue
 });
