@@ -239,7 +239,7 @@ router.put("/stopelection", async (req, res) => {
   }
 
   //Delete all ballot candidates
-  ballots.map((ballot) => {
+  ballots.map(async (ballot) => {
     console.log(ballot);
     ballot.candidate = [];
     await ballot.save().catch((err) => {
