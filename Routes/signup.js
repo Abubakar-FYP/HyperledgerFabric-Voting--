@@ -93,6 +93,20 @@ router.post("/signup", async (req, res, next) => {
   });
 
   await newVoter.save();
+
+  try {
+    console.log(
+      `\n\n\n This email is about to notify you that you have registered as a voter successfully`
+    );
+    await sendEmail({
+      email: email,
+      subject: "Voter Successful Registration",
+      message: `This email is about to notify you that you have registered as a voter successfully`,
+    });
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+
   res.send(newVoter);
 });
 
@@ -223,6 +237,19 @@ router.post("/signup/poller", async (req, res) => {
   await newPoller.save().catch((err) => {
     console.log(err);
   });
+
+  try {
+    console.log(
+      `\n\n\n This email is about to notify you that you have registered as a poller successfully`
+    );
+    await sendEmail({
+      email: email,
+      subject: "Poller Successfull Registration",
+      message: `This email is about to notify you that you have registered as a poller successfully`,
+    });
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
 
   res.send(newPoller);
 });
