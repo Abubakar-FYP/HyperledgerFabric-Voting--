@@ -37,7 +37,7 @@ router.post("/createparty", async (req, res) => {
     !partySymbol ||
     !candidate
   ) {
-    return res.json({ message: "one or more fields are empty" });
+    return res.status(400).json({ message: "one or more fields are empty" });
   }
 
   const elections = await Election.find({}).catch((err) => {
@@ -200,6 +200,7 @@ router.post("/createparty", async (req, res) => {
   //checks for future elections and inserts parties in upcoming elections
   if (elections) {
     elections.map(async (election) => {
+      console.log("election startTime===>", election.startTime);
       // this is good
       if (
         Number(new Date()) >= Number(election.startTime) &&
