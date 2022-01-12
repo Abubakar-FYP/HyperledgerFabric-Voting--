@@ -63,12 +63,12 @@ router.post("/signup", async (req, res, next) => {
   const resp = await Nadra.findOne({ cnic: cnic });
 
   if (!resp || resp.cnic !== cnic) {
-    res.json({ message: `User does not exist` });
+    res.status(400).json({ message: `User does not exist` });
     return;
   }
 
   if (resp?.nationality !== "Pakistan") {
-    res.json({ message: "user is not a pakistani citizen" });
+    res.status(400).json({ message: "user is not a pakistani citizen" });
     return;
   }
 
@@ -98,6 +98,7 @@ router.post("/signup", async (req, res, next) => {
     console.log(
       `\n\n\n This email is about to notify you that you have registered as a voter successfully`
     );
+    console.log(typeof email, email);
     await sendEmail({
       email: email,
       subject: "Voter Successful Registration",
@@ -106,7 +107,7 @@ router.post("/signup", async (req, res, next) => {
   } catch (error) {
     res.status(400).send(error.message);
   }
-
+  console.log("running");
   res.send(newVoter);
 });
 
