@@ -164,115 +164,128 @@ router.get("/get/first/election", async (req, res) => {
 });
 
 router.put("/startelection", async (req, res) => {
-  const elections = await Election.find({})
-    .populate("parties")
-    .select("-partyImg")
-    .catch((err) => {
-      console.log(err);
-      res.json({ message: "there was an error fetching elections" });
+  try {
+    const elections = await Election.find({})
+      .populate("parties")
+      .select("-partyImg")
+      .catch((err) => {
+        console.log(err);
+        res.json({ message: "there was an error fetching elections" });
+      });
+
+    elections.map(async (election) => {
+      if (
+        Number(new Date()) >= Number(election.startTime) &&
+        Number(new Date()) <= Number(election.endTime)
+      )
+        election.valid = true;
+      await election.save();
     });
 
-  elections.map(async (election) => {
-    if (
-      Number(new Date()) >= Number(election.startTime) &&
-      Number(new Date()) <= Number(election.endTime)
-    )
-      election.valid = true;
-    await election.save();
-  });
-
-  res.json({ message: elections });
+    res.json({ message: elections });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 router.put("/stopelection", async (req, res) => {
   console.log("Stopping Election");
-  const elections = await Election.find({})
-    .populate({
-      path: "parties",
-      select: "-partyImg",
-    })
-    .catch((err) => {
-      console.log(err);
-      res.json({ message: "there was an error fetching elections" });
-    });
-
-  const voters = await Voter.find({});
-  const ballots = await Ballot.find({});
-
-  elections.map(async (election) => {
-    if (Number(new Date()) >= Number(election.endTime)) election.valid = false;
-    if (election.valid == false) {
-      //checks if election has ended
-      election.parties.map(async (party) => {
-        if (party.participate.inelection == true) {
-          //if election has ended, then set party to not participate in any election
-          const updateParty = await Party.findOne({ _id: party._id });
-          updateParty.participate.inelection = false;
-          await updateParty.save().catch((err) => {
-            console.log(err);
-          });
-        }
-      });
-    }
-    await election.save().catch((err) => {
-      console.log(err);
-    });
-  });
-
-  //sends email to all voters
   try {
-    const emailsList = voters.map((voter) => {
-      return voter.email;
+    const elections = await Election.find({})
+      .populate({
+        path: "parties",
+        select: "-partyImg",
+      })
+      .catch((err) => {
+        console.log(err);
+        res.json({ message: "there was an error fetching elections" });
+      });
+
+    const voters = await Voter.find({});
+    const ballots = await Ballot.find({});
+
+    elections.map(async (election) => {
+      if (Number(new Date()) >= Number(election.endTime))
+        election.valid = false;
+      if (election.valid == false) {
+        //checks if election has ended
+        election.parties.map(async (party) => {
+          if (party.participate.inelection == true) {
+            //if election has ended, then set party to not participate in any election
+            const updateParty = await Party.findOne({ _id: party._id });
+            updateParty.participate.inelection = false;
+            await updateParty.save().catch((err) => {
+              console.log(err);
+            });
+          }
+        });
+      }
+      await election.save().catch((err) => {
+        console.log(err);
+      });
     });
-    const emails = emailsList.join(",");
-    //console.log("Emails==>", emails);
-    console.log(
-      `\n This email is about to notify you that the current election has ended`
-    );
-    await sendEmail({
-      email: emails,
-      subject: "Election Ended",
-      message: `This email is about to notify you that the current election has ended`,
+
+    //sends email to all voters
+    try {
+      const emailsList = voters.map((voter) => {
+        return voter.email;
+      });
+      const emails = emailsList.join(",");
+      //console.log("Emails==>", emails);
+      console.log(
+        `\n This email is about to notify you that the current election has ended`
+      );
+      await sendEmail({
+        email: emails,
+        subject: "Election Ended",
+        message: `This email is about to notify you that the current election has ended`,
+      });
+    } catch (error) {
+      res.status(400).send(error.message);
+    }
+
+    //Delete all ballot candidates
+    ballots.map(async (ballot) => {
+      console.log(ballot);
+      ballot.candidate = [];
+      await ballot.save().catch((err) => {
+        console.log(err);
+      });
     });
-  } catch (error) {
-    res.status(400).send(error.message);
+
+    res.json({ message: elections });
+  } catch (err) {
+    console.log(err);
   }
-
-  //Delete all ballot candidates
-  ballots.map(async (ballot) => {
-    console.log(ballot);
-    ballot.candidate = [];
-    await ballot.save().catch((err) => {
-      console.log(err);
-    });
-  });
-
-  res.json({ message: elections });
-
   //check if already participated and valid
   //parties particpate.inelection = false
 });
 
 router.get("/get/election/byid/:id", async (req, res) => {
-  const election = await Election.findOne({ _id: req.params.id }).populate({
-    path: "parties",
-    populate: {
-      path: "candidate",
+  try {
+    const election = await Election.findOne({ _id: req.params.id }).populate({
+      path: "parties",
       populate: {
-        path: "ballotId",
+        path: "candidate",
         populate: {
-          path: "candidate",
+          path: "ballotId",
+          populate: {
+            path: "candidate",
+          },
         },
       },
-    },
-  });
+    });
 
-  if (election == null || election == undefined) {
-    return res.status(400).json({ message: "election not found" });
+    if (election == null || election == undefined) {
+      return res.status(400).json({ message: "election not found" });
+    }
+    return res.status(200).json({ message: election });
+  } catch (err) {
+    console.log(err);
   }
-  return res.status(200).json({ message: election });
 });
 
+/* 
 router.get("/get/election/foruser", async (req, res) => {
   //returned to the user
   const elections = await Election.find({}).populate({
@@ -307,6 +320,7 @@ router.get("/get/election/foruser", async (req, res) => {
 
   return res.status(200).json({ message: currentElection });
 });
+ */
 
 //gets previous election result
 //get all parties in an election and store it in an array

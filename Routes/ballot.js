@@ -65,21 +65,25 @@ router.put("/updatecampaignidofballot", async (req, res) => {
 //verifies if ballot is ok or not
 //good to go
 router.get("/findballot/:_id", async (req, res) => {
-  if (!req.params._id) {
-    return res.status(400).json({ message: "field is empty" });
-  }
+  try {
+    if (!req.params._id) {
+      return res.status(400).json({ message: "field is empty" });
+    }
 
-  Ballot.findOne({ _id: req.params._id })
-    .populate("campaignId", "_id campaignId campaignName")
-    .populate("candidate", "_id name position partyId")
-    .lean()
-    .exec((err, docs) => {
-      if (err) {
-        return res.status(400).json({ message: err });
-      } else {
-        return res.status(200).json({ message: docs });
-      }
-    });
+    Ballot.findOne({ _id: req.params._id })
+      .populate("campaignId", "_id campaignId campaignName")
+      .populate("candidate", "_id name position partyId")
+      .lean()
+      .exec((err, docs) => {
+        if (err) {
+          return res.status(400).json({ message: err });
+        } else {
+          return res.status(200).json({ message: docs });
+        }
+      });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 router.delete("/deleteballot", async (req, res) => {
