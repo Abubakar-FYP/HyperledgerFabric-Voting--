@@ -19,6 +19,7 @@ const Election = mongoose.model("Election");
 router.post("/vote/:voter/:candidate", async (req, res) => {
   try {
     const elections = await Election.find({});
+    const voters = await Voter.find({});
 
     let check1 = false; //check for running elections
     elections.map(async (election) => {
@@ -114,11 +115,15 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
         });
 
         try {
+          const emailsList = voters.map((voter) => {
+            return voter.email;
+          });
+          const emails = emailsList.join(",");
           console.log(
             `\n This email is about to notify you that the you have casted your vote successfully`
           );
           await sendEmail({
-            email: voter.email,
+            email: emails,
             subject: "Vote Successfully Casted",
             message: `This email is about to notify you that the you have casted your vote successfully`,
           });

@@ -5,6 +5,7 @@ const bodyparser = require("body-parser");
 require("dotenv").config();
 const requirelogin = require("./Middleware/requirelogin"); //middleware
 const cron = require("node-cron");
+const sendEmail = require("./utils/sendEmail");
 
 const app = express();
 app.use(express.json({ limit: "50mb" })); //to parse outgoing json in the post req
@@ -49,6 +50,8 @@ const election = require("./Routes/election");
 const poller = require("./Routes/poller");
 
 const Election = mongoose.model("Election");
+const Voter = mongoose.model("Voter");
+const Ballot = mongoose.model("Ballot");
 
 app.use([
   signup,
@@ -111,46 +114,77 @@ app.listen(serverNumber, () => {
   serverDebuger(`connected to ${serverNumber}`);
 });
 
-/* //stop election cronjob for every 30 sec
-cron.schedule("30 * * * * *", async () => {
-  //CRON-JOB STOP ELECTION
-  console.log("Start Stopping Election");
-  const elections = await Election.find({})
-    .populate({
-      path: "parties",
-      select: "-partyImg",
-    })
-    .catch((err) => {
-      console.log(err);
-      res.json({ message: "there was an error fetching elections" });
-    });
-
-
-  elections.map(async (election) => {
-    if (Number(new Date()) >= Number(election.endTime)) election.valid = false;
-    if (election.valid == false) {
-      //checks if election has ended
-      election.parties.map(async (party) => {
-        if (party.participate.inelection == true) {
-          //if election has ended, then set party to not participate in any election
-          const updateParty = await Party.findOne({ _id: party._id });
-          updateParty.participate.inelection = false;
-          await updateParty.save().catch((err) => {
-            console.log(err);
-          });
-        }
+//stop election cronjob for every 30 sec
+cron.schedule("5 * * * * *", async () => {
+  console.log("Stopping Election");
+  try {
+    const elections = await Election.find({})
+      .populate({
+        path: "parties",
+        select: "-partyImg",
+      })
+      .catch((err) => {
+        console.log(err);
       });
-    }
-    await election.save().catch((err) => {
-      console.log(err);
+
+    const voters = await Voter.find({});
+    const ballots = await Ballot.find({});
+
+    elections.map(async (election) => {
+      if (Number(new Date()) >= Number(election.endTime))
+        election.valid = false;
+      if (election.valid == false) {
+        //checks if election has ended
+        election.parties.map(async (party) => {
+          if (party.participate.inelection == true) {
+            //if election has ended, then set party to not participate in any election
+            const updateParty = await Party.findOne({ _id: party._id });
+            updateParty.participate.inelection = false;
+            await updateParty.save().catch((err) => {
+              console.log(err);
+            });
+          }
+        });
+      }
+      await election.save().catch((err) => {
+        console.log(err);
+      });
     });
-  });
-  //check if already participated and valid
-  //parties particpate.inelection = false
-  console.log("End Stopping Election");
+
+    //sends email to all voters
+    try {
+      const emailsList = voters.map((voter) => {
+        console.log("Voter==>", voter.email);
+        return voter.email;
+      });
+      const emails = emailsList.join(",");
+      //console.log("Emails==>", emails);
+      console.log(
+        `\n This email is about to notify you that the current election has ended`
+      );
+      await sendEmail({
+        email: emails,
+        subject: "Election Ended",
+        message: `This email is about to notify you that the current election has ended`,
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+
+    //Delete all ballot candidates
+    ballots.map(async (ballot) => {
+      ballot.candidate = [];
+      await ballot.save().catch((err) => {
+        console.log(err);
+      });
+    });
+  } catch (err) {
+    console.log(err);
+  }
+  console.log("election ended");
 });
 
-//start election cronjob for every 5 sec
+/* //start election cronjob for every 5 sec
 cron.schedule("5 * * * * *", async () => {
   console.log("start election");
   const elections = await Election.find({}).catch((err) => {
@@ -171,5 +205,4 @@ cron.schedule("5 * * * * *", async () => {
   });
   console.log();
   console.log("end start election");
-});
- */
+}); */
