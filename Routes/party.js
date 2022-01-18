@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 const requireLogin = require("../Middleware/requirelogin");
+const sendEmail = require("../utils/sendEmail");
 
 //Registering Models
 require("../Models/party");
@@ -54,11 +55,12 @@ router.post("/createparty", async (req, res) => {
           .json({ message: "there was an error finding citizens" });
       });
 
-    const ballots = await Ballot.find({}).catch((err) => {
-      return res
-        .status(400)
-        .json({ message: "there was an error finding ballots" });
-    });
+    let ballots = await Ballot.find({}) //there can be candidates belonging to differnt ballots
+      .catch((err) => {
+        return res
+          .status(400)
+          .json({ message: "there was an error finding ballots" });
+      });
 
     const candidates = await Candidate.find({})
       .select(
@@ -197,9 +199,11 @@ router.post("/createparty", async (req, res) => {
     let check8 = false; //current
     let check9 = false; //future
     let check10 = false; //if no upcoming
+    let electionTime = null;
     //checks for future elections and inserts parties in upcoming elections
     if (elections) {
       elections.map(async (election) => {
+        console.log(election.startTime);
         console.log("election startTime===>", election.startTime);
         // this is good
         if (
@@ -268,41 +272,60 @@ router.post("/createparty", async (req, res) => {
     }
 
     candidate.map(async (item) => {
-      const newCandidate = new Candidate({
+      //traversing candidates list
+      let newCandidate = new Candidate({
         cnic: item.cnic,
         name: item.name,
         position: item.position,
         partyId: newParty._id,
-        ballotId: item.ballotId,
-        candidate,
+        //search this in ballot to find its _id to insert
       });
-
-      newCandidate.ballotId = mongoose.Types.ObjectId(newCandidate.ballotId);
+      const candidate_id = newCandidate._id;
 
       newParty.candidate.push(newCandidate._id);
       //candidates to the party are added here
 
       console.log("New Candidate=====>", newCandidate);
 
-      await newCandidate.save().catch((err) => {
-        //candidate save
-        res.status(400).json({ message: "there was an error saving election" });
-      });
-
       ballots.map(async (ballot) => {
         //good
+        console.log("item===>", item); //req candidate object
+        // console.log("value===>", ballot._id, newCandidate.ballotId);
 
-        if (ballot._id.toString() == item.ballotId.toString()) {
-          ballot.candidate.push(newCandidate._id);
+        console.log(
+          "typeof===>",
+          typeof ballot.ballotid,
+          typeof Number(newCandidate.ballotId)
+        );
+
+        console.log(
+          "comparision===>",
+          ballot.ballotid == Number(newCandidate.ballotId),
+          ballot.ballotid,
+          Number(newCandidate.ballotId)
+        );
+
+        if (ballot.ballotid == item.ballotid) {
+          console.log("matched===>");
+          //its matching if all of the ballot ids matches the new candidates ballot id
+          ballot.candidate.push(candidate_id);
+          newCandidate.ballotId = ballot._id;
           console.log("Update Ballot====>", ballot);
 
           await ballot.save().catch((err) => {
             //ballot save
-            console.log("could not save ballot");
+            console.log(err);
             return res
               .status(400)
               .json({ message: "there was an error saving ballot" });
           });
+
+          await newCandidate.save().catch((err) => {
+            //candidate save
+            res
+              .status(400)
+              .json({ message: "there was an error saving election" });
+          }); //correct till here
         }
       });
     }); //saving candidates in model and candidates in ballot one by one
@@ -318,18 +341,19 @@ router.post("/createparty", async (req, res) => {
 
     try {
       //console.log("Emails==>", emails);
-      console.log(`\n\n\n This email is about to notify you that a new election is coming up at
-    ${new Date(Number(startTime))} and is closing at ${new Date(endTime)}`);
+      console.log(
+        `Your party ${partyName} has been approved for the coming election`
+      );
       await sendEmail({
         email: partyLeaderEmail,
         subject: "Party Approval Response",
         message: `Your party ${partyName} has been approved for the coming election`,
       });
     } catch (error) {
-      res.status(400).send(error.message);
+      return res.status(400).send(error.message);
     }
   } catch (err) {
-    console.log(err);
+    return console.log(err);
   }
 
   res.status(200).json({ message: "Party has been registered" });

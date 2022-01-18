@@ -80,9 +80,12 @@ router.get("/findballot/:_id", async (req, res) => {
         } else {
           return res.status(200).json({ message: docs });
         }
+      })
+      .catch((err) => {
+        return console.log(err);
       });
   } catch (err) {
-    console.log(err);
+    return console.log(err);
   }
 });
 
