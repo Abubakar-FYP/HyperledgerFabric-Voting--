@@ -87,11 +87,13 @@ router.post("/createparty", async (req, res) => {
       } //checks whether party leader exists in nadra
     });
 
+    let users = new Map();
     var check13 = new Array();
     for (var i = 0; i < candidate.length; i++) {
       for (var j = 0; j < nadra.length; j++) {
         if (Number(candidate[i].cnic) == Number(nadra[j].cnic)) {
           console.log(Number(candidate[i].cnic), Number(nadra[j].cnic));
+          users.set(nadra[j].cnic, nadra[j].name);
           check13.push(candidate[i].cnic);
           if (check13.length == candidate.length) {
             //checks if number of candidates found and
@@ -271,7 +273,10 @@ router.post("/createparty", async (req, res) => {
       });
     }
 
+    console.log("hashMap--->", users);
+
     candidate.map(async (item) => {
+      //enter names
       //traversing candidates list
       let newCandidate = new Candidate({
         cnic: item.cnic,
@@ -280,6 +285,9 @@ router.post("/createparty", async (req, res) => {
         partyId: newParty._id,
         //search this in ballot to find its _id to insert
       });
+
+      newCandidate.name = users.get(item.cnic);
+
       const candidate_id = newCandidate._id;
 
       newParty.candidate.push(newCandidate._id);

@@ -176,7 +176,7 @@ cron.schedule("*/10 * * * * *", async () => {
     }
 
     //sends email to all voters
-    /* try {
+    try {
       const emailsList = cloneVoters.map((voter) => {
         console.log("Voter==>", voter.email);
         return voter.email;
@@ -193,7 +193,7 @@ cron.schedule("*/10 * * * * *", async () => {
       });
     } catch (error) {
       console.log(error.message);
-    } */
+    }
 
     //Delete all ballot candidates
     ballots.map(async (ballot) => {
@@ -263,7 +263,7 @@ cron.schedule("*/10 * * * * *", async () => {
   }
 });
 
-//stop polls
+//stop polls ***
 cron.schedule("*/10 * * * * *", async () => {
   console.log("Stopping Poll");
   try {
