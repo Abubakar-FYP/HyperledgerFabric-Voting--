@@ -71,7 +71,6 @@ router.get("/findballot/:_id", async (req, res) => {
     }
 
     await Ballot.findOne({ _id: req.params._id })
-      .populate("campaignId", "_id campaignId campaignName")
       .populate("candidate", "_id name position partyId")
       .populate("partyId", "partyName")
       .lean()
@@ -81,9 +80,6 @@ router.get("/findballot/:_id", async (req, res) => {
         } else {
           return res.status(200).json({ message: docs });
         }
-      })
-      .catch((err) => {
-        return console.log(err);
       });
   } catch (err) {
     return console.log(err);

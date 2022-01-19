@@ -150,7 +150,7 @@ cron.schedule("*/10 * * * * *", async () => {
             check1 = true;
             voters.map(async (voter) => {
               //resets the voteflag of every voter after the current election ends
-              voter.voteflag = true;
+              voter.voteflag = false;
               await voter.save().catch((err) => {
                 console.log(err);
               });
