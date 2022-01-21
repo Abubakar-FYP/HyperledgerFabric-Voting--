@@ -7,8 +7,6 @@ Then for our blockchain we have used one of the most popualar framework for resi
 
 Along side with Hyperledger Fabric we also have used hyperledger explorer which provides a user friendly interface to see blockchain transactions that is going accross the network.
 
-The deployment of the website is still in continuation, Soon it'll be launched.
-
 If your interested,You can contact either of us on the contacts below.
 
 # Instructions of running it locally
