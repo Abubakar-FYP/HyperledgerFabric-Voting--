@@ -15,39 +15,53 @@ const Nadra = mongoose.model("Nadra");
 //this is for his dashboard,where when he/she signs up
 //gets userInfo against his/her cnic
 router.get("/getuserinfo/:cnic", async (req, res) => {
-  await Nadra.findOne({ cnic: req.params.cnic })
-    .exec((err, docs) => {
-      if (!err) {
-        return res.status(200).json({ message: docs });
-      } else {
-        return res.status(400).json({ message: "user does not exist" });
-      }
-    })
-    .catch((err) => console.log(err));
+  try {
+    await Nadra.findOne({ cnic: req.params.cnic })
+      .exec((err, docs) => {
+        if (!err) {
+          return res.status(200).json({ message: docs });
+        } else {
+          return res.status(400).json({ message: "user does not exist" });
+        }
+      })
+      .catch((err) => console.log(err));
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 //returns the number of user who have voted
 //returns a number of users who have voted
 router.get("/getcountvotedusers", async (req, res) => {
-  await Voter.countDocuments({ voteflag: true })
-    .exec((err, count) => {
-      if (!err) {
-        return res.status(200).json({ message: count });
-      } else {
-        return res.status(400).json({ message: "no user has voted yet" });
-      }
-    })
-    .catch((err) => console.log(err));
+  try {
+    await Voter.countDocuments({ voteflag: true })
+      .exec((err, count) => {
+        if (!err) {
+          return res.status(200).json({ message: count });
+        } else {
+          return res.status(400).json({ message: "no user has voted yet" });
+        }
+      })
+      .catch((err) => console.log(err));
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 //check if voted already
 //check this when this user tries to signin
 router.get("/checkifvotedalready/:_id", async (req, res) => {
-  const findVoter = await Voter.findOne({ _id: req.params._id }).exec().lean();
-  if (findVoter.voteflag == true) {
-    return res
-      .status(200)
-      .json({ message: "voter has already voted,logging out :)" });
+  try {
+    const findVoter = await Voter.findOne({ _id: req.params._id })
+      .exec()
+      .lean();
+    if (findVoter.voteflag == true) {
+      return res
+        .status(200)
+        .json({ message: "voter has already voted,logging out :)" });
+    }
+  } catch (err) {
+    console.log(err);
   }
 });
 

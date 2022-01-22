@@ -1,29 +1,41 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const sendEmail = require("../utils/sendEmail");
 
 require("../Models/party");
 require("../Models/election");
+require("../Models/ballot");
+require("../Models/voter");
 //
 const Party = mongoose.model("Party");
-const Election = require("../Models/election");
+const Election = mongoose.model("Election");
+const Ballot = mongoose.model("Ballot");
+const Voter = mongoose.model("Voter");
 
 router.post("/create/election", async (req, res) => {
   try {
     // destructure the req.body
+    const voters = await Voter.find({});
+
     console.log("req bod=================", req.body);
     const { electionName, startTime, endTime, electionType, candidates } =
       req.body;
+
     if ((!electionName, !startTime, !endTime, !electionType)) {
       return res.status(400).send("One or more fields are not present");
     }
 
-    if(endTime < startTime){
-      return res.status(400).json({message:"invalid time entered, end-time is less than start time"});
+    if (endTime < startTime) {
+      return res.status(400).json({
+        message: "invalid time entered, end-time is less than start time",
+      });
     }
 
-    if(Date.now() > startTime){
-      return res.status(400).json({message:"invalid time entered, start time is less than current time"});
+    if (Date.now() > startTime) {
+      return res.status(400).json({
+        message: "invalid time entered, start time is less than current time",
+      });
     }
 
     const elections = await Election.find({}).lean();
@@ -97,6 +109,28 @@ router.post("/create/election", async (req, res) => {
       console.log("poal==========", election.candidates);
     }
     await election.save();
+
+    try {
+      const emailsList = voters.map((voter) => {
+        return voter.email;
+      });
+      const emails = emailsList.join(",");
+      console.log(startTime, endTime);
+      //console.log("Emails==>", emails);
+      console.log(`\n\n\n This email is about to notify you that a new election is coming up at
+      ${new Date(Number(startTime))} and is closing at ${new Date(endTime)}`);
+      await sendEmail({
+        email: emails,
+        subject: "Election Commence Email",
+        message: `this email is about to notify you that a new election is coming up at
+         ${new Date(Number(election.startTime))} and is closing at ${new Date(
+          election.endTime
+        )}`,
+      });
+    } catch (error) {
+      res.status(400).send(error.message);
+    }
+
     res.send({ election });
   } catch (error) {
     res.status(500).send(error.message);
@@ -108,6 +142,7 @@ router.get("/get/election", async (req, res) => {
     const elections = await Election.find().select("-candidates -parties");
     if (!elections)
       return res.status(400).send("There are not elections present");
+
     res.send(elections);
   } catch (error) {
     res.status(500).send(error.message);
@@ -129,84 +164,128 @@ router.get("/get/first/election", async (req, res) => {
 });
 
 router.put("/startelection", async (req, res) => {
-  const elections = await Election.find({})
-    .populate("parties")
-    .select("-partyImg")
-    .catch((err) => {
-      console.log(err);
-      res.json({ message: "there was an error fetching elections" });
+  try {
+    const elections = await Election.find({})
+      .populate("parties")
+      .select("-partyImg")
+      .catch((err) => {
+        console.log(err);
+        res.json({ message: "there was an error fetching elections" });
+      });
+
+    elections.map(async (election) => {
+      if (
+        Number(new Date()) >= Number(election.startTime) &&
+        Number(new Date()) <= Number(election.endTime)
+      )
+        election.valid = true;
+      await election.save();
     });
 
-  elections.map(async (election) => {
-    if (
-      Number(new Date()) >= Number(election.startTime) &&
-      Number(new Date()) <= Number(election.endTime)
-    )
-      election.valid = true;
-    await election.save();
-  });
-
-  res.json({ message: elections });
+    res.json({ message: elections });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 router.put("/stopelection", async (req, res) => {
   console.log("Stopping Election");
-  const elections = await Election.find({})
-    .populate({
-      path: "parties",
-      select: "-partyImg",
-    })
-    .catch((err) => {
-      console.log(err);
-      res.json({ message: "there was an error fetching elections" });
-    });
-
-  elections.map(async (election) => {
-    if (Number(new Date()) >= Number(election.endTime)) election.valid = false;
-    if (election.valid == false) {
-      //checks if election has ended
-      election.parties.map(async (party) => {
-        if (party.participate.inelection == true) {
-          //if election has ended, then set party to not participate in any election
-          const updateParty = await Party.findOne({ _id: party._id });
-          updateParty.participate.inelection = false;
-          await updateParty.save().catch((err) => {
-            console.log(err);
-          });
-        }
+  try {
+    const elections = await Election.find({})
+      .populate({
+        path: "parties",
+        select: "-partyImg",
+      })
+      .catch((err) => {
+        console.log(err);
+        res.json({ message: "there was an error fetching elections" });
       });
-    }
-    await election.save().catch((err) => {
-      console.log(err);
+
+    const voters = await Voter.find({});
+    const ballots = await Ballot.find({});
+
+    elections.map(async (election) => {
+      if (Number(new Date()) >= Number(election.endTime))
+        election.valid = false;
+      if (election.valid == false) {
+        //checks if election has ended
+        election.parties.map(async (party) => {
+          if (party.participate.inelection == true) {
+            //if election has ended, then set party to not participate in any election
+            const updateParty = await Party.findOne({ _id: party._id });
+            updateParty.participate.inelection = false;
+            await updateParty.save().catch((err) => {
+              console.log(err);
+            });
+          }
+        });
+      }
+      await election.save().catch((err) => {
+        console.log(err);
+      });
     });
-  });
 
-  res.json({ message: elections });
+    //sends email to all voters
+    try {
+      const emailsList = voters.map((voter) => {
+        return voter.email;
+      });
+      const emails = emailsList.join(",");
+      //console.log("Emails==>", emails);
+      console.log(
+        `\n This email is about to notify you that the current election has ended`
+      );
+      await sendEmail({
+        email: emails,
+        subject: "Election Ended",
+        message: `This email is about to notify you that the current election has ended`,
+      });
+    } catch (error) {
+      res.status(400).send(error.message);
+    }
 
+    //Delete all ballot candidates
+    ballots.map(async (ballot) => {
+      console.log(ballot);
+      ballot.candidate = [];
+      await ballot.save().catch((err) => {
+        console.log(err);
+      });
+    });
+
+    res.json({ message: elections });
+  } catch (err) {
+    console.log(err);
+  }
   //check if already participated and valid
   //parties particpate.inelection = false
 });
 
 router.get("/get/election/byid/:id", async (req, res) => {
-  const election = await Election.findOne({ _id: req.params.id }).populate({
-    path: "parties",
-    populate: {
-      path: "candidate",
+  try {
+    const election = await Election.findOne({ _id: req.params.id }).populate({
+      path: "parties",
       populate: {
-        path: "ballotId",
+        path: "candidate",
         populate: {
-          path: "candidate",
+          path: "ballotId",
+          populate: {
+            path: "candidate",
+          },
         },
       },
-    },
-  });
+    });
 
-  if (election == null || election == undefined) {
-    return res.status(400).json({ message: "election not found" });
+    if (election == null || election == undefined) {
+      return res.status(400).json({ message: "election not found" });
+    }
+    return res.status(200).json({ message: election });
+  } catch (err) {
+    console.log(err);
   }
-  return res.status(200).json({ message: election });
 });
 
+/* 
 router.get("/get/election/foruser", async (req, res) => {
   //returned to the user
   const elections = await Election.find({}).populate({
@@ -241,6 +320,7 @@ router.get("/get/election/foruser", async (req, res) => {
 
   return res.status(200).json({ message: currentElection });
 });
+ */
 
 //gets previous election result
 //get all parties in an election and store it in an array
@@ -253,7 +333,9 @@ router.get("/get/election/previous", async (req, res) => {
     if (Date.now() >= election.endTime) {
       previousElections.push(election);
 
-      election.parties.sort((a,b)=>{return b?.voteCount-a.voteCount})
+      election.parties.sort((a, b) => {
+        return b?.voteCount - a.voteCount;
+      });
     }
   });
 
