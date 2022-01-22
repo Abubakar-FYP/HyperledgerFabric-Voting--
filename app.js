@@ -302,7 +302,7 @@ cron.schedule("*/10 * * * * *", async () => {
     });
     const emails = emailsList.join(",");
 
-    /* try {
+    try {
       await sendEmail({
         email: emails,
         subject: "Poll End & Result Announcement",
@@ -312,7 +312,7 @@ cron.schedule("*/10 * * * * *", async () => {
       });
     } catch (err) {
       console.log(err);
-    } */
+    }
   } catch (err) {
     console.log(err);
   }

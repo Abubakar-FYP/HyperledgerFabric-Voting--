@@ -160,7 +160,7 @@ router.post("/signin", async (req, res) => {
     const doc = await Voter.findOne({ cnic: cnic, password: password }).select(
       "-password"
     );
-    if (!doc) return res.send("You Are Not A Registered Voter");
+    if (!doc) return res.status(400).send("You Are Not A Registered Voter");
     const user = await Nadra.findOne({ cnic: cnic });
     console.log("Result=========", user);
     const token = jwt.sign({ _id: doc._id }, JWTKEY);

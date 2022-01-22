@@ -13,6 +13,7 @@ require("../Models/party");
 //Models
 const Ballot = mongoose.model("Ballot");
 const Party = mongoose.model("Party");
+const Election = mongoose.model("Election");
 const Campaign = mongoose.model("Campaign");
 
 router.post("/createballot", async (req, res) => {
@@ -70,15 +71,33 @@ router.get("/findballot/:_id", async (req, res) => {
       return res.status(400).json({ message: "field is empty" });
     }
 
+    const elections = await Election.find({});
+    let latestelection = null;
+    let check1 = false;
+    elections.map((election) => {
+      if (
+        Date.now() >= Number(election.startTime) && //means that is the election is currently running
+        Date.now() <= Number(election.endTime) &&
+        election.valid == true
+      ) {
+        latestelection = election;
+        check1 = true;
+      }
+    });
+
+    if (check1 == false) {
+      return res.status(400).json({ message: "election is not running" });
+    }
+
     await Ballot.findOne({ _id: req.params._id })
       .populate("candidate", "_id name position partyId")
       .populate("partyId", "partyName")
       .lean()
-      .exec((err, docs) => {
+      .exec((err, ballot) => {
         if (err) {
           return res.status(400).json({ message: err });
         } else {
-          return res.status(200).json({ message: docs });
+          return res.status(200).send({ ballot });
         }
       });
   } catch (err) {
