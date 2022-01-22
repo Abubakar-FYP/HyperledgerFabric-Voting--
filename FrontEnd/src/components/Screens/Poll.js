@@ -18,7 +18,7 @@ const [user, setUser] = useState(null)
       setOnePoll(data.message);
     } catch (error) {
       console.log("error from single polls", error.message);
-      toast.error(error.message);
+      toast.error("There is some error for fetching a poll");
     }
   };
 
@@ -61,10 +61,13 @@ const [user, setUser] = useState(null)
       if(data.message){
         toast.success(data.message)
         setIsVoteCasted(true)
+        setTimeout(() => {
+          history.push("/polls")
+        }, 3000)
       }
     } catch (error) {
       console.log("error from Vote Casting", error.message);
-      toast.error(error.message);
+      toast.error("there is an error in vote casting");
     }
   }
   return (

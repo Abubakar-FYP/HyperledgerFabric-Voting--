@@ -67,7 +67,7 @@ const NavBar = () => {
           <li><Link className="text-light" to="/votingballot" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Voting Ballot</Link></li>
         ) : null}
 
-        {user && user?.poller?.role !== "Poller" ? (
+        {user && user?.poller?.role === "Poller" ? (
           <li><Link className="text-light" to="/polls" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Polls</Link></li>
         ) : null}
 

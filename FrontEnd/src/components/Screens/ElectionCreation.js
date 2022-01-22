@@ -39,10 +39,16 @@ const ElectionCreation = () => {
                     console.log("done")
                     setElectionName("")
                 }
+                setTimeout(() => {
+                    window.location.reload()
+                }, 3000)
                 return
             } catch (error) {
                 console.log(error.message)
                 toast.error(error.message)
+                setTimeout(() => {
+                    window.location.reload()
+                }, 3000)
                 return
             }
         } else {
@@ -68,9 +74,17 @@ const ElectionCreation = () => {
                     console.log("done")
                     setElectionName("")
                 }
+                setTimeout(() => {
+                    window.location.reload()
+                }, 3000)
+                return
             } catch (error) {
                 console.log(error.message)
                 toast.error(error.message)
+                // setTimeout(() => {
+                //     window.location.reload()
+                // }, 3000)
+                return
             }
         }
         // dataToSend = {
