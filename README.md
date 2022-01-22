@@ -7,10 +7,19 @@ Then for our blockchain we have used one of the most popualar framework for resi
 
 Along side with Hyperledger Fabric we also have used hyperledger explorer which provides a user friendly interface to see blockchain transactions that is going accross the network.
 
-The deployment of the website is still in continuation, Soon it'll be launched.
-
 If your interested,You can contact either of us on the contacts below.
- 
+
+# Instructions of running it locally
+
+### 1) git clone https://github.com/Abubakar-FYP/Voting-System-using-HyperledgerFabric
+### 2) open two terminals, gitbash(recommmended because its fast on windows, you can use any terminal like powershell/command prompt)
+### 3) go to root of directory in the first terminal, your directory should be the same in which app.js is present
+### 4) go from root directory to FrontEnd directory in the second terminal, 
+### 5) first, type (yarn i or npm i) to install all packages in both terminals(!important)
+### 6) after both installation is complete, in the first terminal write (nodemon app) or if it doesn't work type (node app)
+### 7) in the second terminal type yarn start(recommended because its fast) or npm start
+### 8) Viola you've successfully launched both the front and the backend, go ahead and use it :)
+
 # Contact:
 
 ## Syed Murtaza Ali Shah
