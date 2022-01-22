@@ -49,10 +49,10 @@ const NavBar = () => {
             <li><Link className="text-light" to="/partyregisteration" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Party Registeration</Link></li>
             <li><Link className="text-light" to="/electioncreation" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Election Creation</Link></li>
 
-            <li><Link className="text-light" to="/admindashboard" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Admin Dashboard</Link></li>
+            <li><Link className="text-light" to="/admindashboard" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Dashboard</Link></li>
           </>
         ) : null}
-        {user && user?.doc?.role !== "admin" && election && Date.now() > new Date(election?.endTime) ? (
+        {user && election && Date.now() > new Date(election?.endTime) ? (
           <li><Link className="text-light" to="/admindashboard" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Admin Dashboard</Link></li>
         ) : null}
         {!user ? (
