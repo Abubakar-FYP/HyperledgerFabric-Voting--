@@ -41,7 +41,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false && cd FrontEnd && npm install && npm run build"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false && cd FrontEnd && npm install && npm run build",
+    "start": "node app.js"
   },
   "engines": {
     "node": "14.18.0"

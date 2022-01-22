@@ -98,7 +98,7 @@ console.log("user data=========", userData)
                     <div className="card">
                         <div className="card-body">
                             <div className="">
-                                {typeof ballots === "object" && ballots?.length && ballots?.map(ballot => (
+                                {typeof ballots === "object" && ballots?.length ? ballots?.map(ballot => (
                                     <div>
                                         <div className="mt-4">
                                             <strong>Candidate Name :  </strong>
@@ -116,7 +116,13 @@ console.log("user data=========", userData)
                                         </div>
                                         <hr />
                                     </div>
-                                ))}
+                                )):
+                                <div className='card'>
+                                    <div className='card-body'>
+                                        There is no election active right now
+                                    </div>
+                                </div>
+                                }
                             </div>
                         </div>
                     </div>

@@ -69,7 +69,7 @@ app.use([
   poller,
 ]); //using the routes
 
-const serverNumber = 1970;
+const serverNumber = process.env.PORT ||  1970;
 
 ///////MongoDB connection/////////////////////
 
