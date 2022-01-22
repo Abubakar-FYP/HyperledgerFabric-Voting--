@@ -128,7 +128,7 @@ router.post("/createpoll", async (req, res) => {
     await newPol
       .save()
       .then(() => {
-        return res.json({ message: "poll saved successfully" });
+        return res.status(200).json({ message: "poll saved successfully" });
       })
       .catch((err) => {
         console.log(err);
