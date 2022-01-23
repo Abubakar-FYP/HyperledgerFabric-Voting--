@@ -347,8 +347,7 @@ router.post("/createparty", async (req, res) => {
         .json({ message: "there was an error saving election" });
     });
 
-    try {
-      //console.log("Emails==>", emails);
+    /* try {
       console.log(
         `Your party ${partyName} has been approved for the coming election`
       );
@@ -359,9 +358,9 @@ router.post("/createparty", async (req, res) => {
       });
     } catch (error) {
       return res.status(400).send(error.message);
-    }
+    } */
   } catch (err) {
-    return console.log(err);
+    console.log(err);
   }
 
   res.status(200).json({ message: "Party has been registered" });

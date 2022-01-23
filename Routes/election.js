@@ -110,7 +110,7 @@ router.post("/create/election", async (req, res) => {
     }
     await election.save();
 
-    try {
+    /* try {
       const emailsList = voters.map((voter) => {
         return voter.email;
       });
@@ -129,7 +129,7 @@ router.post("/create/election", async (req, res) => {
       });
     } catch (error) {
       res.status(400).send(error.message);
-    }
+    } */
 
     res.send({ election });
   } catch (error) {
