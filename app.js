@@ -297,7 +297,7 @@ cron.schedule("*/10 * * * * *", async () => {
     }
 
     //sends email to all voters
-    const emailsList = pollers.map((poller) => {
+    /* const emailsList = pollers.map((poller) => {
       return poller.email;
     });
     const emails = emailsList.join(",");
@@ -312,7 +312,7 @@ cron.schedule("*/10 * * * * *", async () => {
       });
     } catch (err) {
       console.log(err);
-    }
+    } */
   } catch (err) {
     console.log(err);
   }
