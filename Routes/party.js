@@ -202,6 +202,7 @@ router.post("/createparty", async (req, res) => {
     let check9 = false; //future
     let check10 = false; //if no upcoming
     let electionTime = null;
+    let names = new Array();
     //checks for future elections and inserts parties in upcoming elections
     if (elections) {
       elections.map(async (election) => {
@@ -276,6 +277,7 @@ router.post("/createparty", async (req, res) => {
     console.log("hashMap--->", users);
 
     candidate.map(async (item) => {
+      names.push(item.name);
       //enter names
       //traversing candidates list
       let newCandidate = new Candidate({
@@ -354,7 +356,7 @@ router.post("/createparty", async (req, res) => {
       await sendEmail({
         email: partyLeaderEmail,
         subject: "Party Approval Response",
-        message: `Your party ${partyName} has been approved for the coming election`,
+        message: `Your party ${partyName} has been approved for the coming election, these are the candidates ${names}`,
       });
     } catch (error) {
       return res.status(400).send(error.message);
@@ -464,6 +466,42 @@ router.get("/getallcnic", async (req, res) => {
   const nadra = await Nadra.find({});
   nadra.map((citizen) => {
     console.log("citizen=====>", citizen.cnic);
+  });
+});
+
+router.put("/put/updateparty/:p_id", async (req, res) => {
+  const {
+    partyName,
+    partySymbol,
+    partyImg,
+    partyLeaderCnic,
+    partyLeaderEmail,
+    candidate,
+  } = req.body;
+
+  const party = await Party.findOne({ _id: req.params.p_id });
+
+  party.partyName = partyName;
+  party.partySymbol = partySymbol;
+  party.partyImg = partyImg;
+  party.partyLeaderCnic = partyLeaderCnic;
+  party.partyLeaderEmail = partyLeaderEmail;
+  party.candidate = null;
+  candidate.map((cand) => {
+    party.candidate.push(cand._id);
+  });
+
+  console.log(party);
+});
+
+router.delete("/delete/deleteparty/:p_id", async (req, res) => {
+  const party = await Party.findOne({ _id: req.params.p_id });
+  if (party == [] || !party || party == null || party == undefined) {
+    return res.status(400).json({ message: "party does not exist" });
+  }
+
+  await Party.deleteOne({ _id: req.params.p_id }).then(() => {
+    res.status(200).json({ message: "party has been successfully deleted" });
   });
 });
 
