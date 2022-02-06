@@ -17,7 +17,7 @@ If your interested,You can contact either of us on the contacts below.
 ### 4) go from root directory to FrontEnd directory in the second terminal, 
 ### 5) first, type (yarn i or npm i) to install all packages in both terminals(!important)
 ### 6) after both installation is complete, in the first terminal write (nodemon app) or if it doesn't work type (node app)
-### 7) in the second terminal type yarn start(recommended because its fast) or npm start
+### 7) in the second terminal type Npm run dev
 ### 8) Viola you've successfully launched both the front and the backend, go ahead and use it :)
 
 # Contact:

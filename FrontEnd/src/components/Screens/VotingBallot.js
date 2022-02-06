@@ -20,10 +20,10 @@ console.log("user data=========", userData)
         if (user?.doc?.ballotId) {
             (async () => {
                 try {
-                    const { data } = await axios.get(url + "/getcandidatebyballotid" + "/" + user?.doc?.ballotId)
-                    console.log("users ballots=============", data.message)
-                    console.log("user ballot id=============>",user?.doc?.ballotId)
-                    setBallots(data.message)
+                    const { data } = await axios.get(url + "/findballot" + "/" + user?.doc?.ballotId)
+                    console.log("users ballots=============", data)
+                    console.log("user ballot id=============>",user)
+                    setBallots(data?.ballot?.candidate)
     
                 } catch (error) {
                     toast.error(error.message)
