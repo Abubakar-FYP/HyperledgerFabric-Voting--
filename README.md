@@ -2,7 +2,6 @@
 
 #Screen Shots
 ![WhatsApp Image 2021-10-27 at 4 29 55 AM](https://user-images.githubusercontent.com/61330248/152697581-dd466e72-2768-44a4-adee-4b6957bb8a1c.jpeg)
-![dbe55b603cfae4eb80ca28fb62ee88a9](https://user-images.githubusercontent.com/61330248/152697582-1feab5cd-fff6-4f84-a0ce-564902ede22e.jpg)
 ![5](https://user-images.githubusercontent.com/61330248/152697583-cb2bf612-ade4-4b5a-9eeb-a6b73bd80461.PNG)
 ![4](https://user-images.githubusercontent.com/61330248/152697584-bdb7cb36-e66b-426d-947b-17a07caee104.PNG)
 ![3](https://user-images.githubusercontent.com/61330248/152697586-700de994-1968-4df8-972a-fb05e521bbc5.PNG)
