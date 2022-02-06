@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-
+const sendEmail = require("../utils/sendEmail")
 const requireLogin = require("../Middleware/requirelogin");
 
 require("../Models/voter");
