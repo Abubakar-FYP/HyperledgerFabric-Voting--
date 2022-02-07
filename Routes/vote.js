@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const sendEmail = require("../utils/sendEmail")
+const sendEmail = require("../utils/sendEmail");
 const requireLogin = require("../Middleware/requirelogin");
 
 require("../Models/voter");
@@ -19,7 +19,6 @@ const Election = mongoose.model("Election");
 router.post("/vote/:voter/:candidate", async (req, res) => {
   try {
     const elections = await Election.find({});
-    const voters = await Voter.find({});
 
     let check1 = false; //check for running elections
     elections.map(async (election) => {
@@ -115,15 +114,11 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
         });
 
         try {
-          const emailsList = voters.map((voter) => {
-            return voter.email;
-          });
-          const emails = emailsList.join(",");
           console.log(
             `\n This email is about to notify you that the you have casted your vote successfully`
           );
           await sendEmail({
-            email: emails,
+            email: voter.email,
             subject: "Vote Successfully Casted",
             message: `This email is about to notify you that the you have casted your vote successfully`,
           });
