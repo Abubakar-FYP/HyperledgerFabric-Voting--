@@ -34,7 +34,7 @@ const PollsRegisteration =()=>{
             }    
         } catch (error) {
             console.log(error)
-            toast.error(error.message)
+            toast.error("There is some error in signup, email is registered already")
         }
         
     }

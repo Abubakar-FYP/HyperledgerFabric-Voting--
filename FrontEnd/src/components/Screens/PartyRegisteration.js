@@ -169,7 +169,7 @@ const PartyRegisteration = () => {
     setParty(initialState)
       }
     } catch (error) {
-      toast.error(error.message)
+      toast.error("There is some error in creating Party")
     }
  
 

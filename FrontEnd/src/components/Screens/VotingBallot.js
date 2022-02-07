@@ -26,7 +26,7 @@ console.log("user data=========", userData)
                     setBallots(data?.ballot?.candidate)
     
                 } catch (error) {
-                    toast.error(error.message)
+                    toast.error("There is some error in getting ballot")
                 }
            
             })();

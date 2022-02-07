@@ -47,7 +47,7 @@ const handleSignin =async () =>{
     } catch (error) {
         console.log(error.status)
         console.log(error.message)
-        toast.error(error)
+        toast.error("Incorrect CNIC or Password")
     }
 
 }

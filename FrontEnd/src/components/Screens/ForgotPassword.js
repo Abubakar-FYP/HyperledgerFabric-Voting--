@@ -15,7 +15,7 @@ const ForgotPassword = () => {
             }
         } catch (error) {
             console.log("error message============", error.message)
-            toast.error(error.message)
+            toast.error("There is some error in sending Reset Password Token")
         }
     }
     return (

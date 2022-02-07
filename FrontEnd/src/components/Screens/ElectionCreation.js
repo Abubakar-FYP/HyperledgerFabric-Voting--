@@ -45,7 +45,7 @@ const ElectionCreation = () => {
                 return
             } catch (error) {
                 console.log(error.message)
-                toast.error(error.message)
+                toast.error("There is some error in creating Election")
                 setTimeout(() => {
                     window.location.reload()
                 }, 3000)
@@ -80,7 +80,7 @@ const ElectionCreation = () => {
                 return
             } catch (error) {
                 console.log(error.message)
-                toast.error(error.message)
+                toast.error("There is some error in creating Election")
                 // setTimeout(() => {
                 //     window.location.reload()
                 // }, 3000)
@@ -107,7 +107,7 @@ const ElectionCreation = () => {
                 console.log("data=============", data)
                 setElections(data)
             } catch (error) {
-                toast.error(error.message)
+                toast.error("There is some error in getting election")
             }
         })();
     }, [])

@@ -33,7 +33,7 @@ const Signup =()=>{
             }    
         } catch (error) {
             console.log(error)
-            toast.error(error.message)
+            toast.error("There is some error in signup, same email may be registered aalready")
         }
         
     }

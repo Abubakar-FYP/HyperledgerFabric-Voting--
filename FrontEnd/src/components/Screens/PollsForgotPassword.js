@@ -15,7 +15,7 @@ const PollsForgotPassword = () => {
             }
         } catch (error) {
             console.log("error message============", error.message)
-            toast.error(error.message)
+            toast.error("There is some error in getting reset password token")
         }
     }
     return (

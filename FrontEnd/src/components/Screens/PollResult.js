@@ -15,7 +15,7 @@ const PollResult = ({ match }) => {
             setOnePoll(data.message);
         } catch (error) {
             console.log("error from single polls", error.message);
-            toast.error(error.message);
+            toast.error("There is some error in getting poll")
         }
     };
     useEffect(() => {

@@ -27,7 +27,7 @@ const ResetPassword = ({match}) => {
                 history.push("/signin")
             }
         } catch (error) {
-            toast.error(error)
+            toast.error("There is some error in resetting password")
             
         }
     }

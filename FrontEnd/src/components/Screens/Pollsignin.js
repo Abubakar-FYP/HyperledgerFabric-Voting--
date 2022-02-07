@@ -48,7 +48,7 @@ const handleSignin =async () =>{
     } catch (error) {
         console.log("eeror",error)
         console.log("eeeeerrrrrrrrrrrroooooooooooorrrrrrrrrrrrr=============",error.message)
-        toast.error(error.message)
+        toast.error("Incorrect email or password")
     }
 
 }
