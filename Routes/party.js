@@ -202,7 +202,7 @@ router.post("/createparty", async (req, res) => {
     let check9 = false; //future
     let check10 = false; //if no upcoming
     let electionTime = null;
-    let names = new Array();
+    const names = new Array();
     //checks for future elections and inserts parties in upcoming elections
     if (elections) {
       elections.map(async (election) => {
@@ -277,7 +277,6 @@ router.post("/createparty", async (req, res) => {
     console.log("hashMap--->", users);
 
     candidate.map(async (item) => {
-      names.push(item.name);
       //enter names
       //traversing candidates list
       let newCandidate = new Candidate({
@@ -287,6 +286,9 @@ router.post("/createparty", async (req, res) => {
         partyId: newParty._id,
         //search this in ballot to find its _id to insert
       });
+
+      names.push(users.get(item.cnic));
+      console.log("name==>", names);
 
       newCandidate.name = users.get(item.cnic);
 
@@ -349,18 +351,20 @@ router.post("/createparty", async (req, res) => {
         .json({ message: "there was an error saving election" });
     });
 
-    /* try {
+    try {
+      const namesList = names.join(" , ");
       console.log(
         `Your party ${partyName} has been approved for the coming election`
       );
       await sendEmail({
         email: partyLeaderEmail,
         subject: "Party Approval Response",
-        message: `Your party ${partyName} has been approved for the coming election, these are the candidates ${names}`,
+        message: `Your party ${partyName} has been approved for the coming election, these are the candidates \n ${namesList}`,
       });
     } catch (error) {
+      console.log(error);
       return res.status(400).send(error.message);
-    } */
+    }
   } catch (err) {
     console.log(err);
   }
