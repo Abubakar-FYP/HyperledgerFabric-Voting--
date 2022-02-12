@@ -101,61 +101,61 @@ router.get("/getpositions", async (req, res) => {
 });
 
 router.get("/getmalevoters", async (req, res) => {
-  const voters = await Voter.find({ voteflag: true });
-  const nadra = await Nadra.find({});
-  const male = new Array();
+  const voters = await Voter.find({}).select(
+    "-password -role -resetPassToken -ballotId"
+  );
+  const nadra = await Nadra.find({ gender: "Male" });
 
-  voters.map((voter) => {
-    nadra.map((citizen) => {
-      if (voter.cnic == citizen.cnic && citizen.gender == "Male") {
-        console.log("Male==>", citizen);
-        male.push(voter);
-      }
-    });
-  });
-
-  if (voters == null || voters == []) {
-    return res
-      .status(400)
-      .json({ message: "no vote has been casted by males" });
-  }
-
-  if (nadra == null || nadra == []) {
-    return res
-      .status(400)
-      .json({ message: "there are no candidates in nadra" });
-  }
-
-  return res.status(200).json(male);
-});
-
-router.get("/getfemalevoters", async (req, res) => {
-  const voters = await Voter.find({ voteflag: true });
-  const nadra = await Nadra.find({});
-  const female = new Array();
-
-  voters.map((voter) => {
-    nadra.map((citizen) => {
-      if (voter.cnic == citizen.cnic && citizen.gender == "Female") {
-        female.push(voter);
-        console.log("Female==>", citizen);
-      }
-    });
-  });
-
-  if (voters == null || voters == []) {
+  if (voters == null || voters == [] || voters == undefined) {
     return res
       .status(400)
       .json({ message: "no vote has been casted by females" });
   }
 
-  if (nadra == null || nadra == []) {
+  if (nadra == null || nadra == [] || nadra == undefined) {
     return res
       .status(400)
       .json({ message: "there are no candidates in nadra" });
   }
+  const male = new Array();
+  for (var i = 0; i < voters.length; i++) {
+    for (var j = 0; j < nadra.length; j++) {
+      if (nadra[j].cnic == voters[i].cnic) {
+        male.push(voters[i]);
+      }
+    }
+  }
 
-  return res.status(200).json(female);
+  return res.status(200).json({ message: male });
+});
+
+router.get("/getfemalevoters", async (req, res) => {
+  const voters = await Voter.find({}).select(
+    "-password -role -resetPassToken -ballotId"
+  );
+  const nadra = await Nadra.find({ gender: "Female" });
+
+  if (voters == null || voters == [] || voters == undefined) {
+    return res
+      .status(400)
+      .json({ message: "no vote has been casted by females" });
+  }
+
+  if (nadra == null || nadra == [] || nadra == undefined) {
+    return res
+      .status(400)
+      .json({ message: "there are no candidates in nadra" });
+  }
+  const female = new Array();
+  for (var i = 0; i < voters.length; i++) {
+    for (var j = 0; j < nadra.length; j++) {
+      if (nadra[j].cnic == voters[i].cnic) {
+        female.push(voters[i]);
+      }
+    }
+  }
+
+  return res.status(200).json({ message: female });
 });
 
 //gets all candidates by ballot their ballot id
