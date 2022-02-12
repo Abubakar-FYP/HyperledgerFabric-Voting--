@@ -492,11 +492,12 @@ router.put("/stoppoll", async (req, res) => {
       );
       await sendEmail({
         email: emails,
-        subject: "Poll Commence Email",
+        subject: "Poll Ended Email",
         message: `This email is about to notify you that the current poll has ended`,
       });
     } catch (error) {
-      res.status(400).send(error.message);
+      console.log(error);
+      res.status(400).send(error);
     }
   } catch (err) {
     console.log(err);
