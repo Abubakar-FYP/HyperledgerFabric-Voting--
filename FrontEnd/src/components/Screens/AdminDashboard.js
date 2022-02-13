@@ -5,6 +5,7 @@ import axios from "axios"
 import { url } from "../../constants"
 import BarChart from './charts/BarChart';
 const AdminDashboard = () => {
+
     const [totalVotes, setTotalVotes] = useState("")
     const [ballotWinners, setBallotWinners] = useState([])
     const [maleVoters, setMaleVoters] = useState("")
@@ -28,12 +29,12 @@ const AdminDashboard = () => {
         })();
         (async () => {
             const { data } = await axios.get(url + "/getmalevoters")
-            // console.log(data)
+            console.log("data Maleeeeeeeeeeeeeeeeeeeeeeeeeeee",data)
             setMaleVoters(data.length)
         })();
         (async () => {
             const { data } = await axios.get(url + "/getfemalevoters")
-            // console.log(data)
+            console.log("data femaleeeeeeeeeeeeeeeeeee",data)
             setfeMaleVoters(data.length)
         })();
 
