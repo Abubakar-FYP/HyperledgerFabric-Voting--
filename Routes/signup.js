@@ -98,7 +98,7 @@ router.post("/signup", async (req, res, next) => {
 
     await newVoter.save();
 
-    /*  try {
+    try {
       console.log(
         `\n\n\n This email is about to notify you that you have registered as a voter successfully`
       );
@@ -110,7 +110,7 @@ router.post("/signup", async (req, res, next) => {
       });
     } catch (error) {
       res.status(400).send(error.message);
-    } */
+    }
     console.log("running");
     res.status(200).send(newVoter);
   } catch (err) {
@@ -263,7 +263,7 @@ router.post("/signup/poller", async (req, res) => {
       console.log(err);
     });
 
-    /* try {
+    try {
       console.log(
         `\n\n\n This email is about to notify you that you have registered as a poller successfully`
       );
@@ -274,7 +274,7 @@ router.post("/signup/poller", async (req, res) => {
       });
     } catch (error) {
       res.status(400).send(error.message);
-    } */
+    }
 
     res.status(200).send(newPoller);
   } catch (err) {

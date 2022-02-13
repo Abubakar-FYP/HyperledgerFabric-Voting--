@@ -69,7 +69,7 @@ app.use([
   poller,
 ]); //using the routes
 
-const serverNumber = process.env.PORT ||  1970;
+const serverNumber = process.env.PORT || 1970;
 
 ///////MongoDB connection/////////////////////
 
@@ -116,7 +116,6 @@ app.listen(serverNumber, () => {
   serverDebuger(`connected to ${serverNumber}`);
 });
 
-//stop election for every 1 sec
 cron.schedule("*/10 * * * * *", async () => {
   console.log("Stopping Election");
   try {
@@ -275,12 +274,11 @@ cron.schedule("*/10 * * * * *", async () => {
       return console.log(err);
     });
 
-    const cloneVoters = pollers;
-
     let check1 = false; //checks if the current poll has ended or not
 
     polls.map(async (poll) => {
-      if (Date.now() >= Number(poll.endTime)) {
+      console.log(Date.now() >= Number(poll.endTime) && poll.valid == true);
+      if (Date.now() >= Number(poll.endTime) && poll.valid == true) {
         poll.valid = false;
         check1 = true;
         await poll.save().catch((err) => {
@@ -297,12 +295,12 @@ cron.schedule("*/10 * * * * *", async () => {
     }
 
     //sends email to all voters
-    /* const emailsList = pollers.map((poller) => {
+    const emailsList = pollers.map((poller) => {
       return poller.email;
     });
     const emails = emailsList.join(",");
 
-    try {
+    /*  try {
       await sendEmail({
         email: emails,
         subject: "Poll End & Result Announcement",
