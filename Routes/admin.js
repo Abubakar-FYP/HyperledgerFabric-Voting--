@@ -53,7 +53,7 @@ router.get("/getallparties", async (req, res) => {
 //takes a party _id
 //updates the is_valid field,meaning approves the party
 router.put("/approveparty/:partyId", async (req, res) => {
-  Party.findOneAndUpdate(
+  await Party.findOneAndUpdate(
     { _id: req.params.partyId },
     { is_valid: true },
     (resp) => {
@@ -63,7 +63,7 @@ router.put("/approveparty/:partyId", async (req, res) => {
     console.log(err);
   });
 });
-
+//rejects a party
 router.delete("/rejectparty/:partyId", async (req, res) => {
   let resp = await Party.findOne({ _id: req.params.partyId });
 
