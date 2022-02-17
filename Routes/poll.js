@@ -399,7 +399,7 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
             //increases vote count of item
             check6 = true;
             item.item.voteCount = item.item.voteCount + 1; //updates vote count of item
-            poller.pollitem = item._id;
+            poller.pollitem = item.item.name;
           }
         });
 
