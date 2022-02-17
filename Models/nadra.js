@@ -38,5 +38,5 @@ const NadraSchema = new mongoose.Schema({
   },
 });
 
-mongoose.model("Nadra", NadraSchema);
-module.exports = global.Nadra;
+const Nadra = global.Nadra || mongoose.model("Nadra", NadraSchema);
+module.exports = Nadra;

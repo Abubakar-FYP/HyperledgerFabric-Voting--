@@ -33,5 +33,5 @@ const campaign = new Schema({
   },
 });
 
-global.Campaign = global.Campaign || mongoose.model("Campaign", campaign);
-module.exports = global.Campaign;
+const Campaign = global.Campaign || mongoose.model("Campaign", campaign);
+module.exports = Campaign;

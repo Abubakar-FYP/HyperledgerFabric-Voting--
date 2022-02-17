@@ -45,5 +45,5 @@ const pollsSchema = new mongoose.Schema({
   ],
 });
 
-global.Polls = global.Polls || mongoose.model("Polls", pollsSchema);
-module.exports = global.Polls;
+const Polls = global.Polls || mongoose.model("Polls", pollsSchema);
+module.exports = Polls;

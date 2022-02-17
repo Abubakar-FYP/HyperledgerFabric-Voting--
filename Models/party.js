@@ -63,6 +63,6 @@ const partySchema = new Schema({
   },
 });
 
-global.Party = global.Party || mongoose.model("Party", partySchema);
+const Party = global.Party || mongoose.model("Party", partySchema);
 
-module.exports = global.Party;
+module.exports = Party;

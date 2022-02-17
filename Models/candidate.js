@@ -48,6 +48,6 @@ const candidateSchema = new mongoose.Schema({
   },
 });
 
-global.Candidate =
+const Candidate =
   global.Candidate || mongoose.model("Candidate", candidateSchema);
-module.exports = global.Candidate;
+module.exports = Candidate;

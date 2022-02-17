@@ -34,5 +34,5 @@ const pollerSchema = new mongoose.Schema({
   },
 });
 
-global.Poller = global.Poller || mongoose.model("Poller", pollerSchema);
-module.exports = global.Poller;
+const Poller = global.Poller || mongoose.model("Poller", pollerSchema);
+module.exports = Poller;

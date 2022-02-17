@@ -29,5 +29,5 @@ const ballotSchema = new mongoose.Schema({
   ],
 });
 
-global.Ballot = global.Ballot || mongoose.model("Ballot", ballotSchema);
-module.exports = global.Ballot;
+const Ballot = global.Ballot || mongoose.model("Ballot", ballotSchema);
+module.exports = Ballot;
