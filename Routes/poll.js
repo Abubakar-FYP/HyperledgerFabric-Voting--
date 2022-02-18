@@ -242,12 +242,14 @@ router.get("/abouttostartpolls", async (req, res) => {
 //all started,yet to start and finished polls
 router.get("/getallpolls", async (req, res) => {
   try {
-    const polls = await Polls.find({}).catch((err) => {
-      console.log(err);
-      return res
-        .status(400)
-        .json({ message: "there was an error finding polls" });
-    });
+    const polls = await Polls.find({})
+      .populate("pollvote")
+      .catch((err) => {
+        console.log(err);
+        return res
+          .status(400)
+          .json({ message: "there was an error finding polls" });
+      });
 
     if (polls == null || !polls || polls == []) {
       return res.status(400).json({ message: "polls not found" });

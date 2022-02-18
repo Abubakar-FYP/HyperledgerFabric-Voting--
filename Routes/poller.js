@@ -8,6 +8,12 @@ require("../Models/poller");
 const Polls = mongoose.model("Polls");
 const Poller = mongoose.model("Poller");
 
-//home page
+router.get("/getallpollers", async (req, res) => {
+  const pollers = await Poller.find({})
+    .populate("pollvote")
+    .catch((err) => console.log(err));
+
+  res.status(200).json({ message: pollers });
+});
 
 module.exports = router;
