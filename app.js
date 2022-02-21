@@ -35,6 +35,8 @@ require("./Models/nadra");
 require("./Models/criminal");
 require("./Models/election");
 require("./Models/poller");
+require("./Models/electionLedger");
+require("./Models/pollLedger");
 
 //Routes Registering
 const vote = require("./Routes/vote");
@@ -54,6 +56,12 @@ const Voter = mongoose.model("Voter");
 const Ballot = mongoose.model("Ballot");
 const Polls = mongoose.model("Polls");
 const Poller = mongoose.model("Poller");
+const Campaign = mongoose.model("Campaign");
+const Party = mongoose.model("Party");
+const Nadra = mongoose.model("Nadra");
+const Candidate = mongoose.model("Candidate");
+const ElectionLedger = mongoose.model("ElectionLedger");
+const PollLedger = mongoose.model("PollLedger");
 
 app.use([
   signup,
@@ -111,14 +119,21 @@ if (process.env.NODE_ENV === "production") {
 app.get("/", (req, res) => {
   res.send("home");
 });
+
 const serverDebuger = require("debug")("app:server");
 app.listen(serverNumber, () => {
   serverDebuger(`connected to ${serverNumber}`);
 });
 
-cron.schedule("*/10 * * * * *", async () => {
+//stopping Election
+cron.schedule("*/15 * * * * *", async () => {
   console.log("Stopping Election");
   try {
+    const campaign = await Campaign.find({});
+    const party = await Party.find({});
+    const candidate = await Candidate.find({});
+    const nadra = await Nadra.find({});
+
     const elections = await Election.find({})
       .populate({
         path: "parties",
@@ -174,8 +189,37 @@ cron.schedule("*/10 * * * * *", async () => {
       return;
     }
 
+    const newElectionLedger = new ElectionLedger({
+      election: elections,
+      voter: voters,
+      ballot: ballots,
+      campaign,
+      party,
+      candidate,
+      nadra,
+    }); //gets all data into object
+
+    await newElectionLedger
+      .save()
+      .then(() => {
+        console.log("ledger saved");
+      })
+      .catch((err) => {
+        console.log(err);
+      }); //save data for ledger
+
+    //  console.log(newElectionLedger);
+
+    //set the votecount of all models to 0 when reseting
+    await Campaign.updateMany({}, { voteCounts: 0 });
+
+    //wipe out all candidates and parties at the end of election
+    //new will be created at the start of new election
+    await Candidate.deleteMany();
+    await Party.deleteMany();
+
     //sends email to all voters
-    try {
+    /* try {
       const emailsList = cloneVoters.map((voter) => {
         console.log("Voter==>", voter.email);
         return voter.email;
@@ -192,7 +236,7 @@ cron.schedule("*/10 * * * * *", async () => {
       });
     } catch (error) {
       console.log(error.message);
-    }
+    } */
 
     //Delete all ballot candidates
     ballots.map(async (ballot) => {
@@ -208,7 +252,7 @@ cron.schedule("*/10 * * * * *", async () => {
 });
 
 //start election
-cron.schedule("*/10 * * * * *", async () => {
+cron.schedule("*/30 * * * * *", async () => {
   console.log("start election");
   const elections = await Election.find({}).catch((err) => {
     console.log(err);
@@ -234,7 +278,7 @@ cron.schedule("*/10 * * * * *", async () => {
 });
 
 //start polls
-cron.schedule("*/10 * * * * *", async () => {
+cron.schedule("*/30 * * * * *", async () => {
   try {
     const polls = await Polls.find({}).catch((err) => {
       console.log(err);
@@ -248,7 +292,8 @@ cron.schedule("*/10 * * * * *", async () => {
       if (
         //checks if its a polls valid time
         Date.now() >= Number(poll.startTime) &&
-        Date.now() <= Number(poll.endTime)
+        Date.now() <= Number(poll.endTime) &&
+        poll.valid == false
       ) {
         poll.valid = true;
         await poll.save().catch((err) => {
@@ -263,21 +308,33 @@ cron.schedule("*/10 * * * * *", async () => {
 });
 
 //stop polls ***
-cron.schedule("*/10 * * * * *", async () => {
+cron.schedule("*/40 * * * * *", async () => {
   console.log("Stopping Poll");
   try {
     const polls = await Polls.find({}).catch((err) => {
       return console.log(err);
     });
 
-    const pollers = await Poller.find({}).catch((err) => {
-      return console.log(err);
-    });
+    const pollers = await Poller.find({})
+      .populate("pollvote")
+      .catch((err) => console.log(err));
+
+    //console.log(pollers);
 
     let check1 = false; //checks if the current poll has ended or not
 
     polls.map(async (poll) => {
-      console.log(Date.now() >= Number(poll.endTime) && poll.valid == true);
+      /* console.log("Now Time==>", Date.now(), "Poll Time==>", poll.endTime);
+      console.log("valid==>", poll.valid);
+
+      console.log("time-condition==>", Date.now() >= Number(poll.endTime));
+      console.log("valid-condition==>", poll.valid == true);
+
+      console.log(
+        "total-condition==>",
+        Date.now() >= Number(poll.endTime) && poll.valid == true
+      ); */
+
       if (Date.now() >= Number(poll.endTime) && poll.valid == true) {
         poll.valid = false;
         check1 = true;
@@ -294,13 +351,26 @@ cron.schedule("*/10 * * * * *", async () => {
       return;
     }
 
+    const newPollLedger = new PollLedger({
+      poller: pollers,
+    }); //creates an instance of poll ledger
+
+    await newPollLedger
+      .save()
+      .then(() => {
+        console.log("Poll Ledger Succesfully Saved");
+      })
+      .catch((err) => {
+        console.log(err);
+      }); //saves the model for the poll ledger
+
     //sends email to all voters
     const emailsList = pollers.map((poller) => {
       return poller.email;
     });
     const emails = emailsList.join(",");
 
-    /*  try {
+    /* try {
       await sendEmail({
         email: emails,
         subject: "Poll End & Result Announcement",
@@ -310,7 +380,7 @@ cron.schedule("*/10 * * * * *", async () => {
       });
     } catch (err) {
       console.log(err);
-    } */
+    }  */
   } catch (err) {
     console.log(err);
   }
