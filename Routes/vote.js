@@ -15,6 +15,7 @@ const Ballot = mongoose.model("Ballot");
 const Party = mongoose.model("Party");
 const Candidate = mongoose.model("Candidate");
 const Election = mongoose.model("Election");
+const Campaign = mongoose.model("Campaign");
 
 router.post("/vote/:voter/:candidate", async (req, res) => {
   try {

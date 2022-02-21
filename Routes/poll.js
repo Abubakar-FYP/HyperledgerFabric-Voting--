@@ -105,7 +105,7 @@ router.post("/createpoll", async (req, res) => {
       items: items,
     });
 
-    try {
+    /*  try {
       const emailsList = pollers.map((poller) => {
         return poller.email;
       });
@@ -124,7 +124,7 @@ router.post("/createpoll", async (req, res) => {
     } catch (error) {
       res.status(400).send(error.message);
     }
-
+ */
     await newPol
       .save()
       .then(() => {

@@ -42,6 +42,7 @@ router.post("/createparty", async (req, res) => {
   }
   try {
     const elections = await Election.find({}).catch((err) => {
+      console.log(err);
       return res
         .status(400)
         .json({ message: "there was an error finding elections" });
@@ -324,20 +325,25 @@ router.post("/createparty", async (req, res) => {
           newCandidate.ballotId = ballot._id;
           console.log("Update Ballot====>", ballot);
 
-          await ballot.save().catch((err) => {
-            //ballot save
-            console.log(err);
-            return res
-              .status(400)
-              .json({ message: "there was an error saving ballot" });
-          });
+          try {
+            await ballot.save().catch((err) => {
+              //ballot save
+              console.log(err);
+              return res
+                .status(400)
+                .json({ message: "there was an error saving ballot" });
+            });
 
-          await newCandidate.save().catch((err) => {
-            //candidate save
-            res
-              .status(400)
-              .json({ message: "there was an error saving election" });
-          }); //correct till here
+            await newCandidate.save().catch((err) => {
+              //candidate save
+              res
+                .status(400)
+                .json({ message: "there was an error saving election" });
+            }); //correct till here
+          } catch (err) {
+            console.log(err.message);
+            return;
+          }
         }
       });
     }); //saving candidates in model and candidates in ballot one by one
