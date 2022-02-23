@@ -380,71 +380,83 @@ router.get("/getcampaignwinner/:_id", async (req, res) => {
 
 //good to go
 router.get("/getallcampaignwinner", async (req, res) => {
-  const party = await Party.find().select("partyName");
-  await Campaign.find({})
-    .lean()
-    .populate({
-      path: "ballotId",
-      select: "ballotname",
-      populate: {
-        path: "candidate",
+  try {
+    const party = await Party.find().select("partyName");
+    await Campaign.find({})
+      .lean()
+      .populate({
+        path: "ballotId",
+        select: "ballotname",
         populate: {
-          path: "partyId -_id -_cnic -position",
-          select: "partyName",
+          path: "candidate",
+          populate: {
+            path: "partyId -_id -_cnic -position",
+            select: "partyName",
+          },
         },
-      },
-    })
-    .exec((err, docs) => {
-      const sorted = new Array();
-      docs.map((doc) =>
-        // console.log("docs=====================", doc.ballotId[1].candidate)
-        doc.ballotId.map(
-          (ballot) =>
-            // console.log("ballot=================", ballot.candidate)
-            (ballot.candidate = ballot.candidate.sort(
-              (a, b) => b?.voteCount - a?.voteCount
-              // console.log("candidate===========", cand)
-            ))
-        )
-      );
-      const allWinnerCandidatesFromABallot = docs.map((compaign) =>
-        compaign.ballotId.map((ballot) => ballot.candidate)
-      );
+      })
+      .exec((err, docs) => {
+        const sorted = new Array();
+        docs.map((doc) =>
+          // console.log("docs=====================", doc.ballotId[1].candidate)
+          doc.ballotId.map(
+            (ballot) =>
+              // console.log("ballot=================", ballot.candidate)
+              (ballot.candidate = ballot.candidate.sort(
+                (a, b) => b?.voteCount - a?.voteCount
+                // console.log("candidate===========", cand)
+              ))
+          )
+        );
+        const allWinnerCandidatesFromABallot = docs.map((compaign) =>
+          compaign.ballotId.map((ballot) => ballot.candidate)
+        );
 
-      // get same parties from each compaign
-      // const data =
+        // get same parties from each compaign
+        // const data =
 
-      // get all the winners
-      console.log("winners", allWinnerCandidatesFromABallot);
-      res.send({
-        candidates: allWinnerCandidatesFromABallot,
-        // winners: firsWinningCandidates,
-        // party
+        // get all the winners
+        console.log("winners", allWinnerCandidatesFromABallot);
+        res.send({
+          candidates: allWinnerCandidatesFromABallot,
+          // winners: firsWinningCandidates,
+          // party
+        });
       });
-    });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 router.get("/getoverallpartywinner", async (req, res) => {
-  await Party.find({})
-    .lean()
-    .populate({
-      path: "ballotId",
-      select: "ballotname",
-      populate: {
-        path: "candidate",
+  try {
+    await Party.find({})
+      .lean()
+      .populate({
+        path: "ballotId",
+        select: "ballotname",
         populate: {
-          path: "partyId",
-          select: "partyName",
+          path: "candidate",
+          populate: {
+            path: "partyId",
+            select: "partyName",
+          },
         },
-      },
-    })
-    .exec((err, docs) => {
-      docs.sort((a, b) => b?.voteCount - a?.voteCount);
-      res.json({
-        voteCount: docs[0].voteCount,
-        partyName: docs[0].partyName,
+      })
+      .exec((err, docs) => {
+        if (!err) {
+          docs.sort((a, b) => b?.voteCount - a?.voteCount);
+          res.json({
+            voteCount: docs[0].voteCount,
+            partyName: docs[0].partyName,
+          });
+        } else {
+          console.log(err);
+        }
       });
-    });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 router.get("/getallpartyvotes", async (req, res) => {

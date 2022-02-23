@@ -42,9 +42,9 @@ router.get("/getcountvotedusers", async (req, res) => {
           return res.status(400).json({ message: "no user has voted yet" });
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err.message));
   } catch (err) {
-    console.log(err);
+    console.log(err.message);
   }
 });
 
