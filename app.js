@@ -153,6 +153,8 @@ cron.schedule("*/15 * * * * *", async () => {
       return console.log(err);
     });
 
+    let voterUpdateCheck = false;
+
     let check1 = false; //checks if the current election has ended or not
     elections.map(async (election) => {
       if (Date.now() >= election.endTime) {
@@ -162,13 +164,7 @@ cron.schedule("*/15 * * * * *", async () => {
           if (party.participate.inelection == true) {
             console.log("running currently");
             check1 = true;
-            voters.map(async (voter) => {
-              //resets the voteflag of every voter after the current election ends
-              voter.voteflag = false;
-              await voter.save().catch((err) => {
-                console.log(err);
-              });
-            });
+
             //if election has ended, then set party to not participate in any election
             const updateParty = await Party.findOne({ _id: party._id });
             updateParty.participate.inelection = false;
@@ -178,6 +174,7 @@ cron.schedule("*/15 * * * * *", async () => {
           }
         });
       }
+
       await election.save().catch((err) => {
         console.log(err);
       });
@@ -199,6 +196,11 @@ cron.schedule("*/15 * * * * *", async () => {
       nadra,
     }); //gets all data into object
 
+    if (voterUpdateCheck == false) {
+      await Voter.updateMany({ voteflag: true }, { voteflag: false });
+      voterUpdateCheck = true;
+    }
+
     await newElectionLedger
       .save()
       .then(() => {
@@ -211,7 +213,7 @@ cron.schedule("*/15 * * * * *", async () => {
     //  console.log(newElectionLedger);
 
     //set the votecount of all models to 0 when reseting
-    await Campaign.updateMany({}, { voteCounts: 0 });
+    await Campaign.updateMany({}, { voteCounts: null });
 
     //wipe out all candidates and parties at the end of election
     //new will be created at the start of new election
