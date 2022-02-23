@@ -65,4 +65,8 @@ router.get("/checkifvotedalready/:_id", async (req, res) => {
   }
 });
 
+router.put("/put/votertrueflag", async (req, res) => {
+  await Voter.updateMany({ voteflag: false }, { voteflag: true });
+});
+
 module.exports = router;
