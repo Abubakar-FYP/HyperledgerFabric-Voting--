@@ -26,7 +26,6 @@ const campaign = new Schema({
         },
         voteCount: {
           type: Number,
-          defualt: 0,
         },
       },
     ],
