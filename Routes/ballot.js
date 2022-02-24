@@ -447,8 +447,8 @@ router.get("/getoverallpartywinner", async (req, res) => {
         if (!err) {
           docs.sort((a, b) => b?.voteCount - a?.voteCount);
           res.json({
-            voteCount: docs[0].voteCount,
-            partyName: docs[0].partyName,
+            voteCount: docs[0]?.voteCount,
+            partyName: docs[0]?.partyName,
           });
         } else {
           console.log(err);

@@ -17,6 +17,7 @@ require("../Models/nadra");
 require("../Models/election");
 require("../Models/poller");
 require("../Models/polls");
+require("../Models/ballot");
 
 //models
 const Admin = mongoose.model("Admin");
@@ -25,6 +26,7 @@ const Nadra = mongoose.model("Nadra");
 const Elections = mongoose.model("Election");
 const Poller = mongoose.model("Poller");
 const Polls = mongoose.model("Polls");
+const Ballot = mongoose.model("Ballot");
 //HERE OTP WORK WAS DONE
 
 router.post("/signinadmin", requireLogin, (req, res) => {
