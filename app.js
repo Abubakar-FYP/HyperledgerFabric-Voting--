@@ -213,7 +213,7 @@ cron.schedule("*/15 * * * * *", async () => {
     //  console.log(newElectionLedger);
 
     //set the votecount of all models to 0 when reseting
-    await Campaign.updateMany({}, { voteCounts: null });
+    await Campaign.updateMany({}, { voteCounts: [] });
 
     //wipe out all candidates and parties at the end of election
     //new will be created at the start of new election
