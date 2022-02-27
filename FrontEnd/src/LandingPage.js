@@ -152,6 +152,11 @@ const LandingPage = () => {
               alt='Client'
             />
           </div>
+
+          <div className='client'>
+            <img src='/img/logos/murtaza.png' alt='Client' />
+          </div>
+
           <div className='client'>
             <img
               src='/img/logos/WhatsAppImage2021-10-18at12.53.07AM.jpeg'
@@ -160,7 +165,10 @@ const LandingPage = () => {
           </div>
 
           <div className='client'>
-            <img src='/img/logos/murtaza.png' alt='Client' />
+            <img
+              src='https://pak-vote.herokuapp.com/img/logos/WhatsAppImage2021-10-18at12.53.07AM1.jpeg'
+              alt='Client'
+            />
           </div>
         </div>
       </section>
