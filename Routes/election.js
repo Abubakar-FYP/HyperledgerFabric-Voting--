@@ -12,6 +12,7 @@ const Party = mongoose.model("Party");
 const Election = mongoose.model("Election");
 const Ballot = mongoose.model("Ballot");
 const Voter = mongoose.model("Voter");
+const ElectionLedger = mongoose.model("ElectionLedger");
 
 router.post("/create/election", async (req, res) => {
   try {
@@ -331,20 +332,34 @@ router.get("/get/election/foruser", async (req, res) => {
 //get all parties in an election and store it in an array
 //sort the parties of that array while traversing inside election
 //sort them by their vote count
-router.get("/get/election/previous", async (req, res) => {
-  const elections = await Election.find({}).populate("parties");
-  let previousElections = new Array();
-  elections.map((election) => {
-    if (Date.now() >= election.endTime) {
-      previousElections.push(election);
 
-      election.parties.sort((a, b) => {
-        return b?.voteCount - a.voteCount;
-      });
-    }
-  });
+router.get("/get/previouselections", async (req, res) => {
+  try {
+    const electionLedgers = await ElectionLedger.find({})
+      .select("election campaign")
+      .catch((err) => console.log(err));
 
-  res.status(200).json({ message: elections });
+    console.log("got it");
+
+    electionLedgers.map((elections) => {
+      //for converting epoch to readable/date
+      for (let i = 0; i < elections.election.length; i++) {
+        elections.election[i].startTime = new Date(
+          Number(elections.election[i].startTime)
+        ); //changing start time(epoch) to readable time
+
+        elections.election[i].endTime = new Date(
+          Number(toString(elections.election[i].endTime))
+        );
+      }
+    });
+
+    res.status(200).json({
+      message: electionLedgers,
+    });
+  } catch (err) {
+    console.log(err.message);
+  }
 });
 
 module.exports = router;
