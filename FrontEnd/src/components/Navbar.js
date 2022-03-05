@@ -28,6 +28,7 @@ const NavBar = () => {
     history.push("/")
 
   }
+  console.log("electionelectionelection", election)
   return (
     <nav id="home">
       <h1 className="nav logo">
@@ -40,8 +41,11 @@ const NavBar = () => {
           className="text-light">Home</Link></li>
 
         {user && user?.doc?.role === "Voter" ? (
+          <>
           <li><Link to="/partiesstatus" style={{ listStyle: "none", textDecoration: "none" }}
             className="text-light">Parties Status</Link></li>
+           <li><Link className="text-light" to="/admindashboard" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Dashboard</Link></li>
+          </>
         ) : null}
 
         {user && user?.doc?.role === "admin" ? (
@@ -52,9 +56,10 @@ const NavBar = () => {
             <li><Link className="text-light" to="/admindashboard" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Dashboard</Link></li>
           </>
         ) : null}
-        {user && election && Date.now() > new Date(election?.endTime) ? (
+        {/* {user && election && Date.now() > new Date(election?.endTime) ? (
           <li><Link className="text-light" to="/admindashboard" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Admin Dashboard</Link></li>
-        ) : null}
+        ) : null} */}
+           
         {!user ? (
           <li><Link className="text-light" to="/signup" style={{ listStyle: "none", textDecoration: "none", color: "#fff" }}>Voter Registeration</Link></li>
         ) : null}
