@@ -204,6 +204,7 @@ router.post("/createparty", async (req, res) => {
     let check10 = false; //if no upcoming
     let electionTime = null;
     const names = new Array();
+
     //checks for future elections and inserts parties in upcoming elections
     if (elections) {
       elections.map(async (election) => {
@@ -232,8 +233,8 @@ router.post("/createparty", async (req, res) => {
             election.candidates.push(cand.cnic);
           });
 
-          console.log("Update Election=====>", election);
-
+          /* console.log("Update Election=====>", election);
+           */
           await election.save().catch((err) => {
             res
               .status(400)
@@ -275,12 +276,13 @@ router.post("/createparty", async (req, res) => {
       });
     }
 
-    console.log("hashMap--->", users);
-
+    /*   console.log("hashMap--->", users); */
+    let ballotList = [];
     candidate.map(async (item) => {
       //enter names
       //traversing candidates list
-      let newCandidate = new Candidate({
+
+      const newCandidate = new Candidate({
         cnic: item.cnic,
         name: item.name,
         position: item.position,
@@ -289,7 +291,7 @@ router.post("/createparty", async (req, res) => {
       });
 
       names.push(users.get(item.cnic));
-      console.log("name==>", names);
+      /* console.log("name==>", names); */
 
       newCandidate.name = users.get(item.cnic);
 
@@ -305,7 +307,7 @@ router.post("/createparty", async (req, res) => {
         console.log("item===>", item); //req candidate object
         // console.log("value===>", ballot._id, newCandidate.ballotId);
 
-        console.log(
+        /* console.log(
           "typeof===>",
           typeof ballot.ballotid,
           typeof Number(newCandidate.ballotId)
@@ -316,34 +318,24 @@ router.post("/createparty", async (req, res) => {
           ballot.ballotid == Number(newCandidate.ballotId),
           ballot.ballotid,
           Number(newCandidate.ballotId)
-        );
+        ); */
 
         if (ballot.ballotid == item.ballotid) {
-          console.log("matched===>");
+          // console.log("matched===>");
           //its matching if all of the ballot ids matches the new candidates ballot id
           ballot.candidate.push(candidate_id);
           newCandidate.ballotId = ballot._id;
           console.log("Update Ballot====>", ballot);
 
-          try {
-            await ballot.save().catch((err) => {
-              //ballot save
-              console.log(err);
-              return res
-                .status(400)
-                .json({ message: "there was an error saving ballot" });
-            });
+          await newCandidate.save().catch((err) => {
+            //candidate save
+            console.log(err);
+            res
+              .status(400)
+              .json({ message: "there was an error saving candidate" });
+          }); //correct till here
 
-            await newCandidate.save().catch((err) => {
-              //candidate save
-              res
-                .status(400)
-                .json({ message: "there was an error saving election" });
-            }); //correct till here
-          } catch (err) {
-            console.log(err.message);
-            return;
-          }
+          await Ballot.findOneAndUpdate({ _id: ballot._id }, ballot);
         }
       });
     }); //saving candidates in model and candidates in ballot one by one
@@ -357,7 +349,7 @@ router.post("/createparty", async (req, res) => {
         .json({ message: "there was an error saving election" });
     });
 
-    try {
+    /* try {
       const namesList = names.join(" , ");
       console.log(
         `Your party ${partyName} has been approved for the coming election`
@@ -369,8 +361,7 @@ router.post("/createparty", async (req, res) => {
       });
     } catch (error) {
       console.log(error);
-      return res.status(400).send(error.message);
-    }
+    } */
   } catch (err) {
     console.log(err);
   }

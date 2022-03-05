@@ -17,7 +17,7 @@ const AdminDashboard = () => {
   const [campaignWiseWinners, setCampaignWiseWinners] = useState([]);
   useEffect(() => {
     (async () => {
-      const { data } = await axios.get(url + "/getcountvotedusers");
+      const { data } = (await axios.get(url + "/getcountvotedusers")) || 0;
       // console.log(data)
       setTotalVotes(data.message);
     })();
@@ -118,7 +118,7 @@ const AdminDashboard = () => {
       <div className='row'>
         <div className='col-12 col-md-3'>
           <div className='card text-white bg-success'>
-            <div className='card-header'>Male Votes</div>
+            <div className='card-header'>Male Voters</div>
             <div className='card-body'>
               <div className='row'>
                 <div className='col-4'>
@@ -138,7 +138,7 @@ const AdminDashboard = () => {
         </div>
         <div className='col-12 col-md-3'>
           <div className='card text-white bg-warning'>
-            <div className='card-header'>female Votes</div>
+            <div className='card-header'>Female Voters</div>
             <div className='card-body'>
               <div className='row'>
                 <div className='col-4'>
@@ -197,7 +197,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className='card-body'>
                   <span className=' mx-3'>
-                    {party.voteCounts[0]?.partyName}
+                    {party.voteCounts[0]?.partyName || " "}
                   </span>
                   <CountUp
                     start={0}

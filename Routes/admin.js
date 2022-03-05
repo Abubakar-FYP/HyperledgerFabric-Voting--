@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const epxress = require("express");
 const router = epxress.Router();
 const requireLogin = require("../Middleware/requirelogin");
+const sendEmail = require("../utils/sendEmail");
 
 require("../Models/party");
 
@@ -77,6 +78,37 @@ router.delete("/rejectparty/:partyId", async (req, res) => {
     return res.status(400).json({ message: `party does not exist` });
   } else {
     return res.status(200).json({ message: `party has been deleted` });
+  }
+});
+
+router.post("/post/contactus", async (req, res) => {
+  const { name, email, phone, message } = req.body;
+
+  if (!name || !email || !phone || !message) {
+    res.status(400).json({ message: "one of the fields is empty" });
+  }
+
+  try {
+    await sendEmail({
+      email: "murtazaalimashadi1999@gmail.com,abubakarmujahid672@gmail.com",
+      subject: "Pak Voting System Contact Query",
+      message: `
+        Name: ${name} 
+        Email: ${email}
+        Phone: ${phone} 
+        Message: ${message}`,
+    })
+      .then(() => {
+        return res.status(200).json({
+          message:
+            "Email sent successfully, Our team will get back to you shortly",
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } catch (err) {
+    console.log(err);
   }
 });
 
