@@ -10,7 +10,7 @@ const Candidate = require("./candidate").schema;
 const Nadra = require("./nadra").schema;
 
 const electionLedger = new mongoose.Schema({
-  election: [Election],
+  election: Election,
   voter: [Voter],
   ballot: [Ballot],
   campaign: [Campaign],

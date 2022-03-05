@@ -362,4 +362,31 @@ router.get("/get/previouselections", async (req, res) => {
   }
 });
 
+router.get("/get/previoussingleelection/:e_id", async (req, res) => {
+  try {
+    const electionFound = await Election.findOne({
+      _id: req.params.e_id,
+    }).catch((err) => {
+      console.log(err);
+      return res
+        .status(400)
+        .json({ message: "there was an error finding elections" });
+    });
+    const electionLedger = await ElectionLedger.findOne({
+      "election._id": electionFound._id,
+    })
+      .select("election campaign")
+      .catch((err) => {
+        console.log(err);
+        return res
+          .status(400)
+          .json({ message: "there was an error finding election-ledger" });
+      });
+
+    res.status(200).json({ message: electionLedger });
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
 module.exports = router;

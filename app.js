@@ -155,9 +155,15 @@ cron.schedule("*/15 * * * * *", async () => {
 
     let voterUpdateCheck = false;
 
-    let check1 = false; //checks if the current election has ended or not
+    var check1 = false; //checks if the current election has ended or not
     elections.map(async (election) => {
-      if (Date.now() >= election.endTime) {
+      console.log(
+        "Time passed==>",
+        Date.now() >= election.endTime,
+        "valid==>",
+        election.valid == true
+      );
+      if (Date.now() >= election.endTime && election.valid == true) {
         election.valid = false;
         //checks if election has ended
         election.parties.map(async (party) => {
@@ -174,20 +180,22 @@ cron.schedule("*/15 * * * * *", async () => {
           }
         });
       }
-
-      await election.save().catch((err) => {
-        console.log(err);
-      });
+      if (check1 == true)
+        await election.save().catch((err) => {
+          console.log(err);
+        });
     });
 
+    /*     console.log(elections[elections.length - 1]);
+     */
     if (!check1 || check1 == false) {
       console.log("no election in que for ending");
       //checks if the current election has ended, if it has then a email will not be generated
       return;
     }
-
+    console.log("Through here");
     const newElectionLedger = new ElectionLedger({
-      election: elections,
+      election: elections[elections.length - 1],
       voter: voters,
       ballot: ballots,
       campaign,
