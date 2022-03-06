@@ -1,0 +1,1 @@
+[34m2022-03-06 20:15:43.850 PKT [chaincodeCmd] chaincodeInvokeOrQuery -> INFO 001[0m Chaincode invoke successful. result: status:200 
