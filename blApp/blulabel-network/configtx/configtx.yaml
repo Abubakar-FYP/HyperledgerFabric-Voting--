@@ -1,0 +1,244 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+################################################################################
+#
+#   Section: Organizations
+#
+#   - This section defines the different organizational identities which will
+#   be referenced later in the configuration.
+#
+################################################################################
+Organizations:
+
+
+    - &OrdererOrg
+     
+        Name: OrdererOrg
+
+        ID: OrdererMSP
+
+        MSPDir: ../organizations/ordererOrganizations/example.com/msp
+
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererMSP.admin')"
+
+        OrdererEndpoints:
+            - orderer.example.com:7050
+
+    - &bluL1
+     
+        Name: bluL1MSP
+
+        ID: bluL1MSP
+
+        MSPDir: ../organizations/peerOrganizations/bluL1.example.com/msp
+
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('bluL1MSP.admin', 'bluL1MSP.peer', 'bluL1MSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('bluL1MSP.admin', 'bluL1MSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('bluL1MSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('bluL1MSP.peer')"
+
+    - &bluL2
+     
+        Name: bluL2MSP
+
+      
+        ID: bluL2MSP
+
+        MSPDir: ../organizations/peerOrganizations/bluL2.example.com/msp
+
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('bluL2MSP.admin', 'bluL2MSP.peer', 'bluL2MSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('bluL2MSP.admin', 'bluL2MSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('bluL2MSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('bluL2MSP.peer')"
+
+################################################################################
+#
+#   SECTION: Capabilities
+#
+################################################################################
+Capabilities:
+  
+    Channel: &ChannelCapabilities
+
+        V2_0: true
+
+    Orderer: &OrdererCapabilities
+   
+        V2_0: true
+
+    Application: &ApplicationCapabilities
+    
+        V2_0: true
+
+################################################################################
+#
+#   SECTION: Application
+#
+#   - This section defines the values to encode into a config transaction or
+#   genesis block for application related parameters
+#
+################################################################################
+Application: &ApplicationDefaults
+
+    # Organizations is the list of orgs which are defined as participants on
+    # the application side of the network
+    Organizations:
+
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        LifecycleEndorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+        Endorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+
+    Capabilities:
+        <<: *ApplicationCapabilities
+################################################################################
+#
+#   SECTION: Orderer
+#
+#   - This section defines the values to encode into a config transaction or
+#   genesis block for orderer related parameters
+#
+################################################################################
+Orderer: &OrdererDefaults
+
+    OrdererType: etcdraft
+    
+    Addresses:
+        - orderer.example.com:7050
+
+    EtcdRaft:
+        Consenters:
+        - Host: orderer.example.com
+          Port: 7050
+          ClientTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
+          ServerTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
+
+    BatchTimeout: 2s
+
+    BatchSize:
+
+        MaxMessageCount: 10
+
+        AbsoluteMaxBytes: 99 MB
+
+        PreferredMaxBytes: 512 KB
+
+    Organizations:
+
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+
+################################################################################
+#
+#   CHANNEL
+#
+#   This section defines the values to encode into a config transaction or
+#   genesis block for channel related parameters.
+#
+################################################################################
+Channel: &ChannelDefaults
+  
+    Policies:
+        # Who may invoke the 'Deliver' API
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        # Who may invoke the 'Broadcast' API
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        # By default, who may modify elements at this config level
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    Capabilities:
+        <<: *ChannelCapabilities
+
+################################################################################
+#
+#   Profile
+#
+#   - Different configuration profiles may be encoded here to be specified
+#   as parameters to the configtxgen tool
+#
+################################################################################
+Profiles:
+
+    TwoOrgsOrdererGenesis:
+        <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                    - *bluL1
+                    - *bluL2
+    TwoOrgsChannel:
+        Consortium: SampleConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *bluL1
+                - *bluL2
+            Capabilities:
+                <<: *ApplicationCapabilities
