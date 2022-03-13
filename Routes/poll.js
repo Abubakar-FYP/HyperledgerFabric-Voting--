@@ -416,6 +416,53 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
         console.log(poller);
         console.log(poller?.pollvote);
 
+        //API blockchain data save
+
+        
+
+        try {
+
+          const url = 'www.blockchain.api.com'
+          const body = {
+            pollId: req.params.p_id,
+            pollerId: req.params.v_id,
+            itemId: req.params.i_id
+          }
+
+          const pollResponse = await Axios.post(url,body);
+
+        if(pollResponse.status === 200){
+
+          await voter.save().catch((err) => {
+            console.log(err);
+          });
+          await campaign.save().catch((err) => {
+            console.log(err);
+          });
+          await candidate.save().catch((err) => {
+            console.log(err);
+          });
+          await party.save().catch((err) => {
+            console.log(err);
+          });
+
+        } else {
+          res.status(500).json({
+            msg: "Somthing went wrong on blockchain",
+            status: false
+          })
+        }
+
+        } catch (error) {
+
+          res.status(500).json({
+            msg: error,
+            status: false
+          })
+
+        }
+
+
         await poller.save().catch((err) => {
           console.log(err);
           return res

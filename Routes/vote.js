@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const sendEmail = require("../utils/sendEmail");
 const requireLogin = require("../Middleware/requirelogin");
+const Axios = required('axios');
 
 require("../Models/voter");
 require("../Models/ballot");
@@ -100,6 +101,51 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
         voter.voteflag = true;
         candidate.voteCount = candidate.voteCount + 1;
         candidate.voters.push(req.params.voter);
+
+
+
+        try {
+
+          const url = 'www.blockchain.api.com'
+          const body = {
+            voterId: req.params.voter, 
+            candidateId: req.params.candidate
+          }
+
+          const voteResponse = await Axios.post(url,body);
+
+        if(voteResponse.status === 200){
+
+          await voter.save().catch((err) => {
+            console.log(err);
+          });
+          await campaign.save().catch((err) => {
+            console.log(err);
+          });
+          await candidate.save().catch((err) => {
+            console.log(err);
+          });
+          await party.save().catch((err) => {
+            console.log(err);
+          });
+
+        } else {
+          res.status(500).json({
+            msg: "Somthing went wrong on blockchain",
+            status: false
+          })
+        }
+
+        } catch (error) {
+
+          res.status(500).json({
+            msg: error,
+            status: false
+          })
+          
+        }
+
+        //API call blockchain save data
 
         await voter.save().catch((err) => {
           console.log(err);
