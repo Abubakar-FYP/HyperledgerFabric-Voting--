@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const sendEmail = require("../utils/sendEmail");
 const requireLogin = require("../Middleware/requirelogin");
-const Axios = required('axios');
+const Axios = require('axios');
 
 require("../Models/voter");
 require("../Models/ballot");
@@ -106,13 +106,20 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
 
         try {
 
-          const url = 'www.blockchain.api.com'
+          const url = 'http://localhost:5000'
           const body = {
-            voterId: req.params.voter, 
-            candidateId: req.params.candidate
-          }
+            "func":"castElectionVote",
+            "chaincodeName" : "transaction",
+            "channelName" : "pev",
+            "args" : [req.params.voter,req.params.candidate]
+        }
 
-          const voteResponse = await Axios.post(url,body);
+        const voteResponse = await Axios.post(url,body, {
+          headers: {
+          'Authorization': "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjM2MDAwMDAwMDE2NDc2NTcwMDAsInVzZXJuYW1lIjoiYWJ1YmFrYXIiLCJvcmdOYW1lIjoiUEVWMSIsImlhdCI6MTY0NzY1NzE0M30.pGcVU3nj9uTGHsL_MXsLZJAz2wHj4I0kOQwWC33oqLY" 
+          }
+          }) 
+
 
         if(voteResponse.status === 200){
 

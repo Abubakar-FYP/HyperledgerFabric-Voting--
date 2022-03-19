@@ -4,6 +4,7 @@ const router = express.Router();
 const sendEmail = require("../utils/sendEmail");
 const requireLogin = require("../Middleware/requirelogin");
 const { compareSync } = require("bcryptjs");
+const Axios = require("axios");
 
 require("../Models/nadra");
 require("../Models/polls");
@@ -422,14 +423,19 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
 
         try {
 
-          const url = 'www.blockchain.api.com'
+          const url = 'http://localhost:5000'
           const body = {
-            pollId: req.params.p_id,
-            pollerId: req.params.v_id,
-            itemId: req.params.i_id
-          }
+            "func":"castPollVote",
+            "chaincodeName" : "transaction",
+            "channelName" : "pev",
+            "args" : [req.params.v_id,req.params.i_id,req.params.p_id]
+        }
 
-          const pollResponse = await Axios.post(url,body);
+        const pollResponse = await Axios.post(url,body, {
+          headers: {
+          'Authorization': "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjM2MDAwMDAwMDE2NDc2NTcwMDAsInVzZXJuYW1lIjoiYWJ1YmFrYXIiLCJvcmdOYW1lIjoiUEVWMSIsImlhdCI6MTY0NzY1NzE0M30.pGcVU3nj9uTGHsL_MXsLZJAz2wHj4I0kOQwWC33oqLY" 
+          }
+          }) 
 
         if(pollResponse.status === 200){
 
