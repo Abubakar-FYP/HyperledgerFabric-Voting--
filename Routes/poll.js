@@ -419,62 +419,50 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
 
         //API blockchain data save
 
-        
-
         try {
-
-          const url = 'http://localhost:5000'
+          const url = "http://localhost:5000";
           const body = {
-            "func":"castPollVote",
-            "chaincodeName" : "transaction",
-            "channelName" : "pev",
-            "args" : [req.params.v_id,req.params.i_id,req.params.p_id]
-        }
+            func: "castPollVote",
+            chaincodeName: "transaction",
+            channelName: "pev",
+            args: [req.params.v_id, req.params.i_id, req.params.p_id],
+          };
 
-        const pollResponse = await Axios.post(url,body, {
-          headers: {
-          'Authorization': "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjM2MDAwMDAwMDE2NDc2NTcwMDAsInVzZXJuYW1lIjoiYWJ1YmFrYXIiLCJvcmdOYW1lIjoiUEVWMSIsImlhdCI6MTY0NzY1NzE0M30.pGcVU3nj9uTGHsL_MXsLZJAz2wHj4I0kOQwWC33oqLY" 
+          const pollResponse = await Axios.post(url, body, {
+            headers: {
+              Authorization:
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjM2MDAwMDAwMDE2NDc2NTcwMDAsInVzZXJuYW1lIjoiYWJ1YmFrYXIiLCJvcmdOYW1lIjoiUEVWMSIsImlhdCI6MTY0NzY1NzE0M30.pGcVU3nj9uTGHsL_MXsLZJAz2wHj4I0kOQwWC33oqLY",
+            },
+          });
+
+          if (pollResponse.status === 200) {
+            await poll
+              .save()
+              .then(() => {
+                return res.json({ message: "voted successfully" });
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+
+            await poller.save().catch((err) => {
+              console.log(err);
+              return res
+                .status(400)
+                .json({ message: "couldnt save poll in poller" });
+            });
+          } else {
+            res.status(500).json({
+              msg: "Somthing went wrong on blockchain",
+              status: false,
+            });
           }
-          }) 
-
-        if(pollResponse.status === 200){
-
-          await voter.save().catch((err) => {
-            console.log(err);
-          });
-          await campaign.save().catch((err) => {
-            console.log(err);
-          });
-          await candidate.save().catch((err) => {
-            console.log(err);
-          });
-          await party.save().catch((err) => {
-            console.log(err);
-          });
-
-        } else {
-          res.status(500).json({
-            msg: "Somthing went wrong on blockchain",
-            status: false
-          })
-        }
-
         } catch (error) {
-
           res.status(500).json({
             msg: error,
-            status: false
-          })
-
+            status: false,
+          });
         }
-
-
-        await poller.save().catch((err) => {
-          console.log(err);
-          return res
-            .status(400)
-            .json({ message: "couldnt save poll in poller" });
-        });
 
         try {
           console.log(
@@ -488,15 +476,6 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
         } catch (error) {
           res.status(400).send(error.message);
         }
-
-        await poll
-          .save()
-          .then(() => {
-            return res.json({ message: "voted successfully" });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
       } else {
         return res.status(400).json({ message: "There is no poll in session" });
       }
