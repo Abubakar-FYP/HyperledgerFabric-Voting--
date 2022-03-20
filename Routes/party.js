@@ -335,7 +335,10 @@ router.post("/createparty", async (req, res) => {
               .json({ message: "there was an error saving candidate" });
           }); //correct till here
 
-          await Ballot.findOneAndUpdate({ _id: ballot._id }, ballot);
+          const oldBallot = await Ballot.findOne({ _id: ballot._id });
+          oldBallot.set(ballot);
+          const newBallot = oldBallot.getChanges();
+          await Ballot.updateOne({ _id: ballot._id }, newBallot);
         }
       });
     }); //saving candidates in model and candidates in ballot one by one
