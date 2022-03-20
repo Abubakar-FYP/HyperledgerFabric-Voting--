@@ -420,7 +420,7 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
         //API blockchain data save
 
         try {
-          const url = "http://localhost:5000";
+          const url = "http://localhost:5000/channels/pev/chaincodes/transaction";
           const body = {
             func: "castPollVote",
             chaincodeName: "transaction",
@@ -434,8 +434,10 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
                 "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjM2MDAwMDAwMDE2NDc2NTcwMDAsInVzZXJuYW1lIjoiYWJ1YmFrYXIiLCJvcmdOYW1lIjoiUEVWMSIsImlhdCI6MTY0NzY1NzE0M30.pGcVU3nj9uTGHsL_MXsLZJAz2wHj4I0kOQwWC33oqLY",
             },
           });
-
+                console.log("Hellp Poll Response here ------------->",pollResponse);
           if (pollResponse.status === 200) {
+          
+            console.log("I am here ----------------->");
             await poll
               .save()
               .then(() => {
@@ -458,7 +460,8 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
             });
           }
         } catch (error) {
-          res.status(500).json({
+          console.log("Error Displaying ------------>", error)
+         return res.status(500).json({
             msg: error,
             status: false,
           });

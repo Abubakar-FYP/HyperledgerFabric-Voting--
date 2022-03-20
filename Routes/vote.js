@@ -106,7 +106,7 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
 
         try {
 
-          const url = 'http://localhost:5000'
+          const url = 'http://localhost:5000/channels/pev/chaincodes/transaction'
           const body = {
             "func":"castElectionVote",
             "chaincodeName" : "transaction",
@@ -145,7 +145,7 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
 
         } catch (error) {
 
-          res.status(500).json({
+          return res.status(500).json({
             msg: error,
             status: false
           })
