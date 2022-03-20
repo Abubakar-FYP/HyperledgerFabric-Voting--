@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const sendEmail = require("../utils/sendEmail");
 const requireLogin = require("../Middleware/requirelogin");
-const Axios = require('axios');
+const Axios = require("axios");
 
 require("../Models/voter");
 require("../Models/ballot");
@@ -102,7 +102,7 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
         candidate.voteCount = candidate.voteCount + 1;
         candidate.voters.push(req.params.voter);
 
-
+        /* 
 
         try {
 
@@ -150,7 +150,7 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
             status: false
           })
           
-        }
+        } */
 
         //API call blockchain save data
 

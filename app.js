@@ -129,10 +129,18 @@ app.listen(serverNumber, () => {
 cron.schedule("*/15 * * * * *", async () => {
   console.log("Stopping Election");
   try {
-    const campaign = await Campaign.find({});
-    const party = await Party.find({});
-    const candidate = await Candidate.find({});
-    const nadra = await Nadra.find({});
+    const campaign = await Campaign.find({}).catch((err) => {
+      return console.log(err.message);
+    });
+    const party = await Party.find({}).catch((err) => {
+      return console.log(err.message);
+    });
+    const candidate = await Candidate.find({}).catch((err) => {
+      return console.log(err.message);
+    });
+    const nadra = await Nadra.find({}).catch((err) => {
+      return console.log(err.message);
+    });
 
     const elections = await Election.find({})
       .populate({
@@ -147,15 +155,13 @@ cron.schedule("*/15 * * * * *", async () => {
       return console.log(err);
     });
 
-    const cloneVoters = voters;
-
     const ballots = await Ballot.find({}).catch((err) => {
       return console.log(err);
     });
 
     let voterUpdateCheck = false;
 
-    var check1 = false; //checks if the current election has ended or not
+    let check1 = false; //checks if the current election has ended or not
     elections.map(async (election) => {
       console.log(
         "Time passed==>",
@@ -204,10 +210,9 @@ cron.schedule("*/15 * * * * *", async () => {
       nadra,
     }); //gets all data into object
 
-    if (voterUpdateCheck == false) {
-      await Voter.updateMany({ voteflag: true }, { voteflag: false });
-      voterUpdateCheck = true;
-    }
+    await Voter.updateMany({ voteflag: true }, { voteflag: false }).then(() => {
+      console.log("voter's vote flag reset");
+    });
 
     await newElectionLedger
       .save()
@@ -249,6 +254,7 @@ cron.schedule("*/15 * * * * *", async () => {
     } */
 
     //Delete all ballot candidates
+    console.log("DELETING BALLOT CANDIDATES");
     ballots.map(async (ballot) => {
       ballot.candidate = [];
       await ballot.save().catch((err) => {
@@ -271,8 +277,8 @@ cron.schedule("*/30 * * * * *", async () => {
   let check1 = false;
   elections.map(async (election) => {
     if (
-      Number(Date.now()) >= Number(election.startTime) &&
-      Number(Date.now()) <= Number(election.endTime)
+      Date.now() >= Number(election.startTime) &&
+      Date.now() <= Number(election.endTime)
     ) {
       election.valid = true;
       await election.save();
@@ -288,7 +294,7 @@ cron.schedule("*/30 * * * * *", async () => {
 });
 
 //start polls
-cron.schedule("*/30 * * * * *", async () => {
+cron.schedule("*/35 * * * * *", async () => {
   try {
     const polls = await Polls.find({}).catch((err) => {
       console.log(err);

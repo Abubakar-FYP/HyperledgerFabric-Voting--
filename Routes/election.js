@@ -164,7 +164,7 @@ router.get("/get/first/election", async (req, res) => {
   }
 });
 
-router.put("/startelection", async (req, res) => {
+/* router.put("/startelection", async (req, res) => {
   try {
     console.log("start election");
     const elections = await Election.find({}).catch((err) => {
@@ -266,7 +266,7 @@ router.put("/stopelection", async (req, res) => {
   //check if already participated and valid
   //parties particpate.inelection = false
 });
-
+ */
 router.get("/get/election/byid/:id", async (req, res) => {
   try {
     const election = await Election.findOne({ _id: req.params.id }).populate({
