@@ -61,8 +61,11 @@ const ElectionCreation = () => {
                 items: poolNameList
             }
             try {
-                console.log("clicked1", dataToSend)
-    
+                // console.log("clicked1", dataToSend)
+
+                if(!poolNameList.length){
+                    return alert("Pool Items SHould Not be Empty")
+                }
                 const { data } = await axios.post(url + "/createpoll", dataToSend)
                 console.log("res.data=======", data.election)
                 if (data.election) {
@@ -100,103 +103,30 @@ const ElectionCreation = () => {
     // console.log("approvedPartiesapprovedParties",approvedParties)
     // console.log("start timeeee", startDate)
     // console.log("end Dateeee", endDate)
+    const getElections =async () => {
+        try {
+            const { data } = await axios.get(url + "/get/election")
+            // console.log("data=============", data)
+            setElections(data)
+        } catch (error) {
+            // toast.error("There is some error in getting election")
+        }
+    }
     useEffect(() => {
-        (async () => {
-            try {
-                const { data } = await axios.get(url + "/get/election")
-                console.log("data=============", data)
-                setElections(data)
-            } catch (error) {
-                toast.error("There is some error in getting election")
-            }
-        })();
+        getElections();
+
     }, [])
+
+      useEffect(() => {
+        const interval = setInterval(() => {
+            getElections();
+          }, 60000)
+        return () => {
+          clearInterval(interval)
+        }
+      },[])
     return (
         <div className="container ">
-
-            <div className="d-flex justify-content-end">
-                <button className={`btn ${!createElection ? "btn-secondary" : "btn-danger"}`}
-                    onClick={() => setCreateElection(!createElection)}
-                >
-                    {createElection ? "Deny" : "Create"}
-
-                </button>
-            </div>
-            <div className="card">
-                <div className="card-header">Elections</div>
-                <div className="card-body">
-                    <div className="card mt-5">
-                        <div className="card-header">
-                            Elections in QUE
-                        </div>
-                        <div className="card-body">
-                            <div className="row">
-                                {elections?.map(el =>
-                                    new Date(Number(el.startTime)) > Date.now() &&
-                                        new Date(Number(el.endTime)) > Date.now() ? (
-                                        <div className="card bg-warning text-light col-md-4">
-                                            <div className="card-header">
-                                                Election Type : {el.electionType}
-                                            </div>
-                                            <div className="card-body">
-                                                <strong>Election Name</strong> : {el.electionName}
-                                            </div>
-                                        </div>
-                                    ) : null
-                                )}
-
-                            </div>
-                        </div>
-                    </div>
-                    <div className="card mt-5">
-                        <div className="card-header">
-                            Active Elections
-                        </div>
-                        <div className="card-body">
-                            <div className="row">
-                                {elections?.map(el =>
-                                    new Date(Number(el.startTime)) < Date.now() &&
-                                        new Date(Number(el.endTime)) > Date.now() ? (
-                                        <div className="card bg-success text-light col-md-4">
-                                            <div className="card-header">
-                                                Election Type : {el.electionType}
-                                            </div>
-                                            <div className="card-body">
-                                                <strong>Election Name</strong> : {el.electionName}
-                                            </div>
-                                        </div>
-                                    ) : null
-                                )}
-
-                            </div>
-                        </div>
-                    </div>
-                    <div className="card mt-5">
-                        <div className="card-header">
-                            Previos Elections
-                        </div>
-                        <div className="card-body">
-                            <div className="row">
-                                {elections?.map(el =>
-                                    Date.now() > new Date(Number(el.startTime)) &&
-                                        Date.now() > new Date(Number(el.endTime)) ? (
-                                        <div className="card bg-danger text-light col-md-4">
-                                            <div className="card-header">
-                                                Election Type : {el.electionType}
-                                            </div>
-                                            <div className="card-body">
-                                                <strong>Election Name</strong> : {el.electionName}
-                                            </div>
-                                        </div>
-                                    ) : null
-                                )}
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div className={`card mt-5 ${createElection ? "d-block" : "d-none"}`}>
                 <div className="card-header">Election Data</div>
                 <div className="card-body">
@@ -282,6 +212,7 @@ const ElectionCreation = () => {
                                     <div className="col-md-4">
                                         <button
                                             onClick={() => {
+                                                if(!poolName){return}
                                                 let obj = {item: {name: poolName}}
 
                                                 setPoolNameList([...poolNameList, obj])
@@ -313,6 +244,88 @@ const ElectionCreation = () => {
                                 className="btn btn-secondary">
                                 Done
                             </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="d-flex justify-content-end">
+                <button className={`btn ${!createElection ? "btn-secondary" : "btn-danger"}`}
+                    onClick={() => setCreateElection(!createElection)}
+                >
+                    {createElection ? "Deny" : "Create"}
+
+                </button>
+            </div>
+            <div className="card">
+                <div className="card-header">Elections</div>
+                <div className="card-body">
+                    <div className="card mt-5">
+                        <div className="card-header">
+                            Elections in QUE
+                        </div>
+                        <div className="card-body">
+                            <div className="row">
+                                {elections?.map(el =>
+                                    new Date(Number(el.startTime)) > Date.now() &&
+                                        new Date(Number(el.endTime)) > Date.now() ? (
+                                        <div className="card bg-warning text-light col-md-4">
+                                            <div className="card-header">
+                                                Election Type : {el.electionType}
+                                            </div>
+                                            <div className="card-body">
+                                                <strong>Election Name</strong> : {el.electionName}
+                                            </div>
+                                        </div>
+                                    ) : null
+                                )}
+
+                            </div>
+                        </div>
+                    </div>
+                    <div className="card mt-5">
+                        <div className="card-header">
+                            Active Elections
+                        </div>
+                        <div className="card-body">
+                            <div className="row">
+                                {elections?.map(el =>
+                                    new Date(Number(el.startTime)) < Date.now() &&
+                                        new Date(Number(el.endTime)) > Date.now() ? (
+                                        <div className="card bg-success text-light col-md-4">
+                                            <div className="card-header">
+                                                Election Type : {el.electionType}
+                                            </div>
+                                            <div className="card-body">
+                                                <strong>Election Name</strong> : {el.electionName}
+                                            </div>
+                                        </div>
+                                    ) : null
+                                )}
+
+                            </div>
+                        </div>
+                    </div>
+                    <div className="card mt-5">
+                        <div className="card-header">
+                            Previos Elections
+                        </div>
+                        <div className="card-body">
+                            <div className="row">
+                                {elections?.map(el =>
+                                    Date.now() > new Date(Number(el.startTime)) &&
+                                        Date.now() > new Date(Number(el.endTime)) ? (
+                                        <div className="card bg-danger text-light col-md-4">
+                                            <div className="card-header">
+                                                Election Type : {el.electionType}
+                                            </div>
+                                            <div className="card-body">
+                                                <strong>Election Name</strong> : {el.electionName}
+                                            </div>
+                                        </div>
+                                    ) : null
+                                )}
+
+                            </div>
                         </div>
                     </div>
                 </div>

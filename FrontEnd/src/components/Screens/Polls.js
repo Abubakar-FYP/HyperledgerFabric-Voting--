@@ -16,7 +16,7 @@ const Polls = () => {
       setActivePolls(data.message);
     } catch (error) {
       console.log("error from active polls", error.message);
-      toast.error("No current Active Polls are available");
+      // toast.error("No current Active Polls are available");
     }
   };
   const getEndedPolls = async () => {
@@ -27,7 +27,7 @@ const Polls = () => {
       setEndedPolls(data);
     } catch (error) {
       console.log("error from ended polls", error.message);
-      toast.error("there is an error in getting previous polls");
+      // toast.error("there is an error in getting previous polls");
     }
   };
   const getAllPolls = async () => {
@@ -38,16 +38,25 @@ const Polls = () => {
       setAllPolls(data.message);
     } catch (error) {
       console.log("error from all polls", error.message);
-      toast.error("there is an error in getting all polls");
+      // toast.error("there is an error in getting all polls");
     }
   };
 
   useEffect(() => {
-    getAllPolls();
     getActivePolls();
+    getAllPolls();
     getEndedPolls();
   }, []);
 
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getActivePolls();
+    }, 60000)
+    return () => {
+      clearInterval(interval)
+    }
+  },[])
   return (
     <div className="container">
       <div className="card">
