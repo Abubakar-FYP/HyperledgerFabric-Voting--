@@ -10,6 +10,7 @@ require("../Models/ballot");
 require("../Models/party");
 require("../Models/candidate");
 require("../Models/election");
+require("../Models/nadra");
 
 const Voter = mongoose.model("Voter");
 const Ballot = mongoose.model("Ballot");
@@ -17,6 +18,7 @@ const Party = mongoose.model("Party");
 const Candidate = mongoose.model("Candidate");
 const Election = mongoose.model("Election");
 const Campaign = mongoose.model("Campaign");
+const Nadra = mongoose.model("Nadra");
 
 router.post("/vote/:voter/:candidate", async (req, res) => {
   try {
@@ -102,55 +104,70 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
         candidate.voteCount = candidate.voteCount + 1;
         candidate.voters.push(req.params.voter);
 
-        /* 
+        const nadraVoter = await Nadra.findOne({
+          cnic: req.params.voter,
+        })
+          .select("name")
+          .catch((err) => {
+            console.log(err);
+            return res
+              .status(400)
+              .json({ message: "There was an error finding nadra voter" });
+          });
+
+        const nadraCandidate = await Nadra.findOne({
+          cnic: req.params.candidate,
+        })
+          .select("name")
+          .catch((err) => {
+            console.log(err);
+            return res
+              .status(400)
+              .json({ message: "There was an error finding nadra candidate" });
+          });
 
         try {
-
-          const url = 'http://localhost:5000/channels/pev/chaincodes/transaction'
+          const url =
+            "http://localhost:5000/channels/pev/chaincodes/transaction";
           const body = {
-            "func":"castElectionVote",
-            "chaincodeName" : "transaction",
-            "channelName" : "pev",
-            "args" : [req.params.voter,req.params.candidate]
-        }
+            func: "castElectionVote",
+            chaincodeName: "transaction",
+            channelName: "pev",
+            args: [nadraVoter.name, nadraCandidate.name],
+          };
 
-        const voteResponse = await Axios.post(url,body, {
-          headers: {
-          'Authorization': "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjM2MDAwMDAwMDE2NDc2NTcwMDAsInVzZXJuYW1lIjoiYWJ1YmFrYXIiLCJvcmdOYW1lIjoiUEVWMSIsImlhdCI6MTY0NzY1NzE0M30.pGcVU3nj9uTGHsL_MXsLZJAz2wHj4I0kOQwWC33oqLY" 
+          const voteResponse = await Axios.post(url, body, {
+            headers: {
+              Authorization:
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjM2MDAwMDAwMDE2NDc2NTcwMDAsInVzZXJuYW1lIjoiYWJ1YmFrYXIiLCJvcmdOYW1lIjoiUEVWMSIsImlhdCI6MTY0NzY1NzE0M30.pGcVU3nj9uTGHsL_MXsLZJAz2wHj4I0kOQwWC33oqLY",
+            },
+          });
+
+          if (voteResponse.status === 200) {
+            await voter.save().catch((err) => {
+              console.log(err);
+            });
+            await campaign.save().catch((err) => {
+              console.log(err);
+            });
+            await candidate.save().catch((err) => {
+              console.log(err);
+            });
+            await party.save().catch((err) => {
+              console.log(err);
+            });
+          } else {
+            res.status(500).json({
+              msg: "Somthing went wrong on blockchain",
+              status: false,
+            });
           }
-          }) 
-
-
-        if(voteResponse.status === 200){
-
-          await voter.save().catch((err) => {
-            console.log(err);
-          });
-          await campaign.save().catch((err) => {
-            console.log(err);
-          });
-          await candidate.save().catch((err) => {
-            console.log(err);
-          });
-          await party.save().catch((err) => {
-            console.log(err);
-          });
-
-        } else {
-          res.status(500).json({
-            msg: "Somthing went wrong on blockchain",
-            status: false
-          })
-        }
-
         } catch (error) {
-
           return res.status(500).json({
             msg: error,
-            status: false
-          })
-          
-        } */
+            status: false,
+          });
+        }
 
         //API call blockchain save data
 
