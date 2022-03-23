@@ -113,7 +113,46 @@ const PollResult = ({ match }) => {
                          </div>
                      </div>
                         ): 
+                        <>
                         <h1 className='alert alert-danger'>Poll Draw</h1>
+                        {
+                            onePoll.items.map((item, index) => 
+                            <div 
+                            key={item._id} 
+                            className={`card bg-${
+                           !item.item.voteCount ? 
+                            "danger" : index === 0  && 
+                            item.item.voteCount ? "success" : "primary"
+                            } text-light mx-3`} 
+                            style={{width: "20%"}}
+                            >
+                            <div className='card-header'>Poll Item</div>
+                            <div className='card-body'>
+                                {index === 0 && item.item.voteCount ? 
+                                    <p className='col-12 float-left'>
+                                    <span className='' style={{ fontSize: "30px" }}> Winner Candidate
+                                    </span>
+                                </p>
+                                : null
+                                }
+                                <p className='col-12 float-left'>
+                                    <span className='' style={{ fontSize: "20px" }}> Name :
+                                    </span>
+   
+                                    {item.item.name}
+                                </p>
+   
+                                <p className='col-12 float-left'>
+                                    <span className='' style={{ fontSize: "20px" }}> Vote Count :
+                                    </span>
+   
+                                    {item.item.voteCount}
+                                </p>
+                            </div>
+                        </div>
+                           )
+                        }
+                        </>
                         }
                     </div>
                 </div>
