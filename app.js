@@ -81,6 +81,8 @@ const serverNumber = process.env.PORT || 1970;
 
 ///////MongoDB connection/////////////////////
 
+const serverDebuger = require("debug")("app:server");
+
 mongoose.connect(MONGOURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -89,6 +91,9 @@ mongoose.connect(MONGOURI, {
 
 mongoose.connection.on("connected", () => {
   console.log("Successfully made a connection with MONGO");
+  app.listen(serverNumber, () => {
+    serverDebuger(`connected to ${serverNumber}`);
+  });
 });
 
 mongoose.connection.on("error", (err) => {
@@ -120,11 +125,6 @@ app.get("/", (req, res) => {
   res.send("home");
 });
 
-const serverDebuger = require("debug")("app:server");
-app.listen(serverNumber, () => {
-  serverDebuger(`connected to ${serverNumber}`);
-});
-
 //stopping Election
 cron.schedule("*/15 * * * * *", async () => {
   console.log("Stopping Election");
@@ -138,26 +138,21 @@ cron.schedule("*/15 * * * * *", async () => {
         return console.log(err);
       });
 
-    console.log(elections);
-
     let check1 = false; //checks if the current election has ended or not
 
     elections.map(async (election) => {
-      console.log(
-        election.valid == true && Number(Date.now()) >= Number(election.endTime)
-      );
       if (
         Number(Date.now()) >= Number(election.endTime) &&
         election.valid == true
       ) {
+        console.log(
+          election.valid == true &&
+            Number(Date.now()) >= Number(election.endTime)
+        );
         election.valid = false;
         //checks if election has ended
         election.parties.map(async (party) => {
-          console.log(party);
           if (party.participate.inelection == true) {
-            console.log("running currently");
-            check1 = true;
-
             //if election has ended, then set party to not participate in any election
             const updateParty = await Party.findOne({ _id: party._id });
             updateParty.participate.inelection = false;
@@ -166,11 +161,11 @@ cron.schedule("*/15 * * * * *", async () => {
             });
           }
         });
-      }
-      if (check1 == true)
         await election.save().catch((err) => {
           console.log(err);
         });
+        check1 = true;
+      }
     });
     //check for election end
     if (check1 == false) {
