@@ -395,7 +395,7 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
 
         let check6 = false; //checks if item is present or not
         poll.voters.push(req.params.v_id); //pushes voter id,into poll
-
+        let itemVoted = null;
         poll.items.map((item) => {
           console.log(item.item._id, req.params.i_id);
           if (item._id == req.params.i_id) {
@@ -420,12 +420,13 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
         //API blockchain data save
 
         try {
-          const url = "http://localhost:5000/channels/pev/chaincodes/transaction";
+          const url =
+            "http://localhost:5000/channels/pev/chaincodes/transaction";
           const body = {
             func: "castPollVote",
             chaincodeName: "transaction",
             channelName: "pev",
-            args: [req.params.v_id, req.params.i_id, req.params.p_id],
+            args: [poller.email, poller.pollitem, poll.pollname],
           };
 
           const pollResponse = await Axios.post(url, body, {
@@ -434,9 +435,8 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
                 "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjM2MDAwMDAwMDE2NDc2NTcwMDAsInVzZXJuYW1lIjoiYWJ1YmFrYXIiLCJvcmdOYW1lIjoiUEVWMSIsImlhdCI6MTY0NzY1NzE0M30.pGcVU3nj9uTGHsL_MXsLZJAz2wHj4I0kOQwWC33oqLY",
             },
           });
-                console.log("Hellp Poll Response here ------------->",pollResponse);
+          console.log("Hellp Poll Response here ------------->", pollResponse);
           if (pollResponse.status === 200) {
-          
             console.log("I am here ----------------->");
             await poll
               .save()
@@ -460,8 +460,8 @@ router.post("/votepoll/:p_id/:v_id/:i_id", async (req, res) => {
             });
           }
         } catch (error) {
-          console.log("Error Displaying ------------>", error)
-         return res.status(500).json({
+          console.log("Error Displaying ------------>", error);
+          return res.status(500).json({
             msg: error,
             status: false,
           });
