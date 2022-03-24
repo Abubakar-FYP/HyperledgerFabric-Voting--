@@ -40,7 +40,7 @@ const NavBar = () => {
         <li><Link to="/" style={{ listStyle: "none", textDecoration: "none" }}
           className="text-light">Home</Link></li>
 
-        {user && user?.doc?.role === "Voter" ? (
+        {user && user?.doc?.role === "admin" ? (
           <>
           <li><Link to="/partiesstatus" style={{ listStyle: "none", textDecoration: "none" }}
             className="text-light">Parties Status</Link></li>
