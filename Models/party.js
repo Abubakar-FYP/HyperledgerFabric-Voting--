@@ -25,14 +25,14 @@ const partySchema = new Schema({
 
   candidate: [
     {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Candidate",
     },
   ],
 
   voters: [
     {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Voter",
     },
   ],
@@ -51,7 +51,7 @@ const partySchema = new Schema({
   participate: {
     election: [
       {
-        type: mongoose.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Election",
         default: null,
       },

@@ -296,8 +296,8 @@ router.post("/signin/poller", async (req, res) => {
     let latestPoll;
     _polls.map((poll) => {
       if (
-        Number(new Date()) >= Number(poll.startTime) &&
-        Number(new Date()) <= Number(poll.endTime)
+        Date.now() >= Number(poll.startTime) &&
+        Date.now() <= Number(poll.endTime)
       ) {
         latestPoll = poll;
       }

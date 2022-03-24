@@ -7,23 +7,109 @@ require("../Models/party");
 require("../Models/election");
 require("../Models/ballot");
 require("../Models/voter");
-//
+
+const Candidate = mongoose.model("Candidate");
 const Party = mongoose.model("Party");
 const Election = mongoose.model("Election");
 const Ballot = mongoose.model("Ballot");
 const Voter = mongoose.model("Voter");
+const Campaign = mongoose.model("Campaign");
+const Nadra = mongoose.model("Nadra");
 const ElectionLedger = mongoose.model("ElectionLedger");
 
 router.post("/create/election", async (req, res) => {
   try {
     // destructure the req.body
-    const voters = await Voter.find({});
 
-    console.log("req bod=================", req.body);
+    const campaign = await Campaign.find({}).catch((err) => {
+      return console.log(err.message);
+    });
+    const party = await Party.find({}).catch((err) => {
+      return console.log(err.message);
+    });
+    const candidate = await Candidate.find({}).catch((err) => {
+      return console.log(err.message);
+    });
+    const nadra = await Nadra.find({}).catch((err) => {
+      return console.log(err.message);
+    });
+    const elections = await Election.find({})
+      .populate({
+        path: "parties",
+        select: "-partyImg",
+      })
+      .catch((err) => {
+        return console.log(err);
+      });
+
+    const voters = await Voter.find({}).catch((err) => {
+      return console.log(err);
+    });
+    const ballots = await Ballot.find({}).catch((err) => {
+      return console.log(err);
+    });
+
+    try {
+      await Election.updateMany({});
+      console.log("Through here");
+      const newElectionLedger = new ElectionLedger({
+        election: elections[elections.length - 1],
+        voter: voters,
+        ballot: ballots,
+        campaign: campaign,
+        party: party,
+        candidate: candidate,
+        nadra: nadra,
+      }); //gets all data into object
+
+      await Voter.updateMany({ voteflag: true }, { voteflag: false }).then(
+        () => {
+          console.log("voter's vote flag reset");
+        }
+      );
+
+      await newElectionLedger
+        .save()
+        .then(() => {
+          console.log("ledger saved");
+        })
+        .catch((err) => {
+          console.log(err.message);
+        }); //save data for ledger
+
+      //  console.log(newElectionLedger);
+
+      //set the votecount of all models to 0 when reseting
+      await Campaign.updateMany({}, { voteCounts: [] }).catch((err) => {
+        console.log(err.message);
+      });
+
+      //wipe out all candidates and parties at the end of election
+      //new will be created at the start of new election
+      await Candidate.deleteMany().catch((err) => {
+        console.log(err.message);
+      });
+
+      await Party.deleteMany().catch((err) => {
+        console.log(err.message);
+      });
+
+      //Delete all ballot candidates
+      console.log("DELETING BALLOT CANDIDATES");
+      ballots.map(async (ballot) => {
+        ballot.candidate = [];
+        await ballot.save().catch((err) => {
+          console.log(err);
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    }
+
     const { electionName, startTime, endTime, electionType, candidates } =
       req.body;
 
-    if ((!electionName, !startTime, !endTime, !electionType)) {
+    if (!electionName || !startTime || !endTime || !electionType) {
       return res.status(400).send("One or more fields are not present");
     }
 
@@ -39,8 +125,6 @@ router.post("/create/election", async (req, res) => {
       });
     }
 
-    const elections = await Election.find({}).lean();
-
     let check1 = false; //checks for current
     let check2 = false; //checks for future
     if (elections) {
@@ -52,7 +136,7 @@ router.post("/create/election", async (req, res) => {
           check1 = true;
         } //checks for any running elections or a single election
 
-        if (Number(new Date()) < Number(election.startTime)) {
+        if (Date() < Number(election.startTime)) {
           check2 = true;
         } //checks for any elections that are about to start in future
       });
@@ -132,7 +216,7 @@ router.post("/create/election", async (req, res) => {
       res.status(400).send(error.message);
     } */
 
-    res.send({ election });
+    res.status(200).send({ election });
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -387,6 +471,11 @@ router.get("/get/previoussingleelection/:e_id", async (req, res) => {
   } catch (err) {
     console.log(err.message);
   }
+});
+
+router.get("/testElection", async (req, res) => {
+  const elections = await Election.find().populate("parties");
+  res.status(200).json({ message: elections[elections.length - 1] });
 });
 
 module.exports = router;

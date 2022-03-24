@@ -31,8 +31,8 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
       console.log(Number(new Date()), election.startTime);
       console.log(Number(new Date()), election.endTime);
       if (
-        Number(new Date()) >= election.startTime &&
-        Number(new Date()) <= election.endTime &&
+        Date.now() >= Number(election.startTime) &&
+        Date.now() <= Number(election.endTime) &&
         election.valid == true
       ) {
         check1 = true;
@@ -126,7 +126,7 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
               .json({ message: "There was an error finding nadra candidate" });
           });
 
-        try {
+        /* try {
           const url =
             "http://localhost:5000/channels/pev/chaincodes/transaction";
           const body = {
@@ -167,7 +167,7 @@ router.post("/vote/:voter/:candidate", async (req, res) => {
             msg: error,
             status: false,
           });
-        }
+        } */
 
         //API call blockchain save data
 

@@ -39,7 +39,7 @@ const pollsSchema = new mongoose.Schema({
 
   voters: [
     {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Voters",
     },
   ],

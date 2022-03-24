@@ -17,7 +17,7 @@ const pollerSchema = new mongoose.Schema({
   },
   pollvote: [
     {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Polls",
       default: null,
     },

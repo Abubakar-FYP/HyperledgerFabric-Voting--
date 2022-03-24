@@ -212,20 +212,20 @@ router.post("/createparty", async (req, res) => {
         console.log("election startTime===>", election.startTime);
         // this is good
         if (
-          Number(new Date()) >= Number(election.startTime) &&
-          Number(new Date()) <= Number(election.endTime)
+          Date.now() >= Number(election.startTime) &&
+          Date.now() <= Number(election.endTime)
         ) {
           check8 = true;
         } //checks for any running elections or a single election
 
-        if (Number(new Date()) < Number(election.startTime)) {
+        if (Date.now() < Number(election.startTime)) {
           check9 = true;
           newParty.participate.election.push(election._id);
           newParty.participate.inelection = true;
         } //checks for any elections that are about to start in future
         //console.log("new Date",Number(new Date),"end tIME",Number(election.endTime))
 
-        if (Number(new Date()) < Number(election.endTime)) {
+        if (Date.now() < Number(election.endTime)) {
           check10 = true;
           election.parties.push(newParty._id);
           //pushes party id into election

@@ -16,13 +16,13 @@ const ballotSchema = new mongoose.Schema({
   },
 
   campaignId: {
-    type: mongoose.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Campaign",
   },
 
   candidate: [
     {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Candidate",
       default: null,
     },

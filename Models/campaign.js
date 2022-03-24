@@ -12,7 +12,7 @@ const campaign = new Schema({
 
   ballotId: [
     {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Ballot",
       default: null,
     },
