@@ -305,20 +305,6 @@ router.post("/createparty", async (req, res) => {
       ballots.map(async (ballot) => {
         //good
         console.log("item===>", item); //req candidate object
-        // console.log("value===>", ballot._id, newCandidate.ballotId);
-
-        /* console.log(
-          "typeof===>",
-          typeof ballot.ballotid,
-          typeof Number(newCandidate.ballotId)
-        );
-
-        console.log(
-          "comparision===>",
-          ballot.ballotid == Number(newCandidate.ballotId),
-          ballot.ballotid,
-          Number(newCandidate.ballotId)
-        ); */
 
         if (ballot.ballotid == item.ballotid) {
           // console.log("matched===>");
