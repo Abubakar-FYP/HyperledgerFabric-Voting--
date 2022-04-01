@@ -1,7 +1,0 @@
-node_modules/
-Keys/
-
-.dockerignore
-.gitignore
-.env
-Dockerfile
